@@ -9,8 +9,8 @@ devDependencies:
     specifier: ^2.2.5
     version: 2.2.5
   '@metaplex-foundation/kinobi':
-    specifier: ^0.17.4
-    version: 0.17.7(fastestsmallesttextencoderdecoder@1.0.22)
+    specifier: ^0.17.8
+    version: 0.17.8(fastestsmallesttextencoderdecoder@1.0.22)
   '@metaplex-foundation/shank-js':
     specifier: ^0.1.7
     version: 0.1.7
@@ -27,8 +27,8 @@ packages:
     resolution: {integrity: sha512-trnsAYxU3xnS1gPHPyU961coFyLkh4gAD/0zQ5mymY4yOZ+CYvsPqUbOFSw0aDM4y0tV7tiFxL/1XfXPNC6IPg==}
     dev: true
 
-  /@metaplex-foundation/kinobi@0.17.7(fastestsmallesttextencoderdecoder@1.0.22):
-    resolution: {integrity: sha512-cfx33zB/a0WH4q9ECoIIEGY3xmQZnmCQThz0oEqUZQ3755DIAv+WwHz3smTvKCLgNj2zchZ45O0xggo/egf1sA==}
+  /@metaplex-foundation/kinobi@0.17.8(fastestsmallesttextencoderdecoder@1.0.22):
+    resolution: {integrity: sha512-MPtUzxox+asyD3ut6hXyLJkcW/XbFCVFzWGyY9IH/ghdfUGwbFZcHXHRXiqOssKS5y1+tw6+5byCCCiswYoVlw==}
     dependencies:
       '@noble/hashes': 1.3.3
       '@solana/codecs-strings': 2.0.0-experimental.a157265(fastestsmallesttextencoderdecoder@1.0.22)

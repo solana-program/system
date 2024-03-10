@@ -6,12 +6,16 @@
  * @see https://github.com/metaplex-foundation/kinobi
  */
 
-import { Codec, Decoder, Encoder, combineCodec } from '@solana/codecs-core';
 import {
+  Codec,
+  Decoder,
+  Encoder,
+  combineCodec,
   getScalarEnumDecoder,
   getScalarEnumEncoder,
-} from '@solana/codecs-data-structures';
-import { getU32Decoder, getU32Encoder } from '@solana/codecs-numbers';
+  getU32Decoder,
+  getU32Encoder,
+} from '@solana/codecs';
 
 export enum NonceState {
   Uninitialized,

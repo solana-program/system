@@ -16,13 +16,12 @@ import {
   Decoder,
   Encoder,
   combineCodec,
-  mapEncoder,
-} from '@solana/codecs-core';
-import {
   getStructDecoder,
   getStructEncoder,
-} from '@solana/codecs-data-structures';
-import { getU32Decoder, getU32Encoder } from '@solana/codecs-numbers';
+  getU32Decoder,
+  getU32Encoder,
+  mapEncoder,
+} from '@solana/codecs';
 import {
   AccountRole,
   IAccountMeta,
