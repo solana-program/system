@@ -16,7 +16,7 @@ import {
   signAndSendTransaction,
 } from './_setup';
 
-test('it can transfer SOL from one account to another', async (t) => {
+test('it transfers SOL from one account to another', async (t) => {
   // Given a source account with 3 SOL and a destination account with no SOL.
   const client = createDefaultSolanaClient();
   const source = await generateKeyPairSignerWithSol(client, 3_000_000_000n);
@@ -43,7 +43,7 @@ test('it can transfer SOL from one account to another', async (t) => {
   t.is(await getBalance(client, destination), lamports(1_000_000_000n));
 });
 
-test('it can parse the accounts and data of an existing transfer SOL instruction', async (t) => {
+test('it parses the accounts and the data of an existing transfer SOL instruction', async (t) => {
   // Given a transfer SOL instruction with the following accounts and data.
   const source = await generateKeyPairSigner();
   const destination = (await generateKeyPairSigner()).address;

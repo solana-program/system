@@ -12,6 +12,7 @@ import {
   fetchNonce,
   getCreateAccountInstruction,
   getInitializeNonceAccountInstruction,
+  getNonceSize,
 } from '../src';
 import {
   createDefaultSolanaClient,
@@ -20,7 +21,7 @@ import {
   signAndSendTransaction,
 } from './_setup';
 
-test('it can create and initialize a durable nonce account', async (t) => {
+test('it creates and initialize a durable nonce account', async (t) => {
   // Given some brand now payer, authority, and nonce KeyPairSigners.
   const client = createDefaultSolanaClient();
   const payer = await generateKeyPairSignerWithSol(client);
@@ -28,12 +29,13 @@ test('it can create and initialize a durable nonce account', async (t) => {
   const nonceAuthority = await generateKeyPairSigner();
 
   // When we use them to create and initialize a nonce account.
-  const rent = await client.rpc.getMinimumBalanceForRentExemption(80n).send();
+  const space = BigInt(getNonceSize());
+  const rent = await client.rpc.getMinimumBalanceForRentExemption(space).send();
   const createAccount = getCreateAccountInstruction({
     payer,
     newAccount: nonce,
     lamports: rent,
-    space: 80,
+    space,
     programAddress: SYSTEM_PROGRAM_ADDRESS,
   });
   const initializeNonceAccount = getInitializeNonceAccountInstruction({

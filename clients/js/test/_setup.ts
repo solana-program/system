@@ -9,6 +9,7 @@ import {
   SolanaRpcSubscriptionsApi,
   TransactionSigner,
   airdropFactory,
+  appendTransactionInstruction,
   createSolanaRpc,
   createSolanaRpcSubscriptions,
   createTransaction,
@@ -21,6 +22,12 @@ import {
   setTransactionLifetimeUsingBlockhash,
   signTransactionWithSigners,
 } from '@solana/web3.js';
+import {
+  SYSTEM_PROGRAM_ADDRESS,
+  getCreateAccountInstruction,
+  getInitializeNonceAccountInstruction,
+  getNonceSize,
+} from '../src';
 
 type Client = {
   rpc: Rpc<SolanaRpcApi>;
@@ -76,3 +83,30 @@ export const signAndSendTransaction = async (
 export const getBalance = async (client: Client, address: Address) =>
   (await client.rpc.getBalance(address, { commitment: 'confirmed' }).send())
     .value;
+
+export const createNonceAccount = async (
+  client: Client,
+  payer: TransactionSigner,
+  nonce: TransactionSigner,
+  nonceAuthority: TransactionSigner
+) => {
+  const space = BigInt(getNonceSize());
+  const rent = await client.rpc.getMinimumBalanceForRentExemption(space).send();
+  const createAccount = getCreateAccountInstruction({
+    payer,
+    newAccount: nonce,
+    lamports: rent,
+    space,
+    programAddress: SYSTEM_PROGRAM_ADDRESS,
+  });
+  const initializeNonceAccount = getInitializeNonceAccountInstruction({
+    nonceAccount: nonce.address,
+    nonceAuthority: nonceAuthority.address,
+  });
+  await pipe(
+    await createDefaultTransaction(client, payer),
+    (tx) => appendTransactionInstruction(createAccount, tx),
+    (tx) => appendTransactionInstruction(initializeNonceAccount, tx),
+    (tx) => signAndSendTransaction(client, tx)
+  );
+};
