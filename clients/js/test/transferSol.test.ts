@@ -7,14 +7,17 @@ import {
   pipe,
 } from '@solana/web3.js';
 import test from 'ava';
-import { getTransferSolInstruction, parseTransferSolInstruction } from '../src';
+import {
+  getTransferSolInstruction,
+  parseTransferSolInstruction,
+} from '../src/index.js';
 import {
   createDefaultSolanaClient,
   createDefaultTransaction,
   generateKeyPairSignerWithSol,
   getBalance,
   signAndSendTransaction,
-} from './_setup';
+} from './_setup.js';
 
 test('it transfers SOL from one account to another', async (t) => {
   // Given a source account with 3 SOL and a destination account with no SOL.

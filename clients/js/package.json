@@ -1,11 +1,12 @@
 {
   "name": "@solana-program/system",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "JavaScript client for the System program",
   "sideEffects": false,
   "module": "./dist/src/index.mjs",
   "main": "./dist/src/index.js",
   "types": "./dist/types/src/index.d.ts",
+  "type": "module",
   "exports": {
     ".": {
       "types": "./dist/types/src/index.d.ts",

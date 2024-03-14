@@ -27,7 +27,7 @@ import {
   getCreateAccountInstruction,
   getInitializeNonceAccountInstruction,
   getNonceSize,
-} from '../src';
+} from '../src/index.js';
 
 type Client = {
   rpc: Rpc<SolanaRpcApi>;

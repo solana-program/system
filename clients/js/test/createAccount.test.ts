@@ -5,13 +5,16 @@ import {
   pipe,
 } from '@solana/web3.js';
 import test from 'ava';
-import { SYSTEM_PROGRAM_ADDRESS, getCreateAccountInstruction } from '../src';
+import {
+  SYSTEM_PROGRAM_ADDRESS,
+  getCreateAccountInstruction,
+} from '../src/index.js';
 import {
   createDefaultSolanaClient,
   createDefaultTransaction,
   generateKeyPairSignerWithSol,
   signAndSendTransaction,
-} from './_setup';
+} from './_setup.js';
 
 test('it creates a new empty account', async (t) => {
   // Given we have a newly generated account keypair to create with 42 bytes of space.
