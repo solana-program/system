@@ -35,7 +35,7 @@ import {
 export type UpgradeNonceAccountInstruction<
   TProgram extends string = '11111111111111111111111111111111',
   TAccountNonceAccount extends string | IAccountMeta<string> = string,
-  TRemainingAccounts extends Array<IAccountMeta<string>> = []
+  TRemainingAccounts extends Array<IAccountMeta<string>> = [],
 > = IInstruction<TProgram> &
   IInstructionWithData<Uint8Array> &
   IInstructionWithAccounts<
@@ -43,14 +43,14 @@ export type UpgradeNonceAccountInstruction<
       TAccountNonceAccount extends string
         ? WritableAccount<TAccountNonceAccount>
         : TAccountNonceAccount,
-      ...TRemainingAccounts
+      ...TRemainingAccounts,
     ]
   >;
 
 export type UpgradeNonceAccountInstructionWithSigners<
   TProgram extends string = '11111111111111111111111111111111',
   TAccountNonceAccount extends string | IAccountMeta<string> = string,
-  TRemainingAccounts extends Array<IAccountMeta<string>> = []
+  TRemainingAccounts extends Array<IAccountMeta<string>> = [],
 > = IInstruction<TProgram> &
   IInstructionWithData<Uint8Array> &
   IInstructionWithAccounts<
@@ -58,7 +58,7 @@ export type UpgradeNonceAccountInstructionWithSigners<
       TAccountNonceAccount extends string
         ? WritableAccount<TAccountNonceAccount>
         : TAccountNonceAccount,
-      ...TRemainingAccounts
+      ...TRemainingAccounts,
     ]
   >;
 
@@ -92,26 +92,26 @@ export type UpgradeNonceAccountInput<TAccountNonceAccount extends string> = {
 };
 
 export type UpgradeNonceAccountInputWithSigners<
-  TAccountNonceAccount extends string
+  TAccountNonceAccount extends string,
 > = {
   nonceAccount: Address<TAccountNonceAccount>;
 };
 
 export function getUpgradeNonceAccountInstruction<
   TAccountNonceAccount extends string,
-  TProgram extends string = '11111111111111111111111111111111'
+  TProgram extends string = '11111111111111111111111111111111',
 >(
   input: UpgradeNonceAccountInputWithSigners<TAccountNonceAccount>
 ): UpgradeNonceAccountInstructionWithSigners<TProgram, TAccountNonceAccount>;
 export function getUpgradeNonceAccountInstruction<
   TAccountNonceAccount extends string,
-  TProgram extends string = '11111111111111111111111111111111'
+  TProgram extends string = '11111111111111111111111111111111',
 >(
   input: UpgradeNonceAccountInput<TAccountNonceAccount>
 ): UpgradeNonceAccountInstruction<TProgram, TAccountNonceAccount>;
 export function getUpgradeNonceAccountInstruction<
   TAccountNonceAccount extends string,
-  TProgram extends string = '11111111111111111111111111111111'
+  TProgram extends string = '11111111111111111111111111111111',
 >(input: UpgradeNonceAccountInput<TAccountNonceAccount>): IInstruction {
   // Program address.
   const programAddress =
@@ -143,7 +143,7 @@ export function getUpgradeNonceAccountInstruction<
 export function getUpgradeNonceAccountInstructionRaw<
   TProgram extends string = '11111111111111111111111111111111',
   TAccountNonceAccount extends string | IAccountMeta<string> = string,
-  TRemainingAccounts extends Array<IAccountMeta<string>> = []
+  TRemainingAccounts extends Array<IAccountMeta<string>> = [],
 >(
   accounts: {
     nonceAccount: TAccountNonceAccount extends string
@@ -169,7 +169,7 @@ export function getUpgradeNonceAccountInstructionRaw<
 
 export type ParsedUpgradeNonceAccountInstruction<
   TProgram extends string = '11111111111111111111111111111111',
-  TAccountMetas extends readonly IAccountMeta[] = readonly IAccountMeta[]
+  TAccountMetas extends readonly IAccountMeta[] = readonly IAccountMeta[],
 > = {
   programAddress: Address<TProgram>;
   accounts: {
@@ -180,7 +180,7 @@ export type ParsedUpgradeNonceAccountInstruction<
 
 export function parseUpgradeNonceAccountInstruction<
   TProgram extends string,
-  TAccountMetas extends readonly IAccountMeta[]
+  TAccountMetas extends readonly IAccountMeta[],
 >(
   instruction: IInstruction<TProgram> &
     IInstructionWithAccounts<TAccountMetas> &

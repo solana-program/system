@@ -42,7 +42,7 @@ export type AuthorizeNonceAccountInstruction<
   TProgram extends string = '11111111111111111111111111111111',
   TAccountNonceAccount extends string | IAccountMeta<string> = string,
   TAccountNonceAuthority extends string | IAccountMeta<string> = string,
-  TRemainingAccounts extends Array<IAccountMeta<string>> = []
+  TRemainingAccounts extends Array<IAccountMeta<string>> = [],
 > = IInstruction<TProgram> &
   IInstructionWithData<Uint8Array> &
   IInstructionWithAccounts<
@@ -53,7 +53,7 @@ export type AuthorizeNonceAccountInstruction<
       TAccountNonceAuthority extends string
         ? ReadonlySignerAccount<TAccountNonceAuthority>
         : TAccountNonceAuthority,
-      ...TRemainingAccounts
+      ...TRemainingAccounts,
     ]
   >;
 
@@ -61,7 +61,7 @@ export type AuthorizeNonceAccountInstructionWithSigners<
   TProgram extends string = '11111111111111111111111111111111',
   TAccountNonceAccount extends string | IAccountMeta<string> = string,
   TAccountNonceAuthority extends string | IAccountMeta<string> = string,
-  TRemainingAccounts extends Array<IAccountMeta<string>> = []
+  TRemainingAccounts extends Array<IAccountMeta<string>> = [],
 > = IInstruction<TProgram> &
   IInstructionWithData<Uint8Array> &
   IInstructionWithAccounts<
@@ -73,7 +73,7 @@ export type AuthorizeNonceAccountInstructionWithSigners<
         ? ReadonlySignerAccount<TAccountNonceAuthority> &
             IAccountSignerMeta<TAccountNonceAuthority>
         : TAccountNonceAuthority,
-      ...TRemainingAccounts
+      ...TRemainingAccounts,
     ]
   >;
 
@@ -115,7 +115,7 @@ export function getAuthorizeNonceAccountInstructionDataCodec(): Codec<
 
 export type AuthorizeNonceAccountInput<
   TAccountNonceAccount extends string,
-  TAccountNonceAuthority extends string
+  TAccountNonceAuthority extends string,
 > = {
   nonceAccount: Address<TAccountNonceAccount>;
   nonceAuthority: Address<TAccountNonceAuthority>;
@@ -124,7 +124,7 @@ export type AuthorizeNonceAccountInput<
 
 export type AuthorizeNonceAccountInputWithSigners<
   TAccountNonceAccount extends string,
-  TAccountNonceAuthority extends string
+  TAccountNonceAuthority extends string,
 > = {
   nonceAccount: Address<TAccountNonceAccount>;
   nonceAuthority: TransactionSigner<TAccountNonceAuthority>;
@@ -134,7 +134,7 @@ export type AuthorizeNonceAccountInputWithSigners<
 export function getAuthorizeNonceAccountInstruction<
   TAccountNonceAccount extends string,
   TAccountNonceAuthority extends string,
-  TProgram extends string = '11111111111111111111111111111111'
+  TProgram extends string = '11111111111111111111111111111111',
 >(
   input: AuthorizeNonceAccountInputWithSigners<
     TAccountNonceAccount,
@@ -148,7 +148,7 @@ export function getAuthorizeNonceAccountInstruction<
 export function getAuthorizeNonceAccountInstruction<
   TAccountNonceAccount extends string,
   TAccountNonceAuthority extends string,
-  TProgram extends string = '11111111111111111111111111111111'
+  TProgram extends string = '11111111111111111111111111111111',
 >(
   input: AuthorizeNonceAccountInput<
     TAccountNonceAccount,
@@ -162,7 +162,7 @@ export function getAuthorizeNonceAccountInstruction<
 export function getAuthorizeNonceAccountInstruction<
   TAccountNonceAccount extends string,
   TAccountNonceAuthority extends string,
-  TProgram extends string = '11111111111111111111111111111111'
+  TProgram extends string = '11111111111111111111111111111111',
 >(
   input: AuthorizeNonceAccountInput<
     TAccountNonceAccount,
@@ -209,7 +209,7 @@ export function getAuthorizeNonceAccountInstructionRaw<
   TProgram extends string = '11111111111111111111111111111111',
   TAccountNonceAccount extends string | IAccountMeta<string> = string,
   TAccountNonceAuthority extends string | IAccountMeta<string> = string,
-  TRemainingAccounts extends Array<IAccountMeta<string>> = []
+  TRemainingAccounts extends Array<IAccountMeta<string>> = [],
 >(
   accounts: {
     nonceAccount: TAccountNonceAccount extends string
@@ -244,7 +244,7 @@ export function getAuthorizeNonceAccountInstructionRaw<
 
 export type ParsedAuthorizeNonceAccountInstruction<
   TProgram extends string = '11111111111111111111111111111111',
-  TAccountMetas extends readonly IAccountMeta[] = readonly IAccountMeta[]
+  TAccountMetas extends readonly IAccountMeta[] = readonly IAccountMeta[],
 > = {
   programAddress: Address<TProgram>;
   accounts: {
@@ -256,7 +256,7 @@ export type ParsedAuthorizeNonceAccountInstruction<
 
 export function parseAuthorizeNonceAccountInstruction<
   TProgram extends string,
-  TAccountMetas extends readonly IAccountMeta[]
+  TAccountMetas extends readonly IAccountMeta[],
 >(
   instruction: IInstruction<TProgram> &
     IInstructionWithAccounts<TAccountMetas> &

@@ -46,7 +46,7 @@ export type InitializeNonceAccountInstruction<
   TAccountRentSysvar extends
     | string
     | IAccountMeta<string> = 'SysvarRent111111111111111111111111111111111',
-  TRemainingAccounts extends Array<IAccountMeta<string>> = []
+  TRemainingAccounts extends Array<IAccountMeta<string>> = [],
 > = IInstruction<TProgram> &
   IInstructionWithData<Uint8Array> &
   IInstructionWithAccounts<
@@ -60,7 +60,7 @@ export type InitializeNonceAccountInstruction<
       TAccountRentSysvar extends string
         ? ReadonlyAccount<TAccountRentSysvar>
         : TAccountRentSysvar,
-      ...TRemainingAccounts
+      ...TRemainingAccounts,
     ]
   >;
 
@@ -73,7 +73,7 @@ export type InitializeNonceAccountInstructionWithSigners<
   TAccountRentSysvar extends
     | string
     | IAccountMeta<string> = 'SysvarRent111111111111111111111111111111111',
-  TRemainingAccounts extends Array<IAccountMeta<string>> = []
+  TRemainingAccounts extends Array<IAccountMeta<string>> = [],
 > = IInstruction<TProgram> &
   IInstructionWithData<Uint8Array> &
   IInstructionWithAccounts<
@@ -87,7 +87,7 @@ export type InitializeNonceAccountInstructionWithSigners<
       TAccountRentSysvar extends string
         ? ReadonlyAccount<TAccountRentSysvar>
         : TAccountRentSysvar,
-      ...TRemainingAccounts
+      ...TRemainingAccounts,
     ]
   >;
 
@@ -130,7 +130,7 @@ export function getInitializeNonceAccountInstructionDataCodec(): Codec<
 export type InitializeNonceAccountInput<
   TAccountNonceAccount extends string,
   TAccountRecentBlockhashesSysvar extends string,
-  TAccountRentSysvar extends string
+  TAccountRentSysvar extends string,
 > = {
   nonceAccount: Address<TAccountNonceAccount>;
   recentBlockhashesSysvar?: Address<TAccountRecentBlockhashesSysvar>;
@@ -141,7 +141,7 @@ export type InitializeNonceAccountInput<
 export type InitializeNonceAccountInputWithSigners<
   TAccountNonceAccount extends string,
   TAccountRecentBlockhashesSysvar extends string,
-  TAccountRentSysvar extends string
+  TAccountRentSysvar extends string,
 > = {
   nonceAccount: Address<TAccountNonceAccount>;
   recentBlockhashesSysvar?: Address<TAccountRecentBlockhashesSysvar>;
@@ -153,7 +153,7 @@ export function getInitializeNonceAccountInstruction<
   TAccountNonceAccount extends string,
   TAccountRecentBlockhashesSysvar extends string,
   TAccountRentSysvar extends string,
-  TProgram extends string = '11111111111111111111111111111111'
+  TProgram extends string = '11111111111111111111111111111111',
 >(
   input: InitializeNonceAccountInputWithSigners<
     TAccountNonceAccount,
@@ -170,7 +170,7 @@ export function getInitializeNonceAccountInstruction<
   TAccountNonceAccount extends string,
   TAccountRecentBlockhashesSysvar extends string,
   TAccountRentSysvar extends string,
-  TProgram extends string = '11111111111111111111111111111111'
+  TProgram extends string = '11111111111111111111111111111111',
 >(
   input: InitializeNonceAccountInput<
     TAccountNonceAccount,
@@ -187,7 +187,7 @@ export function getInitializeNonceAccountInstruction<
   TAccountNonceAccount extends string,
   TAccountRecentBlockhashesSysvar extends string,
   TAccountRentSysvar extends string,
-  TProgram extends string = '11111111111111111111111111111111'
+  TProgram extends string = '11111111111111111111111111111111',
 >(
   input: InitializeNonceAccountInput<
     TAccountNonceAccount,
@@ -255,7 +255,7 @@ export function getInitializeNonceAccountInstructionRaw<
   TAccountRentSysvar extends
     | string
     | IAccountMeta<string> = 'SysvarRent111111111111111111111111111111111',
-  TRemainingAccounts extends Array<IAccountMeta<string>> = []
+  TRemainingAccounts extends Array<IAccountMeta<string>> = [],
 >(
   accounts: {
     nonceAccount: TAccountNonceAccount extends string
@@ -300,7 +300,7 @@ export function getInitializeNonceAccountInstructionRaw<
 
 export type ParsedInitializeNonceAccountInstruction<
   TProgram extends string = '11111111111111111111111111111111',
-  TAccountMetas extends readonly IAccountMeta[] = readonly IAccountMeta[]
+  TAccountMetas extends readonly IAccountMeta[] = readonly IAccountMeta[],
 > = {
   programAddress: Address<TProgram>;
   accounts: {
@@ -313,7 +313,7 @@ export type ParsedInitializeNonceAccountInstruction<
 
 export function parseInitializeNonceAccountInstruction<
   TProgram extends string,
-  TAccountMetas extends readonly IAccountMeta[]
+  TAccountMetas extends readonly IAccountMeta[],
 >(
   instruction: IInstruction<TProgram> &
     IInstructionWithAccounts<TAccountMetas> &

@@ -117,7 +117,7 @@ export function identifySystemInstruction(
 }
 
 export type ParsedSystemInstruction<
-  TProgram extends string = '11111111111111111111111111111111'
+  TProgram extends string = '11111111111111111111111111111111',
 > =
   | ({
       instructionType: SystemInstruction.CreateAccount;

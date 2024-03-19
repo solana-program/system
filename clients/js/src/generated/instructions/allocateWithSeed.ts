@@ -46,7 +46,7 @@ export type AllocateWithSeedInstruction<
   TProgram extends string = '11111111111111111111111111111111',
   TAccountNewAccount extends string | IAccountMeta<string> = string,
   TAccountBaseAccount extends string | IAccountMeta<string> = string,
-  TRemainingAccounts extends Array<IAccountMeta<string>> = []
+  TRemainingAccounts extends Array<IAccountMeta<string>> = [],
 > = IInstruction<TProgram> &
   IInstructionWithData<Uint8Array> &
   IInstructionWithAccounts<
@@ -57,7 +57,7 @@ export type AllocateWithSeedInstruction<
       TAccountBaseAccount extends string
         ? ReadonlySignerAccount<TAccountBaseAccount>
         : TAccountBaseAccount,
-      ...TRemainingAccounts
+      ...TRemainingAccounts,
     ]
   >;
 
@@ -65,7 +65,7 @@ export type AllocateWithSeedInstructionWithSigners<
   TProgram extends string = '11111111111111111111111111111111',
   TAccountNewAccount extends string | IAccountMeta<string> = string,
   TAccountBaseAccount extends string | IAccountMeta<string> = string,
-  TRemainingAccounts extends Array<IAccountMeta<string>> = []
+  TRemainingAccounts extends Array<IAccountMeta<string>> = [],
 > = IInstruction<TProgram> &
   IInstructionWithData<Uint8Array> &
   IInstructionWithAccounts<
@@ -77,7 +77,7 @@ export type AllocateWithSeedInstructionWithSigners<
         ? ReadonlySignerAccount<TAccountBaseAccount> &
             IAccountSignerMeta<TAccountBaseAccount>
         : TAccountBaseAccount,
-      ...TRemainingAccounts
+      ...TRemainingAccounts,
     ]
   >;
 
@@ -131,7 +131,7 @@ export function getAllocateWithSeedInstructionDataCodec(): Codec<
 
 export type AllocateWithSeedInput<
   TAccountNewAccount extends string,
-  TAccountBaseAccount extends string
+  TAccountBaseAccount extends string,
 > = {
   newAccount: Address<TAccountNewAccount>;
   baseAccount: Address<TAccountBaseAccount>;
@@ -143,7 +143,7 @@ export type AllocateWithSeedInput<
 
 export type AllocateWithSeedInputWithSigners<
   TAccountNewAccount extends string,
-  TAccountBaseAccount extends string
+  TAccountBaseAccount extends string,
 > = {
   newAccount: Address<TAccountNewAccount>;
   baseAccount: TransactionSigner<TAccountBaseAccount>;
@@ -156,7 +156,7 @@ export type AllocateWithSeedInputWithSigners<
 export function getAllocateWithSeedInstruction<
   TAccountNewAccount extends string,
   TAccountBaseAccount extends string,
-  TProgram extends string = '11111111111111111111111111111111'
+  TProgram extends string = '11111111111111111111111111111111',
 >(
   input: AllocateWithSeedInputWithSigners<
     TAccountNewAccount,
@@ -170,7 +170,7 @@ export function getAllocateWithSeedInstruction<
 export function getAllocateWithSeedInstruction<
   TAccountNewAccount extends string,
   TAccountBaseAccount extends string,
-  TProgram extends string = '11111111111111111111111111111111'
+  TProgram extends string = '11111111111111111111111111111111',
 >(
   input: AllocateWithSeedInput<TAccountNewAccount, TAccountBaseAccount>
 ): AllocateWithSeedInstruction<
@@ -181,7 +181,7 @@ export function getAllocateWithSeedInstruction<
 export function getAllocateWithSeedInstruction<
   TAccountNewAccount extends string,
   TAccountBaseAccount extends string,
-  TProgram extends string = '11111111111111111111111111111111'
+  TProgram extends string = '11111111111111111111111111111111',
 >(
   input: AllocateWithSeedInput<TAccountNewAccount, TAccountBaseAccount>
 ): IInstruction {
@@ -225,7 +225,7 @@ export function getAllocateWithSeedInstructionRaw<
   TProgram extends string = '11111111111111111111111111111111',
   TAccountNewAccount extends string | IAccountMeta<string> = string,
   TAccountBaseAccount extends string | IAccountMeta<string> = string,
-  TRemainingAccounts extends Array<IAccountMeta<string>> = []
+  TRemainingAccounts extends Array<IAccountMeta<string>> = [],
 >(
   accounts: {
     newAccount: TAccountNewAccount extends string
@@ -257,7 +257,7 @@ export function getAllocateWithSeedInstructionRaw<
 
 export type ParsedAllocateWithSeedInstruction<
   TProgram extends string = '11111111111111111111111111111111',
-  TAccountMetas extends readonly IAccountMeta[] = readonly IAccountMeta[]
+  TAccountMetas extends readonly IAccountMeta[] = readonly IAccountMeta[],
 > = {
   programAddress: Address<TProgram>;
   accounts: {
@@ -269,7 +269,7 @@ export type ParsedAllocateWithSeedInstruction<
 
 export function parseAllocateWithSeedInstruction<
   TProgram extends string,
-  TAccountMetas extends readonly IAccountMeta[]
+  TAccountMetas extends readonly IAccountMeta[],
 >(
   instruction: IInstruction<TProgram> &
     IInstructionWithAccounts<TAccountMetas> &

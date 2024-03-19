@@ -40,7 +40,7 @@ import {
 export type AssignInstruction<
   TProgram extends string = '11111111111111111111111111111111',
   TAccountAccount extends string | IAccountMeta<string> = string,
-  TRemainingAccounts extends Array<IAccountMeta<string>> = []
+  TRemainingAccounts extends Array<IAccountMeta<string>> = [],
 > = IInstruction<TProgram> &
   IInstructionWithData<Uint8Array> &
   IInstructionWithAccounts<
@@ -48,14 +48,14 @@ export type AssignInstruction<
       TAccountAccount extends string
         ? WritableSignerAccount<TAccountAccount>
         : TAccountAccount,
-      ...TRemainingAccounts
+      ...TRemainingAccounts,
     ]
   >;
 
 export type AssignInstructionWithSigners<
   TProgram extends string = '11111111111111111111111111111111',
   TAccountAccount extends string | IAccountMeta<string> = string,
-  TRemainingAccounts extends Array<IAccountMeta<string>> = []
+  TRemainingAccounts extends Array<IAccountMeta<string>> = [],
 > = IInstruction<TProgram> &
   IInstructionWithData<Uint8Array> &
   IInstructionWithAccounts<
@@ -64,7 +64,7 @@ export type AssignInstructionWithSigners<
         ? WritableSignerAccount<TAccountAccount> &
             IAccountSignerMeta<TAccountAccount>
         : TAccountAccount,
-      ...TRemainingAccounts
+      ...TRemainingAccounts,
     ]
   >;
 
@@ -114,19 +114,19 @@ export type AssignInputWithSigners<TAccountAccount extends string> = {
 
 export function getAssignInstruction<
   TAccountAccount extends string,
-  TProgram extends string = '11111111111111111111111111111111'
+  TProgram extends string = '11111111111111111111111111111111',
 >(
   input: AssignInputWithSigners<TAccountAccount>
 ): AssignInstructionWithSigners<TProgram, TAccountAccount>;
 export function getAssignInstruction<
   TAccountAccount extends string,
-  TProgram extends string = '11111111111111111111111111111111'
+  TProgram extends string = '11111111111111111111111111111111',
 >(
   input: AssignInput<TAccountAccount>
 ): AssignInstruction<TProgram, TAccountAccount>;
 export function getAssignInstruction<
   TAccountAccount extends string,
-  TProgram extends string = '11111111111111111111111111111111'
+  TProgram extends string = '11111111111111111111111111111111',
 >(input: AssignInput<TAccountAccount>): IInstruction {
   // Program address.
   const programAddress =
@@ -162,7 +162,7 @@ export function getAssignInstruction<
 export function getAssignInstructionRaw<
   TProgram extends string = '11111111111111111111111111111111',
   TAccountAccount extends string | IAccountMeta<string> = string,
-  TRemainingAccounts extends Array<IAccountMeta<string>> = []
+  TRemainingAccounts extends Array<IAccountMeta<string>> = [],
 >(
   accounts: {
     account: TAccountAccount extends string
@@ -185,7 +185,7 @@ export function getAssignInstructionRaw<
 
 export type ParsedAssignInstruction<
   TProgram extends string = '11111111111111111111111111111111',
-  TAccountMetas extends readonly IAccountMeta[] = readonly IAccountMeta[]
+  TAccountMetas extends readonly IAccountMeta[] = readonly IAccountMeta[],
 > = {
   programAddress: Address<TProgram>;
   accounts: {
@@ -196,7 +196,7 @@ export type ParsedAssignInstruction<
 
 export function parseAssignInstruction<
   TProgram extends string,
-  TAccountMetas extends readonly IAccountMeta[]
+  TAccountMetas extends readonly IAccountMeta[],
 >(
   instruction: IInstruction<TProgram> &
     IInstructionWithAccounts<TAccountMetas> &

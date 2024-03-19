@@ -48,7 +48,7 @@ export type WithdrawNonceAccountInstruction<
     | string
     | IAccountMeta<string> = 'SysvarRent111111111111111111111111111111111',
   TAccountNonceAuthority extends string | IAccountMeta<string> = string,
-  TRemainingAccounts extends Array<IAccountMeta<string>> = []
+  TRemainingAccounts extends Array<IAccountMeta<string>> = [],
 > = IInstruction<TProgram> &
   IInstructionWithData<Uint8Array> &
   IInstructionWithAccounts<
@@ -68,7 +68,7 @@ export type WithdrawNonceAccountInstruction<
       TAccountNonceAuthority extends string
         ? ReadonlySignerAccount<TAccountNonceAuthority>
         : TAccountNonceAuthority,
-      ...TRemainingAccounts
+      ...TRemainingAccounts,
     ]
   >;
 
@@ -83,7 +83,7 @@ export type WithdrawNonceAccountInstructionWithSigners<
     | string
     | IAccountMeta<string> = 'SysvarRent111111111111111111111111111111111',
   TAccountNonceAuthority extends string | IAccountMeta<string> = string,
-  TRemainingAccounts extends Array<IAccountMeta<string>> = []
+  TRemainingAccounts extends Array<IAccountMeta<string>> = [],
 > = IInstruction<TProgram> &
   IInstructionWithData<Uint8Array> &
   IInstructionWithAccounts<
@@ -104,7 +104,7 @@ export type WithdrawNonceAccountInstructionWithSigners<
         ? ReadonlySignerAccount<TAccountNonceAuthority> &
             IAccountSignerMeta<TAccountNonceAuthority>
         : TAccountNonceAuthority,
-      ...TRemainingAccounts
+      ...TRemainingAccounts,
     ]
   >;
 
@@ -149,7 +149,7 @@ export type WithdrawNonceAccountInput<
   TAccountRecipientAccount extends string,
   TAccountRecentBlockhashesSysvar extends string,
   TAccountRentSysvar extends string,
-  TAccountNonceAuthority extends string
+  TAccountNonceAuthority extends string,
 > = {
   nonceAccount: Address<TAccountNonceAccount>;
   recipientAccount: Address<TAccountRecipientAccount>;
@@ -164,7 +164,7 @@ export type WithdrawNonceAccountInputWithSigners<
   TAccountRecipientAccount extends string,
   TAccountRecentBlockhashesSysvar extends string,
   TAccountRentSysvar extends string,
-  TAccountNonceAuthority extends string
+  TAccountNonceAuthority extends string,
 > = {
   nonceAccount: Address<TAccountNonceAccount>;
   recipientAccount: Address<TAccountRecipientAccount>;
@@ -180,7 +180,7 @@ export function getWithdrawNonceAccountInstruction<
   TAccountRecentBlockhashesSysvar extends string,
   TAccountRentSysvar extends string,
   TAccountNonceAuthority extends string,
-  TProgram extends string = '11111111111111111111111111111111'
+  TProgram extends string = '11111111111111111111111111111111',
 >(
   input: WithdrawNonceAccountInputWithSigners<
     TAccountNonceAccount,
@@ -203,7 +203,7 @@ export function getWithdrawNonceAccountInstruction<
   TAccountRecentBlockhashesSysvar extends string,
   TAccountRentSysvar extends string,
   TAccountNonceAuthority extends string,
-  TProgram extends string = '11111111111111111111111111111111'
+  TProgram extends string = '11111111111111111111111111111111',
 >(
   input: WithdrawNonceAccountInput<
     TAccountNonceAccount,
@@ -226,7 +226,7 @@ export function getWithdrawNonceAccountInstruction<
   TAccountRecentBlockhashesSysvar extends string,
   TAccountRentSysvar extends string,
   TAccountNonceAuthority extends string,
-  TProgram extends string = '11111111111111111111111111111111'
+  TProgram extends string = '11111111111111111111111111111111',
 >(
   input: WithdrawNonceAccountInput<
     TAccountNonceAccount,
@@ -305,7 +305,7 @@ export function getWithdrawNonceAccountInstructionRaw<
     | string
     | IAccountMeta<string> = 'SysvarRent111111111111111111111111111111111',
   TAccountNonceAuthority extends string | IAccountMeta<string> = string,
-  TRemainingAccounts extends Array<IAccountMeta<string>> = []
+  TRemainingAccounts extends Array<IAccountMeta<string>> = [],
 >(
   accounts: {
     nonceAccount: TAccountNonceAccount extends string
@@ -363,7 +363,7 @@ export function getWithdrawNonceAccountInstructionRaw<
 
 export type ParsedWithdrawNonceAccountInstruction<
   TProgram extends string = '11111111111111111111111111111111',
-  TAccountMetas extends readonly IAccountMeta[] = readonly IAccountMeta[]
+  TAccountMetas extends readonly IAccountMeta[] = readonly IAccountMeta[],
 > = {
   programAddress: Address<TProgram>;
   accounts: {
@@ -378,7 +378,7 @@ export type ParsedWithdrawNonceAccountInstruction<
 
 export function parseWithdrawNonceAccountInstruction<
   TProgram extends string,
-  TAccountMetas extends readonly IAccountMeta[]
+  TAccountMetas extends readonly IAccountMeta[],
 >(
   instruction: IInstruction<TProgram> &
     IInstructionWithAccounts<TAccountMetas> &

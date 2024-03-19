@@ -38,7 +38,7 @@ import {
 export type AllocateInstruction<
   TProgram extends string = '11111111111111111111111111111111',
   TAccountNewAccount extends string | IAccountMeta<string> = string,
-  TRemainingAccounts extends Array<IAccountMeta<string>> = []
+  TRemainingAccounts extends Array<IAccountMeta<string>> = [],
 > = IInstruction<TProgram> &
   IInstructionWithData<Uint8Array> &
   IInstructionWithAccounts<
@@ -46,14 +46,14 @@ export type AllocateInstruction<
       TAccountNewAccount extends string
         ? WritableSignerAccount<TAccountNewAccount>
         : TAccountNewAccount,
-      ...TRemainingAccounts
+      ...TRemainingAccounts,
     ]
   >;
 
 export type AllocateInstructionWithSigners<
   TProgram extends string = '11111111111111111111111111111111',
   TAccountNewAccount extends string | IAccountMeta<string> = string,
-  TRemainingAccounts extends Array<IAccountMeta<string>> = []
+  TRemainingAccounts extends Array<IAccountMeta<string>> = [],
 > = IInstruction<TProgram> &
   IInstructionWithData<Uint8Array> &
   IInstructionWithAccounts<
@@ -62,7 +62,7 @@ export type AllocateInstructionWithSigners<
         ? WritableSignerAccount<TAccountNewAccount> &
             IAccountSignerMeta<TAccountNewAccount>
         : TAccountNewAccount,
-      ...TRemainingAccounts
+      ...TRemainingAccounts,
     ]
   >;
 
@@ -109,19 +109,19 @@ export type AllocateInputWithSigners<TAccountNewAccount extends string> = {
 
 export function getAllocateInstruction<
   TAccountNewAccount extends string,
-  TProgram extends string = '11111111111111111111111111111111'
+  TProgram extends string = '11111111111111111111111111111111',
 >(
   input: AllocateInputWithSigners<TAccountNewAccount>
 ): AllocateInstructionWithSigners<TProgram, TAccountNewAccount>;
 export function getAllocateInstruction<
   TAccountNewAccount extends string,
-  TProgram extends string = '11111111111111111111111111111111'
+  TProgram extends string = '11111111111111111111111111111111',
 >(
   input: AllocateInput<TAccountNewAccount>
 ): AllocateInstruction<TProgram, TAccountNewAccount>;
 export function getAllocateInstruction<
   TAccountNewAccount extends string,
-  TProgram extends string = '11111111111111111111111111111111'
+  TProgram extends string = '11111111111111111111111111111111',
 >(input: AllocateInput<TAccountNewAccount>): IInstruction {
   // Program address.
   const programAddress =
@@ -157,7 +157,7 @@ export function getAllocateInstruction<
 export function getAllocateInstructionRaw<
   TProgram extends string = '11111111111111111111111111111111',
   TAccountNewAccount extends string | IAccountMeta<string> = string,
-  TRemainingAccounts extends Array<IAccountMeta<string>> = []
+  TRemainingAccounts extends Array<IAccountMeta<string>> = [],
 >(
   accounts: {
     newAccount: TAccountNewAccount extends string
@@ -180,7 +180,7 @@ export function getAllocateInstructionRaw<
 
 export type ParsedAllocateInstruction<
   TProgram extends string = '11111111111111111111111111111111',
-  TAccountMetas extends readonly IAccountMeta[] = readonly IAccountMeta[]
+  TAccountMetas extends readonly IAccountMeta[] = readonly IAccountMeta[],
 > = {
   programAddress: Address<TProgram>;
   accounts: {
@@ -191,7 +191,7 @@ export type ParsedAllocateInstruction<
 
 export function parseAllocateInstruction<
   TProgram extends string,
-  TAccountMetas extends readonly IAccountMeta[]
+  TAccountMetas extends readonly IAccountMeta[],
 >(
   instruction: IInstruction<TProgram> &
     IInstructionWithAccounts<TAccountMetas> &
