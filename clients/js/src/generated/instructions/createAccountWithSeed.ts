@@ -27,7 +27,6 @@ import {
   mapEncoder,
 } from '@solana/codecs';
 import {
-  AccountRole,
   IAccountMeta,
   IInstruction,
   IInstructionWithAccounts,
@@ -37,41 +36,15 @@ import {
   WritableSignerAccount,
 } from '@solana/instructions';
 import { IAccountSignerMeta, TransactionSigner } from '@solana/signers';
-import {
-  ResolvedAccount,
-  accountMetaWithDefault,
-  getAccountMetasWithSigners,
-} from '../shared';
+import { SYSTEM_PROGRAM_ADDRESS } from '../programs';
+import { ResolvedAccount, getAccountMetaFactory } from '../shared';
 
 export type CreateAccountWithSeedInstruction<
-  TProgram extends string = '11111111111111111111111111111111',
+  TProgram extends string = typeof SYSTEM_PROGRAM_ADDRESS,
   TAccountPayer extends string | IAccountMeta<string> = string,
   TAccountNewAccount extends string | IAccountMeta<string> = string,
   TAccountBaseAccount extends string | IAccountMeta<string> = string,
-  TRemainingAccounts extends Array<IAccountMeta<string>> = [],
-> = IInstruction<TProgram> &
-  IInstructionWithData<Uint8Array> &
-  IInstructionWithAccounts<
-    [
-      TAccountPayer extends string
-        ? WritableSignerAccount<TAccountPayer>
-        : TAccountPayer,
-      TAccountNewAccount extends string
-        ? WritableAccount<TAccountNewAccount>
-        : TAccountNewAccount,
-      TAccountBaseAccount extends string
-        ? ReadonlySignerAccount<TAccountBaseAccount>
-        : TAccountBaseAccount,
-      ...TRemainingAccounts,
-    ]
-  >;
-
-export type CreateAccountWithSeedInstructionWithSigners<
-  TProgram extends string = '11111111111111111111111111111111',
-  TAccountPayer extends string | IAccountMeta<string> = string,
-  TAccountNewAccount extends string | IAccountMeta<string> = string,
-  TAccountBaseAccount extends string | IAccountMeta<string> = string,
-  TRemainingAccounts extends Array<IAccountMeta<string>> = [],
+  TRemainingAccounts extends readonly IAccountMeta<string>[] = [],
 > = IInstruction<TProgram> &
   IInstructionWithData<Uint8Array> &
   IInstructionWithAccounts<
@@ -144,24 +117,9 @@ export function getCreateAccountWithSeedInstructionDataCodec(): Codec<
 }
 
 export type CreateAccountWithSeedInput<
-  TAccountPayer extends string,
-  TAccountNewAccount extends string,
-  TAccountBaseAccount extends string,
-> = {
-  payer: Address<TAccountPayer>;
-  newAccount: Address<TAccountNewAccount>;
-  baseAccount: Address<TAccountBaseAccount>;
-  base: CreateAccountWithSeedInstructionDataArgs['base'];
-  seed: CreateAccountWithSeedInstructionDataArgs['seed'];
-  amount: CreateAccountWithSeedInstructionDataArgs['amount'];
-  space: CreateAccountWithSeedInstructionDataArgs['space'];
-  programAddress: CreateAccountWithSeedInstructionDataArgs['programAddress'];
-};
-
-export type CreateAccountWithSeedInputWithSigners<
-  TAccountPayer extends string,
-  TAccountNewAccount extends string,
-  TAccountBaseAccount extends string,
+  TAccountPayer extends string = string,
+  TAccountNewAccount extends string = string,
+  TAccountBaseAccount extends string = string,
 > = {
   payer: TransactionSigner<TAccountPayer>;
   newAccount: Address<TAccountNewAccount>;
@@ -177,24 +135,6 @@ export function getCreateAccountWithSeedInstruction<
   TAccountPayer extends string,
   TAccountNewAccount extends string,
   TAccountBaseAccount extends string,
-  TProgram extends string = '11111111111111111111111111111111',
->(
-  input: CreateAccountWithSeedInputWithSigners<
-    TAccountPayer,
-    TAccountNewAccount,
-    TAccountBaseAccount
-  >
-): CreateAccountWithSeedInstructionWithSigners<
-  TProgram,
-  TAccountPayer,
-  TAccountNewAccount,
-  TAccountBaseAccount
->;
-export function getCreateAccountWithSeedInstruction<
-  TAccountPayer extends string,
-  TAccountNewAccount extends string,
-  TAccountBaseAccount extends string,
-  TProgram extends string = '11111111111111111111111111111111',
 >(
   input: CreateAccountWithSeedInput<
     TAccountPayer,
@@ -202,103 +142,51 @@ export function getCreateAccountWithSeedInstruction<
     TAccountBaseAccount
   >
 ): CreateAccountWithSeedInstruction<
-  TProgram,
+  typeof SYSTEM_PROGRAM_ADDRESS,
   TAccountPayer,
   TAccountNewAccount,
   TAccountBaseAccount
->;
-export function getCreateAccountWithSeedInstruction<
-  TAccountPayer extends string,
-  TAccountNewAccount extends string,
-  TAccountBaseAccount extends string,
-  TProgram extends string = '11111111111111111111111111111111',
->(
-  input: CreateAccountWithSeedInput<
-    TAccountPayer,
-    TAccountNewAccount,
-    TAccountBaseAccount
-  >
-): IInstruction {
+> {
   // Program address.
-  const programAddress =
-    '11111111111111111111111111111111' as Address<'11111111111111111111111111111111'>;
+  const programAddress = SYSTEM_PROGRAM_ADDRESS;
 
   // Original accounts.
-  type AccountMetas = Parameters<
-    typeof getCreateAccountWithSeedInstructionRaw<
-      TProgram,
-      TAccountPayer,
-      TAccountNewAccount,
-      TAccountBaseAccount
-    >
-  >[0];
-  const accounts: Record<keyof AccountMetas, ResolvedAccount> = {
+  const originalAccounts = {
     payer: { value: input.payer ?? null, isWritable: true },
     newAccount: { value: input.newAccount ?? null, isWritable: true },
     baseAccount: { value: input.baseAccount ?? null, isWritable: false },
   };
+  const accounts = originalAccounts as Record<
+    keyof typeof originalAccounts,
+    ResolvedAccount
+  >;
 
   // Original args.
   const args = { ...input };
 
-  // Get account metas and signers.
-  const accountMetas = getAccountMetasWithSigners(
-    accounts,
-    'programId',
-    programAddress
-  );
-
-  const instruction = getCreateAccountWithSeedInstructionRaw(
-    accountMetas as Record<keyof AccountMetas, IAccountMeta>,
-    args as CreateAccountWithSeedInstructionDataArgs,
-    programAddress
-  );
+  const getAccountMeta = getAccountMetaFactory(programAddress, 'programId');
+  const instruction = {
+    accounts: [
+      getAccountMeta(accounts.payer),
+      getAccountMeta(accounts.newAccount),
+      getAccountMeta(accounts.baseAccount),
+    ],
+    programAddress,
+    data: getCreateAccountWithSeedInstructionDataEncoder().encode(
+      args as CreateAccountWithSeedInstructionDataArgs
+    ),
+  } as CreateAccountWithSeedInstruction<
+    typeof SYSTEM_PROGRAM_ADDRESS,
+    TAccountPayer,
+    TAccountNewAccount,
+    TAccountBaseAccount
+  >;
 
   return instruction;
 }
 
-export function getCreateAccountWithSeedInstructionRaw<
-  TProgram extends string = '11111111111111111111111111111111',
-  TAccountPayer extends string | IAccountMeta<string> = string,
-  TAccountNewAccount extends string | IAccountMeta<string> = string,
-  TAccountBaseAccount extends string | IAccountMeta<string> = string,
-  TRemainingAccounts extends Array<IAccountMeta<string>> = [],
->(
-  accounts: {
-    payer: TAccountPayer extends string
-      ? Address<TAccountPayer>
-      : TAccountPayer;
-    newAccount: TAccountNewAccount extends string
-      ? Address<TAccountNewAccount>
-      : TAccountNewAccount;
-    baseAccount: TAccountBaseAccount extends string
-      ? Address<TAccountBaseAccount>
-      : TAccountBaseAccount;
-  },
-  args: CreateAccountWithSeedInstructionDataArgs,
-  programAddress: Address<TProgram> = '11111111111111111111111111111111' as Address<TProgram>,
-  remainingAccounts?: TRemainingAccounts
-) {
-  return {
-    accounts: [
-      accountMetaWithDefault(accounts.payer, AccountRole.WRITABLE_SIGNER),
-      accountMetaWithDefault(accounts.newAccount, AccountRole.WRITABLE),
-      accountMetaWithDefault(accounts.baseAccount, AccountRole.READONLY_SIGNER),
-      ...(remainingAccounts ?? []),
-    ],
-    data: getCreateAccountWithSeedInstructionDataEncoder().encode(args),
-    programAddress,
-  } as CreateAccountWithSeedInstruction<
-    TProgram,
-    TAccountPayer,
-    TAccountNewAccount,
-    TAccountBaseAccount,
-    TRemainingAccounts
-  >;
-}
-
 export type ParsedCreateAccountWithSeedInstruction<
-  TProgram extends string = '11111111111111111111111111111111',
+  TProgram extends string = typeof SYSTEM_PROGRAM_ADDRESS,
   TAccountMetas extends readonly IAccountMeta[] = readonly IAccountMeta[],
 > = {
   programAddress: Address<TProgram>;

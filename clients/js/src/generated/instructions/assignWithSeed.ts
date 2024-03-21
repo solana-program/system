@@ -25,7 +25,6 @@ import {
   mapEncoder,
 } from '@solana/codecs';
 import {
-  AccountRole,
   IAccountMeta,
   IInstruction,
   IInstructionWithAccounts,
@@ -34,36 +33,14 @@ import {
   WritableAccount,
 } from '@solana/instructions';
 import { IAccountSignerMeta, TransactionSigner } from '@solana/signers';
-import {
-  ResolvedAccount,
-  accountMetaWithDefault,
-  getAccountMetasWithSigners,
-} from '../shared';
+import { SYSTEM_PROGRAM_ADDRESS } from '../programs';
+import { ResolvedAccount, getAccountMetaFactory } from '../shared';
 
 export type AssignWithSeedInstruction<
-  TProgram extends string = '11111111111111111111111111111111',
+  TProgram extends string = typeof SYSTEM_PROGRAM_ADDRESS,
   TAccountAccount extends string | IAccountMeta<string> = string,
   TAccountBaseAccount extends string | IAccountMeta<string> = string,
-  TRemainingAccounts extends Array<IAccountMeta<string>> = [],
-> = IInstruction<TProgram> &
-  IInstructionWithData<Uint8Array> &
-  IInstructionWithAccounts<
-    [
-      TAccountAccount extends string
-        ? WritableAccount<TAccountAccount>
-        : TAccountAccount,
-      TAccountBaseAccount extends string
-        ? ReadonlySignerAccount<TAccountBaseAccount>
-        : TAccountBaseAccount,
-      ...TRemainingAccounts,
-    ]
-  >;
-
-export type AssignWithSeedInstructionWithSigners<
-  TProgram extends string = '11111111111111111111111111111111',
-  TAccountAccount extends string | IAccountMeta<string> = string,
-  TAccountBaseAccount extends string | IAccountMeta<string> = string,
-  TRemainingAccounts extends Array<IAccountMeta<string>> = [],
+  TRemainingAccounts extends readonly IAccountMeta<string>[] = [],
 > = IInstruction<TProgram> &
   IInstructionWithData<Uint8Array> &
   IInstructionWithAccounts<
@@ -124,19 +101,8 @@ export function getAssignWithSeedInstructionDataCodec(): Codec<
 }
 
 export type AssignWithSeedInput<
-  TAccountAccount extends string,
-  TAccountBaseAccount extends string,
-> = {
-  account: Address<TAccountAccount>;
-  baseAccount: Address<TAccountBaseAccount>;
-  base: AssignWithSeedInstructionDataArgs['base'];
-  seed: AssignWithSeedInstructionDataArgs['seed'];
-  programAddress: AssignWithSeedInstructionDataArgs['programAddress'];
-};
-
-export type AssignWithSeedInputWithSigners<
-  TAccountAccount extends string,
-  TAccountBaseAccount extends string,
+  TAccountAccount extends string = string,
+  TAccountBaseAccount extends string = string,
 > = {
   account: Address<TAccountAccount>;
   baseAccount: TransactionSigner<TAccountBaseAccount>;
@@ -148,100 +114,50 @@ export type AssignWithSeedInputWithSigners<
 export function getAssignWithSeedInstruction<
   TAccountAccount extends string,
   TAccountBaseAccount extends string,
-  TProgram extends string = '11111111111111111111111111111111',
 >(
-  input: AssignWithSeedInputWithSigners<TAccountAccount, TAccountBaseAccount>
-): AssignWithSeedInstructionWithSigners<
-  TProgram,
+  input: AssignWithSeedInput<TAccountAccount, TAccountBaseAccount>
+): AssignWithSeedInstruction<
+  typeof SYSTEM_PROGRAM_ADDRESS,
   TAccountAccount,
   TAccountBaseAccount
->;
-export function getAssignWithSeedInstruction<
-  TAccountAccount extends string,
-  TAccountBaseAccount extends string,
-  TProgram extends string = '11111111111111111111111111111111',
->(
-  input: AssignWithSeedInput<TAccountAccount, TAccountBaseAccount>
-): AssignWithSeedInstruction<TProgram, TAccountAccount, TAccountBaseAccount>;
-export function getAssignWithSeedInstruction<
-  TAccountAccount extends string,
-  TAccountBaseAccount extends string,
-  TProgram extends string = '11111111111111111111111111111111',
->(
-  input: AssignWithSeedInput<TAccountAccount, TAccountBaseAccount>
-): IInstruction {
+> {
   // Program address.
-  const programAddress =
-    '11111111111111111111111111111111' as Address<'11111111111111111111111111111111'>;
+  const programAddress = SYSTEM_PROGRAM_ADDRESS;
 
   // Original accounts.
-  type AccountMetas = Parameters<
-    typeof getAssignWithSeedInstructionRaw<
-      TProgram,
-      TAccountAccount,
-      TAccountBaseAccount
-    >
-  >[0];
-  const accounts: Record<keyof AccountMetas, ResolvedAccount> = {
+  const originalAccounts = {
     account: { value: input.account ?? null, isWritable: true },
     baseAccount: { value: input.baseAccount ?? null, isWritable: false },
   };
+  const accounts = originalAccounts as Record<
+    keyof typeof originalAccounts,
+    ResolvedAccount
+  >;
 
   // Original args.
   const args = { ...input };
 
-  // Get account metas and signers.
-  const accountMetas = getAccountMetasWithSigners(
-    accounts,
-    'programId',
-    programAddress
-  );
-
-  const instruction = getAssignWithSeedInstructionRaw(
-    accountMetas as Record<keyof AccountMetas, IAccountMeta>,
-    args as AssignWithSeedInstructionDataArgs,
-    programAddress
-  );
+  const getAccountMeta = getAccountMetaFactory(programAddress, 'programId');
+  const instruction = {
+    accounts: [
+      getAccountMeta(accounts.account),
+      getAccountMeta(accounts.baseAccount),
+    ],
+    programAddress,
+    data: getAssignWithSeedInstructionDataEncoder().encode(
+      args as AssignWithSeedInstructionDataArgs
+    ),
+  } as AssignWithSeedInstruction<
+    typeof SYSTEM_PROGRAM_ADDRESS,
+    TAccountAccount,
+    TAccountBaseAccount
+  >;
 
   return instruction;
 }
 
-export function getAssignWithSeedInstructionRaw<
-  TProgram extends string = '11111111111111111111111111111111',
-  TAccountAccount extends string | IAccountMeta<string> = string,
-  TAccountBaseAccount extends string | IAccountMeta<string> = string,
-  TRemainingAccounts extends Array<IAccountMeta<string>> = [],
->(
-  accounts: {
-    account: TAccountAccount extends string
-      ? Address<TAccountAccount>
-      : TAccountAccount;
-    baseAccount: TAccountBaseAccount extends string
-      ? Address<TAccountBaseAccount>
-      : TAccountBaseAccount;
-  },
-  args: AssignWithSeedInstructionDataArgs,
-  programAddress: Address<TProgram> = '11111111111111111111111111111111' as Address<TProgram>,
-  remainingAccounts?: TRemainingAccounts
-) {
-  return {
-    accounts: [
-      accountMetaWithDefault(accounts.account, AccountRole.WRITABLE),
-      accountMetaWithDefault(accounts.baseAccount, AccountRole.READONLY_SIGNER),
-      ...(remainingAccounts ?? []),
-    ],
-    data: getAssignWithSeedInstructionDataEncoder().encode(args),
-    programAddress,
-  } as AssignWithSeedInstruction<
-    TProgram,
-    TAccountAccount,
-    TAccountBaseAccount,
-    TRemainingAccounts
-  >;
-}
-
 export type ParsedAssignWithSeedInstruction<
-  TProgram extends string = '11111111111111111111111111111111',
+  TProgram extends string = typeof SYSTEM_PROGRAM_ADDRESS,
   TAccountMetas extends readonly IAccountMeta[] = readonly IAccountMeta[],
 > = {
   programAddress: Address<TProgram>;

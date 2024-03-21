@@ -19,38 +19,19 @@ import {
   mapEncoder,
 } from '@solana/codecs';
 import {
-  AccountRole,
   IAccountMeta,
   IInstruction,
   IInstructionWithAccounts,
   IInstructionWithData,
   WritableAccount,
 } from '@solana/instructions';
-import {
-  ResolvedAccount,
-  accountMetaWithDefault,
-  getAccountMetasWithSigners,
-} from '../shared';
+import { SYSTEM_PROGRAM_ADDRESS } from '../programs';
+import { ResolvedAccount, getAccountMetaFactory } from '../shared';
 
 export type UpgradeNonceAccountInstruction<
-  TProgram extends string = '11111111111111111111111111111111',
+  TProgram extends string = typeof SYSTEM_PROGRAM_ADDRESS,
   TAccountNonceAccount extends string | IAccountMeta<string> = string,
-  TRemainingAccounts extends Array<IAccountMeta<string>> = [],
-> = IInstruction<TProgram> &
-  IInstructionWithData<Uint8Array> &
-  IInstructionWithAccounts<
-    [
-      TAccountNonceAccount extends string
-        ? WritableAccount<TAccountNonceAccount>
-        : TAccountNonceAccount,
-      ...TRemainingAccounts,
-    ]
-  >;
-
-export type UpgradeNonceAccountInstructionWithSigners<
-  TProgram extends string = '11111111111111111111111111111111',
-  TAccountNonceAccount extends string | IAccountMeta<string> = string,
-  TRemainingAccounts extends Array<IAccountMeta<string>> = [],
+  TRemainingAccounts extends readonly IAccountMeta<string>[] = [],
 > = IInstruction<TProgram> &
   IInstructionWithData<Uint8Array> &
   IInstructionWithAccounts<
@@ -87,88 +68,47 @@ export function getUpgradeNonceAccountInstructionDataCodec(): Codec<
   );
 }
 
-export type UpgradeNonceAccountInput<TAccountNonceAccount extends string> = {
-  nonceAccount: Address<TAccountNonceAccount>;
-};
-
-export type UpgradeNonceAccountInputWithSigners<
-  TAccountNonceAccount extends string,
+export type UpgradeNonceAccountInput<
+  TAccountNonceAccount extends string = string,
 > = {
   nonceAccount: Address<TAccountNonceAccount>;
 };
 
 export function getUpgradeNonceAccountInstruction<
   TAccountNonceAccount extends string,
-  TProgram extends string = '11111111111111111111111111111111',
->(
-  input: UpgradeNonceAccountInputWithSigners<TAccountNonceAccount>
-): UpgradeNonceAccountInstructionWithSigners<TProgram, TAccountNonceAccount>;
-export function getUpgradeNonceAccountInstruction<
-  TAccountNonceAccount extends string,
-  TProgram extends string = '11111111111111111111111111111111',
 >(
   input: UpgradeNonceAccountInput<TAccountNonceAccount>
-): UpgradeNonceAccountInstruction<TProgram, TAccountNonceAccount>;
-export function getUpgradeNonceAccountInstruction<
-  TAccountNonceAccount extends string,
-  TProgram extends string = '11111111111111111111111111111111',
->(input: UpgradeNonceAccountInput<TAccountNonceAccount>): IInstruction {
+): UpgradeNonceAccountInstruction<
+  typeof SYSTEM_PROGRAM_ADDRESS,
+  TAccountNonceAccount
+> {
   // Program address.
-  const programAddress =
-    '11111111111111111111111111111111' as Address<'11111111111111111111111111111111'>;
+  const programAddress = SYSTEM_PROGRAM_ADDRESS;
 
   // Original accounts.
-  type AccountMetas = Parameters<
-    typeof getUpgradeNonceAccountInstructionRaw<TProgram, TAccountNonceAccount>
-  >[0];
-  const accounts: Record<keyof AccountMetas, ResolvedAccount> = {
+  const originalAccounts = {
     nonceAccount: { value: input.nonceAccount ?? null, isWritable: true },
   };
+  const accounts = originalAccounts as Record<
+    keyof typeof originalAccounts,
+    ResolvedAccount
+  >;
 
-  // Get account metas and signers.
-  const accountMetas = getAccountMetasWithSigners(
-    accounts,
-    'programId',
-    programAddress
-  );
-
-  const instruction = getUpgradeNonceAccountInstructionRaw(
-    accountMetas as Record<keyof AccountMetas, IAccountMeta>,
-    programAddress
-  );
+  const getAccountMeta = getAccountMetaFactory(programAddress, 'programId');
+  const instruction = {
+    accounts: [getAccountMeta(accounts.nonceAccount)],
+    programAddress,
+    data: getUpgradeNonceAccountInstructionDataEncoder().encode({}),
+  } as UpgradeNonceAccountInstruction<
+    typeof SYSTEM_PROGRAM_ADDRESS,
+    TAccountNonceAccount
+  >;
 
   return instruction;
 }
 
-export function getUpgradeNonceAccountInstructionRaw<
-  TProgram extends string = '11111111111111111111111111111111',
-  TAccountNonceAccount extends string | IAccountMeta<string> = string,
-  TRemainingAccounts extends Array<IAccountMeta<string>> = [],
->(
-  accounts: {
-    nonceAccount: TAccountNonceAccount extends string
-      ? Address<TAccountNonceAccount>
-      : TAccountNonceAccount;
-  },
-  programAddress: Address<TProgram> = '11111111111111111111111111111111' as Address<TProgram>,
-  remainingAccounts?: TRemainingAccounts
-) {
-  return {
-    accounts: [
-      accountMetaWithDefault(accounts.nonceAccount, AccountRole.WRITABLE),
-      ...(remainingAccounts ?? []),
-    ],
-    data: getUpgradeNonceAccountInstructionDataEncoder().encode({}),
-    programAddress,
-  } as UpgradeNonceAccountInstruction<
-    TProgram,
-    TAccountNonceAccount,
-    TRemainingAccounts
-  >;
-}
-
 export type ParsedUpgradeNonceAccountInstruction<
-  TProgram extends string = '11111111111111111111111111111111',
+  TProgram extends string = typeof SYSTEM_PROGRAM_ADDRESS,
   TAccountMetas extends readonly IAccountMeta[] = readonly IAccountMeta[],
 > = {
   programAddress: Address<TProgram>;

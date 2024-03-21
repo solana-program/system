@@ -19,7 +19,6 @@ import {
   mapEncoder,
 } from '@solana/codecs';
 import {
-  AccountRole,
   IAccountMeta,
   IInstruction,
   IInstructionWithAccounts,
@@ -29,45 +28,17 @@ import {
   WritableAccount,
 } from '@solana/instructions';
 import { IAccountSignerMeta, TransactionSigner } from '@solana/signers';
-import {
-  ResolvedAccount,
-  accountMetaWithDefault,
-  getAccountMetasWithSigners,
-} from '../shared';
+import { SYSTEM_PROGRAM_ADDRESS } from '../programs';
+import { ResolvedAccount, getAccountMetaFactory } from '../shared';
 
 export type AdvanceNonceAccountInstruction<
-  TProgram extends string = '11111111111111111111111111111111',
+  TProgram extends string = typeof SYSTEM_PROGRAM_ADDRESS,
   TAccountNonceAccount extends string | IAccountMeta<string> = string,
   TAccountRecentBlockhashesSysvar extends
     | string
     | IAccountMeta<string> = 'SysvarRecentB1ockHashes11111111111111111111',
   TAccountNonceAuthority extends string | IAccountMeta<string> = string,
-  TRemainingAccounts extends Array<IAccountMeta<string>> = [],
-> = IInstruction<TProgram> &
-  IInstructionWithData<Uint8Array> &
-  IInstructionWithAccounts<
-    [
-      TAccountNonceAccount extends string
-        ? WritableAccount<TAccountNonceAccount>
-        : TAccountNonceAccount,
-      TAccountRecentBlockhashesSysvar extends string
-        ? ReadonlyAccount<TAccountRecentBlockhashesSysvar>
-        : TAccountRecentBlockhashesSysvar,
-      TAccountNonceAuthority extends string
-        ? ReadonlySignerAccount<TAccountNonceAuthority>
-        : TAccountNonceAuthority,
-      ...TRemainingAccounts,
-    ]
-  >;
-
-export type AdvanceNonceAccountInstructionWithSigners<
-  TProgram extends string = '11111111111111111111111111111111',
-  TAccountNonceAccount extends string | IAccountMeta<string> = string,
-  TAccountRecentBlockhashesSysvar extends
-    | string
-    | IAccountMeta<string> = 'SysvarRecentB1ockHashes11111111111111111111',
-  TAccountNonceAuthority extends string | IAccountMeta<string> = string,
-  TRemainingAccounts extends Array<IAccountMeta<string>> = [],
+  TRemainingAccounts extends readonly IAccountMeta<string>[] = [],
 > = IInstruction<TProgram> &
   IInstructionWithData<Uint8Array> &
   IInstructionWithAccounts<
@@ -112,19 +83,9 @@ export function getAdvanceNonceAccountInstructionDataCodec(): Codec<
 }
 
 export type AdvanceNonceAccountInput<
-  TAccountNonceAccount extends string,
-  TAccountRecentBlockhashesSysvar extends string,
-  TAccountNonceAuthority extends string,
-> = {
-  nonceAccount: Address<TAccountNonceAccount>;
-  recentBlockhashesSysvar?: Address<TAccountRecentBlockhashesSysvar>;
-  nonceAuthority: Address<TAccountNonceAuthority>;
-};
-
-export type AdvanceNonceAccountInputWithSigners<
-  TAccountNonceAccount extends string,
-  TAccountRecentBlockhashesSysvar extends string,
-  TAccountNonceAuthority extends string,
+  TAccountNonceAccount extends string = string,
+  TAccountRecentBlockhashesSysvar extends string = string,
+  TAccountNonceAuthority extends string = string,
 > = {
   nonceAccount: Address<TAccountNonceAccount>;
   recentBlockhashesSysvar?: Address<TAccountRecentBlockhashesSysvar>;
@@ -135,24 +96,6 @@ export function getAdvanceNonceAccountInstruction<
   TAccountNonceAccount extends string,
   TAccountRecentBlockhashesSysvar extends string,
   TAccountNonceAuthority extends string,
-  TProgram extends string = '11111111111111111111111111111111',
->(
-  input: AdvanceNonceAccountInputWithSigners<
-    TAccountNonceAccount,
-    TAccountRecentBlockhashesSysvar,
-    TAccountNonceAuthority
-  >
-): AdvanceNonceAccountInstructionWithSigners<
-  TProgram,
-  TAccountNonceAccount,
-  TAccountRecentBlockhashesSysvar,
-  TAccountNonceAuthority
->;
-export function getAdvanceNonceAccountInstruction<
-  TAccountNonceAccount extends string,
-  TAccountRecentBlockhashesSysvar extends string,
-  TAccountNonceAuthority extends string,
-  TProgram extends string = '11111111111111111111111111111111',
 >(
   input: AdvanceNonceAccountInput<
     TAccountNonceAccount,
@@ -160,37 +103,16 @@ export function getAdvanceNonceAccountInstruction<
     TAccountNonceAuthority
   >
 ): AdvanceNonceAccountInstruction<
-  TProgram,
+  typeof SYSTEM_PROGRAM_ADDRESS,
   TAccountNonceAccount,
   TAccountRecentBlockhashesSysvar,
   TAccountNonceAuthority
->;
-export function getAdvanceNonceAccountInstruction<
-  TAccountNonceAccount extends string,
-  TAccountRecentBlockhashesSysvar extends string,
-  TAccountNonceAuthority extends string,
-  TProgram extends string = '11111111111111111111111111111111',
->(
-  input: AdvanceNonceAccountInput<
-    TAccountNonceAccount,
-    TAccountRecentBlockhashesSysvar,
-    TAccountNonceAuthority
-  >
-): IInstruction {
+> {
   // Program address.
-  const programAddress =
-    '11111111111111111111111111111111' as Address<'11111111111111111111111111111111'>;
+  const programAddress = SYSTEM_PROGRAM_ADDRESS;
 
   // Original accounts.
-  type AccountMetas = Parameters<
-    typeof getAdvanceNonceAccountInstructionRaw<
-      TProgram,
-      TAccountNonceAccount,
-      TAccountRecentBlockhashesSysvar,
-      TAccountNonceAuthority
-    >
-  >[0];
-  const accounts: Record<keyof AccountMetas, ResolvedAccount> = {
+  const originalAccounts = {
     nonceAccount: { value: input.nonceAccount ?? null, isWritable: true },
     recentBlockhashesSysvar: {
       value: input.recentBlockhashesSysvar ?? null,
@@ -198,6 +120,10 @@ export function getAdvanceNonceAccountInstruction<
     },
     nonceAuthority: { value: input.nonceAuthority ?? null, isWritable: false },
   };
+  const accounts = originalAccounts as Record<
+    keyof typeof originalAccounts,
+    ResolvedAccount
+  >;
 
   // Resolve default values.
   if (!accounts.recentBlockhashesSysvar.value) {
@@ -205,71 +131,27 @@ export function getAdvanceNonceAccountInstruction<
       'SysvarRecentB1ockHashes11111111111111111111' as Address<'SysvarRecentB1ockHashes11111111111111111111'>;
   }
 
-  // Get account metas and signers.
-  const accountMetas = getAccountMetasWithSigners(
-    accounts,
-    'programId',
-    programAddress
-  );
-
-  const instruction = getAdvanceNonceAccountInstructionRaw(
-    accountMetas as Record<keyof AccountMetas, IAccountMeta>,
-    programAddress
-  );
+  const getAccountMeta = getAccountMetaFactory(programAddress, 'programId');
+  const instruction = {
+    accounts: [
+      getAccountMeta(accounts.nonceAccount),
+      getAccountMeta(accounts.recentBlockhashesSysvar),
+      getAccountMeta(accounts.nonceAuthority),
+    ],
+    programAddress,
+    data: getAdvanceNonceAccountInstructionDataEncoder().encode({}),
+  } as AdvanceNonceAccountInstruction<
+    typeof SYSTEM_PROGRAM_ADDRESS,
+    TAccountNonceAccount,
+    TAccountRecentBlockhashesSysvar,
+    TAccountNonceAuthority
+  >;
 
   return instruction;
 }
 
-export function getAdvanceNonceAccountInstructionRaw<
-  TProgram extends string = '11111111111111111111111111111111',
-  TAccountNonceAccount extends string | IAccountMeta<string> = string,
-  TAccountRecentBlockhashesSysvar extends
-    | string
-    | IAccountMeta<string> = 'SysvarRecentB1ockHashes11111111111111111111',
-  TAccountNonceAuthority extends string | IAccountMeta<string> = string,
-  TRemainingAccounts extends Array<IAccountMeta<string>> = [],
->(
-  accounts: {
-    nonceAccount: TAccountNonceAccount extends string
-      ? Address<TAccountNonceAccount>
-      : TAccountNonceAccount;
-    recentBlockhashesSysvar?: TAccountRecentBlockhashesSysvar extends string
-      ? Address<TAccountRecentBlockhashesSysvar>
-      : TAccountRecentBlockhashesSysvar;
-    nonceAuthority: TAccountNonceAuthority extends string
-      ? Address<TAccountNonceAuthority>
-      : TAccountNonceAuthority;
-  },
-  programAddress: Address<TProgram> = '11111111111111111111111111111111' as Address<TProgram>,
-  remainingAccounts?: TRemainingAccounts
-) {
-  return {
-    accounts: [
-      accountMetaWithDefault(accounts.nonceAccount, AccountRole.WRITABLE),
-      accountMetaWithDefault(
-        accounts.recentBlockhashesSysvar ??
-          ('SysvarRecentB1ockHashes11111111111111111111' as Address<'SysvarRecentB1ockHashes11111111111111111111'>),
-        AccountRole.READONLY
-      ),
-      accountMetaWithDefault(
-        accounts.nonceAuthority,
-        AccountRole.READONLY_SIGNER
-      ),
-      ...(remainingAccounts ?? []),
-    ],
-    data: getAdvanceNonceAccountInstructionDataEncoder().encode({}),
-    programAddress,
-  } as AdvanceNonceAccountInstruction<
-    TProgram,
-    TAccountNonceAccount,
-    TAccountRecentBlockhashesSysvar,
-    TAccountNonceAuthority,
-    TRemainingAccounts
-  >;
-}
-
 export type ParsedAdvanceNonceAccountInstruction<
-  TProgram extends string = '11111111111111111111111111111111',
+  TProgram extends string = typeof SYSTEM_PROGRAM_ADDRESS,
   TAccountMetas extends readonly IAccountMeta[] = readonly IAccountMeta[],
 > = {
   programAddress: Address<TProgram>;

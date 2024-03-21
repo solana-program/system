@@ -23,7 +23,6 @@ import {
   mapEncoder,
 } from '@solana/codecs';
 import {
-  AccountRole,
   IAccountMeta,
   IInstruction,
   IInstructionWithAccounts,
@@ -32,36 +31,14 @@ import {
   WritableAccount,
 } from '@solana/instructions';
 import { IAccountSignerMeta, TransactionSigner } from '@solana/signers';
-import {
-  ResolvedAccount,
-  accountMetaWithDefault,
-  getAccountMetasWithSigners,
-} from '../shared';
+import { SYSTEM_PROGRAM_ADDRESS } from '../programs';
+import { ResolvedAccount, getAccountMetaFactory } from '../shared';
 
 export type AuthorizeNonceAccountInstruction<
-  TProgram extends string = '11111111111111111111111111111111',
+  TProgram extends string = typeof SYSTEM_PROGRAM_ADDRESS,
   TAccountNonceAccount extends string | IAccountMeta<string> = string,
   TAccountNonceAuthority extends string | IAccountMeta<string> = string,
-  TRemainingAccounts extends Array<IAccountMeta<string>> = [],
-> = IInstruction<TProgram> &
-  IInstructionWithData<Uint8Array> &
-  IInstructionWithAccounts<
-    [
-      TAccountNonceAccount extends string
-        ? WritableAccount<TAccountNonceAccount>
-        : TAccountNonceAccount,
-      TAccountNonceAuthority extends string
-        ? ReadonlySignerAccount<TAccountNonceAuthority>
-        : TAccountNonceAuthority,
-      ...TRemainingAccounts,
-    ]
-  >;
-
-export type AuthorizeNonceAccountInstructionWithSigners<
-  TProgram extends string = '11111111111111111111111111111111',
-  TAccountNonceAccount extends string | IAccountMeta<string> = string,
-  TAccountNonceAuthority extends string | IAccountMeta<string> = string,
-  TRemainingAccounts extends Array<IAccountMeta<string>> = [],
+  TRemainingAccounts extends readonly IAccountMeta<string>[] = [],
 > = IInstruction<TProgram> &
   IInstructionWithData<Uint8Array> &
   IInstructionWithAccounts<
@@ -114,17 +91,8 @@ export function getAuthorizeNonceAccountInstructionDataCodec(): Codec<
 }
 
 export type AuthorizeNonceAccountInput<
-  TAccountNonceAccount extends string,
-  TAccountNonceAuthority extends string,
-> = {
-  nonceAccount: Address<TAccountNonceAccount>;
-  nonceAuthority: Address<TAccountNonceAuthority>;
-  newNonceAuthority: AuthorizeNonceAccountInstructionDataArgs['newNonceAuthority'];
-};
-
-export type AuthorizeNonceAccountInputWithSigners<
-  TAccountNonceAccount extends string,
-  TAccountNonceAuthority extends string,
+  TAccountNonceAccount extends string = string,
+  TAccountNonceAuthority extends string = string,
 > = {
   nonceAccount: Address<TAccountNonceAccount>;
   nonceAuthority: TransactionSigner<TAccountNonceAuthority>;
@@ -134,116 +102,53 @@ export type AuthorizeNonceAccountInputWithSigners<
 export function getAuthorizeNonceAccountInstruction<
   TAccountNonceAccount extends string,
   TAccountNonceAuthority extends string,
-  TProgram extends string = '11111111111111111111111111111111',
->(
-  input: AuthorizeNonceAccountInputWithSigners<
-    TAccountNonceAccount,
-    TAccountNonceAuthority
-  >
-): AuthorizeNonceAccountInstructionWithSigners<
-  TProgram,
-  TAccountNonceAccount,
-  TAccountNonceAuthority
->;
-export function getAuthorizeNonceAccountInstruction<
-  TAccountNonceAccount extends string,
-  TAccountNonceAuthority extends string,
-  TProgram extends string = '11111111111111111111111111111111',
 >(
   input: AuthorizeNonceAccountInput<
     TAccountNonceAccount,
     TAccountNonceAuthority
   >
 ): AuthorizeNonceAccountInstruction<
-  TProgram,
+  typeof SYSTEM_PROGRAM_ADDRESS,
   TAccountNonceAccount,
   TAccountNonceAuthority
->;
-export function getAuthorizeNonceAccountInstruction<
-  TAccountNonceAccount extends string,
-  TAccountNonceAuthority extends string,
-  TProgram extends string = '11111111111111111111111111111111',
->(
-  input: AuthorizeNonceAccountInput<
-    TAccountNonceAccount,
-    TAccountNonceAuthority
-  >
-): IInstruction {
+> {
   // Program address.
-  const programAddress =
-    '11111111111111111111111111111111' as Address<'11111111111111111111111111111111'>;
+  const programAddress = SYSTEM_PROGRAM_ADDRESS;
 
   // Original accounts.
-  type AccountMetas = Parameters<
-    typeof getAuthorizeNonceAccountInstructionRaw<
-      TProgram,
-      TAccountNonceAccount,
-      TAccountNonceAuthority
-    >
-  >[0];
-  const accounts: Record<keyof AccountMetas, ResolvedAccount> = {
+  const originalAccounts = {
     nonceAccount: { value: input.nonceAccount ?? null, isWritable: true },
     nonceAuthority: { value: input.nonceAuthority ?? null, isWritable: false },
   };
+  const accounts = originalAccounts as Record<
+    keyof typeof originalAccounts,
+    ResolvedAccount
+  >;
 
   // Original args.
   const args = { ...input };
 
-  // Get account metas and signers.
-  const accountMetas = getAccountMetasWithSigners(
-    accounts,
-    'programId',
-    programAddress
-  );
-
-  const instruction = getAuthorizeNonceAccountInstructionRaw(
-    accountMetas as Record<keyof AccountMetas, IAccountMeta>,
-    args as AuthorizeNonceAccountInstructionDataArgs,
-    programAddress
-  );
+  const getAccountMeta = getAccountMetaFactory(programAddress, 'programId');
+  const instruction = {
+    accounts: [
+      getAccountMeta(accounts.nonceAccount),
+      getAccountMeta(accounts.nonceAuthority),
+    ],
+    programAddress,
+    data: getAuthorizeNonceAccountInstructionDataEncoder().encode(
+      args as AuthorizeNonceAccountInstructionDataArgs
+    ),
+  } as AuthorizeNonceAccountInstruction<
+    typeof SYSTEM_PROGRAM_ADDRESS,
+    TAccountNonceAccount,
+    TAccountNonceAuthority
+  >;
 
   return instruction;
 }
 
-export function getAuthorizeNonceAccountInstructionRaw<
-  TProgram extends string = '11111111111111111111111111111111',
-  TAccountNonceAccount extends string | IAccountMeta<string> = string,
-  TAccountNonceAuthority extends string | IAccountMeta<string> = string,
-  TRemainingAccounts extends Array<IAccountMeta<string>> = [],
->(
-  accounts: {
-    nonceAccount: TAccountNonceAccount extends string
-      ? Address<TAccountNonceAccount>
-      : TAccountNonceAccount;
-    nonceAuthority: TAccountNonceAuthority extends string
-      ? Address<TAccountNonceAuthority>
-      : TAccountNonceAuthority;
-  },
-  args: AuthorizeNonceAccountInstructionDataArgs,
-  programAddress: Address<TProgram> = '11111111111111111111111111111111' as Address<TProgram>,
-  remainingAccounts?: TRemainingAccounts
-) {
-  return {
-    accounts: [
-      accountMetaWithDefault(accounts.nonceAccount, AccountRole.WRITABLE),
-      accountMetaWithDefault(
-        accounts.nonceAuthority,
-        AccountRole.READONLY_SIGNER
-      ),
-      ...(remainingAccounts ?? []),
-    ],
-    data: getAuthorizeNonceAccountInstructionDataEncoder().encode(args),
-    programAddress,
-  } as AuthorizeNonceAccountInstruction<
-    TProgram,
-    TAccountNonceAccount,
-    TAccountNonceAuthority,
-    TRemainingAccounts
-  >;
-}
-
 export type ParsedAuthorizeNonceAccountInstruction<
-  TProgram extends string = '11111111111111111111111111111111',
+  TProgram extends string = typeof SYSTEM_PROGRAM_ADDRESS,
   TAccountMetas extends readonly IAccountMeta[] = readonly IAccountMeta[],
 > = {
   programAddress: Address<TProgram>;

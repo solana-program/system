@@ -27,7 +27,6 @@ import {
   mapEncoder,
 } from '@solana/codecs';
 import {
-  AccountRole,
   IAccountMeta,
   IInstruction,
   IInstructionWithAccounts,
@@ -36,41 +35,15 @@ import {
   WritableAccount,
 } from '@solana/instructions';
 import { IAccountSignerMeta, TransactionSigner } from '@solana/signers';
-import {
-  ResolvedAccount,
-  accountMetaWithDefault,
-  getAccountMetasWithSigners,
-} from '../shared';
+import { SYSTEM_PROGRAM_ADDRESS } from '../programs';
+import { ResolvedAccount, getAccountMetaFactory } from '../shared';
 
 export type TransferSolWithSeedInstruction<
-  TProgram extends string = '11111111111111111111111111111111',
+  TProgram extends string = typeof SYSTEM_PROGRAM_ADDRESS,
   TAccountSource extends string | IAccountMeta<string> = string,
   TAccountBaseAccount extends string | IAccountMeta<string> = string,
   TAccountDestination extends string | IAccountMeta<string> = string,
-  TRemainingAccounts extends Array<IAccountMeta<string>> = [],
-> = IInstruction<TProgram> &
-  IInstructionWithData<Uint8Array> &
-  IInstructionWithAccounts<
-    [
-      TAccountSource extends string
-        ? WritableAccount<TAccountSource>
-        : TAccountSource,
-      TAccountBaseAccount extends string
-        ? ReadonlySignerAccount<TAccountBaseAccount>
-        : TAccountBaseAccount,
-      TAccountDestination extends string
-        ? WritableAccount<TAccountDestination>
-        : TAccountDestination,
-      ...TRemainingAccounts,
-    ]
-  >;
-
-export type TransferSolWithSeedInstructionWithSigners<
-  TProgram extends string = '11111111111111111111111111111111',
-  TAccountSource extends string | IAccountMeta<string> = string,
-  TAccountBaseAccount extends string | IAccountMeta<string> = string,
-  TAccountDestination extends string | IAccountMeta<string> = string,
-  TRemainingAccounts extends Array<IAccountMeta<string>> = [],
+  TRemainingAccounts extends readonly IAccountMeta<string>[] = [],
 > = IInstruction<TProgram> &
   IInstructionWithData<Uint8Array> &
   IInstructionWithAccounts<
@@ -134,22 +107,9 @@ export function getTransferSolWithSeedInstructionDataCodec(): Codec<
 }
 
 export type TransferSolWithSeedInput<
-  TAccountSource extends string,
-  TAccountBaseAccount extends string,
-  TAccountDestination extends string,
-> = {
-  source: Address<TAccountSource>;
-  baseAccount: Address<TAccountBaseAccount>;
-  destination: Address<TAccountDestination>;
-  amount: TransferSolWithSeedInstructionDataArgs['amount'];
-  fromSeed: TransferSolWithSeedInstructionDataArgs['fromSeed'];
-  fromOwner: TransferSolWithSeedInstructionDataArgs['fromOwner'];
-};
-
-export type TransferSolWithSeedInputWithSigners<
-  TAccountSource extends string,
-  TAccountBaseAccount extends string,
-  TAccountDestination extends string,
+  TAccountSource extends string = string,
+  TAccountBaseAccount extends string = string,
+  TAccountDestination extends string = string,
 > = {
   source: Address<TAccountSource>;
   baseAccount: TransactionSigner<TAccountBaseAccount>;
@@ -163,24 +123,6 @@ export function getTransferSolWithSeedInstruction<
   TAccountSource extends string,
   TAccountBaseAccount extends string,
   TAccountDestination extends string,
-  TProgram extends string = '11111111111111111111111111111111',
->(
-  input: TransferSolWithSeedInputWithSigners<
-    TAccountSource,
-    TAccountBaseAccount,
-    TAccountDestination
-  >
-): TransferSolWithSeedInstructionWithSigners<
-  TProgram,
-  TAccountSource,
-  TAccountBaseAccount,
-  TAccountDestination
->;
-export function getTransferSolWithSeedInstruction<
-  TAccountSource extends string,
-  TAccountBaseAccount extends string,
-  TAccountDestination extends string,
-  TProgram extends string = '11111111111111111111111111111111',
 >(
   input: TransferSolWithSeedInput<
     TAccountSource,
@@ -188,103 +130,51 @@ export function getTransferSolWithSeedInstruction<
     TAccountDestination
   >
 ): TransferSolWithSeedInstruction<
-  TProgram,
+  typeof SYSTEM_PROGRAM_ADDRESS,
   TAccountSource,
   TAccountBaseAccount,
   TAccountDestination
->;
-export function getTransferSolWithSeedInstruction<
-  TAccountSource extends string,
-  TAccountBaseAccount extends string,
-  TAccountDestination extends string,
-  TProgram extends string = '11111111111111111111111111111111',
->(
-  input: TransferSolWithSeedInput<
-    TAccountSource,
-    TAccountBaseAccount,
-    TAccountDestination
-  >
-): IInstruction {
+> {
   // Program address.
-  const programAddress =
-    '11111111111111111111111111111111' as Address<'11111111111111111111111111111111'>;
+  const programAddress = SYSTEM_PROGRAM_ADDRESS;
 
   // Original accounts.
-  type AccountMetas = Parameters<
-    typeof getTransferSolWithSeedInstructionRaw<
-      TProgram,
-      TAccountSource,
-      TAccountBaseAccount,
-      TAccountDestination
-    >
-  >[0];
-  const accounts: Record<keyof AccountMetas, ResolvedAccount> = {
+  const originalAccounts = {
     source: { value: input.source ?? null, isWritable: true },
     baseAccount: { value: input.baseAccount ?? null, isWritable: false },
     destination: { value: input.destination ?? null, isWritable: true },
   };
+  const accounts = originalAccounts as Record<
+    keyof typeof originalAccounts,
+    ResolvedAccount
+  >;
 
   // Original args.
   const args = { ...input };
 
-  // Get account metas and signers.
-  const accountMetas = getAccountMetasWithSigners(
-    accounts,
-    'programId',
-    programAddress
-  );
-
-  const instruction = getTransferSolWithSeedInstructionRaw(
-    accountMetas as Record<keyof AccountMetas, IAccountMeta>,
-    args as TransferSolWithSeedInstructionDataArgs,
-    programAddress
-  );
+  const getAccountMeta = getAccountMetaFactory(programAddress, 'programId');
+  const instruction = {
+    accounts: [
+      getAccountMeta(accounts.source),
+      getAccountMeta(accounts.baseAccount),
+      getAccountMeta(accounts.destination),
+    ],
+    programAddress,
+    data: getTransferSolWithSeedInstructionDataEncoder().encode(
+      args as TransferSolWithSeedInstructionDataArgs
+    ),
+  } as TransferSolWithSeedInstruction<
+    typeof SYSTEM_PROGRAM_ADDRESS,
+    TAccountSource,
+    TAccountBaseAccount,
+    TAccountDestination
+  >;
 
   return instruction;
 }
 
-export function getTransferSolWithSeedInstructionRaw<
-  TProgram extends string = '11111111111111111111111111111111',
-  TAccountSource extends string | IAccountMeta<string> = string,
-  TAccountBaseAccount extends string | IAccountMeta<string> = string,
-  TAccountDestination extends string | IAccountMeta<string> = string,
-  TRemainingAccounts extends Array<IAccountMeta<string>> = [],
->(
-  accounts: {
-    source: TAccountSource extends string
-      ? Address<TAccountSource>
-      : TAccountSource;
-    baseAccount: TAccountBaseAccount extends string
-      ? Address<TAccountBaseAccount>
-      : TAccountBaseAccount;
-    destination: TAccountDestination extends string
-      ? Address<TAccountDestination>
-      : TAccountDestination;
-  },
-  args: TransferSolWithSeedInstructionDataArgs,
-  programAddress: Address<TProgram> = '11111111111111111111111111111111' as Address<TProgram>,
-  remainingAccounts?: TRemainingAccounts
-) {
-  return {
-    accounts: [
-      accountMetaWithDefault(accounts.source, AccountRole.WRITABLE),
-      accountMetaWithDefault(accounts.baseAccount, AccountRole.READONLY_SIGNER),
-      accountMetaWithDefault(accounts.destination, AccountRole.WRITABLE),
-      ...(remainingAccounts ?? []),
-    ],
-    data: getTransferSolWithSeedInstructionDataEncoder().encode(args),
-    programAddress,
-  } as TransferSolWithSeedInstruction<
-    TProgram,
-    TAccountSource,
-    TAccountBaseAccount,
-    TAccountDestination,
-    TRemainingAccounts
-  >;
-}
-
 export type ParsedTransferSolWithSeedInstruction<
-  TProgram extends string = '11111111111111111111111111111111',
+  TProgram extends string = typeof SYSTEM_PROGRAM_ADDRESS,
   TAccountMetas extends readonly IAccountMeta[] = readonly IAccountMeta[],
 > = {
   programAddress: Address<TProgram>;

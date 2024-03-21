@@ -23,7 +23,6 @@ import {
   mapEncoder,
 } from '@solana/codecs';
 import {
-  AccountRole,
   IAccountMeta,
   IInstruction,
   IInstructionWithAccounts,
@@ -31,31 +30,13 @@ import {
   WritableSignerAccount,
 } from '@solana/instructions';
 import { IAccountSignerMeta, TransactionSigner } from '@solana/signers';
-import {
-  ResolvedAccount,
-  accountMetaWithDefault,
-  getAccountMetasWithSigners,
-} from '../shared';
+import { SYSTEM_PROGRAM_ADDRESS } from '../programs';
+import { ResolvedAccount, getAccountMetaFactory } from '../shared';
 
 export type AssignInstruction<
-  TProgram extends string = '11111111111111111111111111111111',
+  TProgram extends string = typeof SYSTEM_PROGRAM_ADDRESS,
   TAccountAccount extends string | IAccountMeta<string> = string,
-  TRemainingAccounts extends Array<IAccountMeta<string>> = [],
-> = IInstruction<TProgram> &
-  IInstructionWithData<Uint8Array> &
-  IInstructionWithAccounts<
-    [
-      TAccountAccount extends string
-        ? WritableSignerAccount<TAccountAccount>
-        : TAccountAccount,
-      ...TRemainingAccounts,
-    ]
-  >;
-
-export type AssignInstructionWithSigners<
-  TProgram extends string = '11111111111111111111111111111111',
-  TAccountAccount extends string | IAccountMeta<string> = string,
-  TRemainingAccounts extends Array<IAccountMeta<string>> = [],
+  TRemainingAccounts extends readonly IAccountMeta<string>[] = [],
 > = IInstruction<TProgram> &
   IInstructionWithData<Uint8Array> &
   IInstructionWithAccounts<
@@ -102,89 +83,43 @@ export function getAssignInstructionDataCodec(): Codec<
   );
 }
 
-export type AssignInput<TAccountAccount extends string> = {
-  account: Address<TAccountAccount>;
-  programAddress: AssignInstructionDataArgs['programAddress'];
-};
-
-export type AssignInputWithSigners<TAccountAccount extends string> = {
+export type AssignInput<TAccountAccount extends string = string> = {
   account: TransactionSigner<TAccountAccount>;
   programAddress: AssignInstructionDataArgs['programAddress'];
 };
 
-export function getAssignInstruction<
-  TAccountAccount extends string,
-  TProgram extends string = '11111111111111111111111111111111',
->(
-  input: AssignInputWithSigners<TAccountAccount>
-): AssignInstructionWithSigners<TProgram, TAccountAccount>;
-export function getAssignInstruction<
-  TAccountAccount extends string,
-  TProgram extends string = '11111111111111111111111111111111',
->(
+export function getAssignInstruction<TAccountAccount extends string>(
   input: AssignInput<TAccountAccount>
-): AssignInstruction<TProgram, TAccountAccount>;
-export function getAssignInstruction<
-  TAccountAccount extends string,
-  TProgram extends string = '11111111111111111111111111111111',
->(input: AssignInput<TAccountAccount>): IInstruction {
+): AssignInstruction<typeof SYSTEM_PROGRAM_ADDRESS, TAccountAccount> {
   // Program address.
-  const programAddress =
-    '11111111111111111111111111111111' as Address<'11111111111111111111111111111111'>;
+  const programAddress = SYSTEM_PROGRAM_ADDRESS;
 
   // Original accounts.
-  type AccountMetas = Parameters<
-    typeof getAssignInstructionRaw<TProgram, TAccountAccount>
-  >[0];
-  const accounts: Record<keyof AccountMetas, ResolvedAccount> = {
+  const originalAccounts = {
     account: { value: input.account ?? null, isWritable: true },
   };
+  const accounts = originalAccounts as Record<
+    keyof typeof originalAccounts,
+    ResolvedAccount
+  >;
 
   // Original args.
   const args = { ...input };
 
-  // Get account metas and signers.
-  const accountMetas = getAccountMetasWithSigners(
-    accounts,
-    'programId',
-    programAddress
-  );
-
-  const instruction = getAssignInstructionRaw(
-    accountMetas as Record<keyof AccountMetas, IAccountMeta>,
-    args as AssignInstructionDataArgs,
-    programAddress
-  );
+  const getAccountMeta = getAccountMetaFactory(programAddress, 'programId');
+  const instruction = {
+    accounts: [getAccountMeta(accounts.account)],
+    programAddress,
+    data: getAssignInstructionDataEncoder().encode(
+      args as AssignInstructionDataArgs
+    ),
+  } as AssignInstruction<typeof SYSTEM_PROGRAM_ADDRESS, TAccountAccount>;
 
   return instruction;
 }
 
-export function getAssignInstructionRaw<
-  TProgram extends string = '11111111111111111111111111111111',
-  TAccountAccount extends string | IAccountMeta<string> = string,
-  TRemainingAccounts extends Array<IAccountMeta<string>> = [],
->(
-  accounts: {
-    account: TAccountAccount extends string
-      ? Address<TAccountAccount>
-      : TAccountAccount;
-  },
-  args: AssignInstructionDataArgs,
-  programAddress: Address<TProgram> = '11111111111111111111111111111111' as Address<TProgram>,
-  remainingAccounts?: TRemainingAccounts
-) {
-  return {
-    accounts: [
-      accountMetaWithDefault(accounts.account, AccountRole.WRITABLE_SIGNER),
-      ...(remainingAccounts ?? []),
-    ],
-    data: getAssignInstructionDataEncoder().encode(args),
-    programAddress,
-  } as AssignInstruction<TProgram, TAccountAccount, TRemainingAccounts>;
-}
-
 export type ParsedAssignInstruction<
-  TProgram extends string = '11111111111111111111111111111111',
+  TProgram extends string = typeof SYSTEM_PROGRAM_ADDRESS,
   TAccountMetas extends readonly IAccountMeta[] = readonly IAccountMeta[],
 > = {
   programAddress: Address<TProgram>;
