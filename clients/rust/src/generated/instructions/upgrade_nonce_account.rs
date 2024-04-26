@@ -41,12 +41,12 @@ impl UpgradeNonceAccount {
 }
 
 #[derive(BorshDeserialize, BorshSerialize)]
-struct UpgradeNonceAccountInstructionData {
+pub struct UpgradeNonceAccountInstructionData {
     discriminator: u32,
 }
 
 impl UpgradeNonceAccountInstructionData {
-    fn new() -> Self {
+    pub fn new() -> Self {
         Self { discriminator: 12 }
     }
 }
@@ -56,7 +56,7 @@ impl UpgradeNonceAccountInstructionData {
 /// ### Accounts:
 ///
 ///   0. `[writable]` nonce_account
-#[derive(Default)]
+#[derive(Clone, Debug, Default)]
 pub struct UpgradeNonceAccountBuilder {
     nonce_account: Option<solana_program::pubkey::Pubkey>,
     __remaining_accounts: Vec<solana_program::instruction::AccountMeta>,
@@ -196,6 +196,7 @@ impl<'a, 'b> UpgradeNonceAccountCpi<'a, 'b> {
 /// ### Accounts:
 ///
 ///   0. `[writable]` nonce_account
+#[derive(Clone, Debug)]
 pub struct UpgradeNonceAccountCpiBuilder<'a, 'b> {
     instruction: Box<UpgradeNonceAccountCpiBuilderInstruction<'a, 'b>>,
 }
@@ -273,6 +274,7 @@ impl<'a, 'b> UpgradeNonceAccountCpiBuilder<'a, 'b> {
     }
 }
 
+#[derive(Clone, Debug)]
 struct UpgradeNonceAccountCpiBuilderInstruction<'a, 'b> {
     __program: &'b solana_program::account_info::AccountInfo<'a>,
     nonce_account: Option<&'b solana_program::account_info::AccountInfo<'a>>,

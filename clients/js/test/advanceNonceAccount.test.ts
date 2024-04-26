@@ -1,5 +1,5 @@
 import {
-  appendTransactionInstruction,
+  appendTransactionMessageInstruction,
   generateKeyPairSigner,
   pipe,
 } from '@solana/web3.js';
@@ -31,7 +31,7 @@ test('it advances the nonce account', async (t) => {
   });
   await pipe(
     await createDefaultTransaction(client, payer),
-    (tx) => appendTransactionInstruction(createAccount, tx),
+    (tx) => appendTransactionMessageInstruction(createAccount, tx),
     (tx) => signAndSendTransaction(client, tx)
   );
 

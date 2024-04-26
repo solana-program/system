@@ -6,33 +6,30 @@
  * @see https://github.com/metaplex-foundation/kinobi
  */
 
-import { BASE_ACCOUNT_SIZE } from '@solana/accounts';
 import {
   Address,
-  getAddressDecoder,
-  getAddressEncoder,
-} from '@solana/addresses';
-import {
+  BASE_ACCOUNT_SIZE,
   Codec,
   Decoder,
   Encoder,
+  IAccountMeta,
+  IAccountSignerMeta,
+  IInstruction,
+  IInstructionWithAccounts,
+  IInstructionWithData,
+  TransactionSigner,
+  WritableSignerAccount,
   combineCodec,
+  getAddressDecoder,
+  getAddressEncoder,
   getStructDecoder,
   getStructEncoder,
   getU32Decoder,
   getU32Encoder,
   getU64Decoder,
   getU64Encoder,
-  mapEncoder,
-} from '@solana/codecs';
-import {
-  IAccountMeta,
-  IInstruction,
-  IInstructionWithAccounts,
-  IInstructionWithData,
-  WritableSignerAccount,
-} from '@solana/instructions';
-import { IAccountSignerMeta, TransactionSigner } from '@solana/signers';
+  transformEncoder,
+} from '@solana/web3.js';
 import { SYSTEM_PROGRAM_ADDRESS } from '../programs';
 import {
   IInstructionWithByteDelta,
@@ -75,7 +72,7 @@ export type CreateAccountInstructionDataArgs = {
 };
 
 export function getCreateAccountInstructionDataEncoder(): Encoder<CreateAccountInstructionDataArgs> {
-  return mapEncoder(
+  return transformEncoder(
     getStructEncoder([
       ['discriminator', getU32Encoder()],
       ['lamports', getU64Encoder()],

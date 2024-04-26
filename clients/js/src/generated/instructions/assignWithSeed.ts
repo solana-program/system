@@ -8,31 +8,30 @@
 
 import {
   Address,
-  getAddressDecoder,
-  getAddressEncoder,
-} from '@solana/addresses';
-import {
   Codec,
   Decoder,
   Encoder,
-  combineCodec,
-  getStringDecoder,
-  getStringEncoder,
-  getStructDecoder,
-  getStructEncoder,
-  getU32Decoder,
-  getU32Encoder,
-  mapEncoder,
-} from '@solana/codecs';
-import {
   IAccountMeta,
+  IAccountSignerMeta,
   IInstruction,
   IInstructionWithAccounts,
   IInstructionWithData,
   ReadonlySignerAccount,
+  TransactionSigner,
   WritableAccount,
-} from '@solana/instructions';
-import { IAccountSignerMeta, TransactionSigner } from '@solana/signers';
+  addDecoderSizePrefix,
+  addEncoderSizePrefix,
+  combineCodec,
+  getAddressDecoder,
+  getAddressEncoder,
+  getStructDecoder,
+  getStructEncoder,
+  getU32Decoder,
+  getU32Encoder,
+  getUtf8Decoder,
+  getUtf8Encoder,
+  transformEncoder,
+} from '@solana/web3.js';
 import { SYSTEM_PROGRAM_ADDRESS } from '../programs';
 import { ResolvedAccount, getAccountMetaFactory } from '../shared';
 
@@ -70,11 +69,11 @@ export type AssignWithSeedInstructionDataArgs = {
 };
 
 export function getAssignWithSeedInstructionDataEncoder(): Encoder<AssignWithSeedInstructionDataArgs> {
-  return mapEncoder(
+  return transformEncoder(
     getStructEncoder([
       ['discriminator', getU32Encoder()],
       ['base', getAddressEncoder()],
-      ['seed', getStringEncoder()],
+      ['seed', addEncoderSizePrefix(getUtf8Encoder(), getU32Encoder())],
       ['programAddress', getAddressEncoder()],
     ]),
     (value) => ({ ...value, discriminator: 10 })
@@ -85,7 +84,7 @@ export function getAssignWithSeedInstructionDataDecoder(): Decoder<AssignWithSee
   return getStructDecoder([
     ['discriminator', getU32Decoder()],
     ['base', getAddressDecoder()],
-    ['seed', getStringDecoder()],
+    ['seed', addDecoderSizePrefix(getUtf8Decoder(), getU32Decoder())],
     ['programAddress', getAddressDecoder()],
   ]);
 }

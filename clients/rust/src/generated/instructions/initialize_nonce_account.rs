@@ -60,12 +60,12 @@ impl InitializeNonceAccount {
 }
 
 #[derive(BorshDeserialize, BorshSerialize)]
-struct InitializeNonceAccountInstructionData {
+pub struct InitializeNonceAccountInstructionData {
     discriminator: u32,
 }
 
 impl InitializeNonceAccountInstructionData {
-    fn new() -> Self {
+    pub fn new() -> Self {
         Self { discriminator: 6 }
     }
 }
@@ -83,7 +83,7 @@ pub struct InitializeNonceAccountInstructionArgs {
 ///   0. `[writable]` nonce_account
 ///   1. `[optional]` recent_blockhashes_sysvar (default to `SysvarRecentB1ockHashes11111111111111111111`)
 ///   2. `[optional]` rent_sysvar (default to `SysvarRent111111111111111111111111111111111`)
-#[derive(Default)]
+#[derive(Clone, Debug, Default)]
 pub struct InitializeNonceAccountBuilder {
     nonce_account: Option<solana_program::pubkey::Pubkey>,
     recent_blockhashes_sysvar: Option<solana_program::pubkey::Pubkey>,
@@ -286,6 +286,7 @@ impl<'a, 'b> InitializeNonceAccountCpi<'a, 'b> {
 ///   0. `[writable]` nonce_account
 ///   1. `[]` recent_blockhashes_sysvar
 ///   2. `[]` rent_sysvar
+#[derive(Clone, Debug)]
 pub struct InitializeNonceAccountCpiBuilder<'a, 'b> {
     instruction: Box<InitializeNonceAccountCpiBuilderInstruction<'a, 'b>>,
 }
@@ -405,6 +406,7 @@ impl<'a, 'b> InitializeNonceAccountCpiBuilder<'a, 'b> {
     }
 }
 
+#[derive(Clone, Debug)]
 struct InitializeNonceAccountCpiBuilderInstruction<'a, 'b> {
     __program: &'b solana_program::account_info::AccountInfo<'a>,
     nonce_account: Option<&'b solana_program::account_info::AccountInfo<'a>>,

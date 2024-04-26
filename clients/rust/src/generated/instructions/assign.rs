@@ -46,12 +46,12 @@ impl Assign {
 }
 
 #[derive(BorshDeserialize, BorshSerialize)]
-struct AssignInstructionData {
+pub struct AssignInstructionData {
     discriminator: u32,
 }
 
 impl AssignInstructionData {
-    fn new() -> Self {
+    pub fn new() -> Self {
         Self { discriminator: 1 }
     }
 }
@@ -67,7 +67,7 @@ pub struct AssignInstructionArgs {
 /// ### Accounts:
 ///
 ///   0. `[writable, signer]` account
-#[derive(Default)]
+#[derive(Clone, Debug, Default)]
 pub struct AssignBuilder {
     account: Option<solana_program::pubkey::Pubkey>,
     program_address: Option<Pubkey>,
@@ -223,6 +223,7 @@ impl<'a, 'b> AssignCpi<'a, 'b> {
 /// ### Accounts:
 ///
 ///   0. `[writable, signer]` account
+#[derive(Clone, Debug)]
 pub struct AssignCpiBuilder<'a, 'b> {
     instruction: Box<AssignCpiBuilderInstruction<'a, 'b>>,
 }
@@ -311,6 +312,7 @@ impl<'a, 'b> AssignCpiBuilder<'a, 'b> {
     }
 }
 
+#[derive(Clone, Debug)]
 struct AssignCpiBuilderInstruction<'a, 'b> {
     __program: &'b solana_program::account_info::AccountInfo<'a>,
     account: Option<&'b solana_program::account_info::AccountInfo<'a>>,

@@ -6,28 +6,27 @@
  * @see https://github.com/metaplex-foundation/kinobi
  */
 
-import { Address } from '@solana/addresses';
 import {
+  Address,
   Codec,
   Decoder,
   Encoder,
-  combineCodec,
-  getStructDecoder,
-  getStructEncoder,
-  getU32Decoder,
-  getU32Encoder,
-  mapEncoder,
-} from '@solana/codecs';
-import {
   IAccountMeta,
+  IAccountSignerMeta,
   IInstruction,
   IInstructionWithAccounts,
   IInstructionWithData,
   ReadonlyAccount,
   ReadonlySignerAccount,
+  TransactionSigner,
   WritableAccount,
-} from '@solana/instructions';
-import { IAccountSignerMeta, TransactionSigner } from '@solana/signers';
+  combineCodec,
+  getStructDecoder,
+  getStructEncoder,
+  getU32Decoder,
+  getU32Encoder,
+  transformEncoder,
+} from '@solana/web3.js';
 import { SYSTEM_PROGRAM_ADDRESS } from '../programs';
 import { ResolvedAccount, getAccountMetaFactory } from '../shared';
 
@@ -62,7 +61,7 @@ export type AdvanceNonceAccountInstructionData = { discriminator: number };
 export type AdvanceNonceAccountInstructionDataArgs = {};
 
 export function getAdvanceNonceAccountInstructionDataEncoder(): Encoder<AdvanceNonceAccountInstructionDataArgs> {
-  return mapEncoder(
+  return transformEncoder(
     getStructEncoder([['discriminator', getU32Encoder()]]),
     (value) => ({ ...value, discriminator: 4 })
   );

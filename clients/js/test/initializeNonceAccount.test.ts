@@ -1,5 +1,6 @@
 import {
-  appendTransactionInstruction,
+  Account,
+  appendTransactionMessageInstruction,
   generateKeyPairSigner,
   pipe,
 } from '@solana/web3.js';
@@ -44,13 +45,13 @@ test('it creates and initialize a durable nonce account', async (t) => {
   });
   await pipe(
     await createDefaultTransaction(client, payer),
-    (tx) => appendTransactionInstruction(createAccount, tx),
-    (tx) => appendTransactionInstruction(initializeNonceAccount, tx),
+    (tx) => appendTransactionMessageInstruction(createAccount, tx),
+    (tx) => appendTransactionMessageInstruction(initializeNonceAccount, tx),
     (tx) => signAndSendTransaction(client, tx)
   );
 
   // Then we expect the nonce account to exist with the following data.
-  t.like(await fetchNonce(client.rpc, nonce.address), <Nonce>{
+  t.like(await fetchNonce(client.rpc, nonce.address), <Account<Nonce>>{
     address: nonce.address,
     data: {
       version: NonceVersion.Current,

@@ -1,5 +1,5 @@
 import {
-  appendTransactionInstruction,
+  appendTransactionMessageInstruction,
   fetchEncodedAccount,
   generateKeyPairSigner,
   pipe,
@@ -36,7 +36,7 @@ test('it creates a new empty account', async (t) => {
   });
   await pipe(
     await createDefaultTransaction(client, payer),
-    (tx) => appendTransactionInstruction(createAccount, tx),
+    (tx) => appendTransactionMessageInstruction(createAccount, tx),
     (tx) => signAndSendTransaction(client, tx)
   );
 

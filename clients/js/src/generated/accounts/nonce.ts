@@ -8,32 +8,28 @@
 
 import {
   Account,
+  Address,
+  Codec,
+  Decoder,
   EncodedAccount,
+  Encoder,
   FetchAccountConfig,
   FetchAccountsConfig,
   MaybeAccount,
   MaybeEncodedAccount,
   assertAccountExists,
   assertAccountsExist,
+  combineCodec,
   decodeAccount,
   fetchEncodedAccount,
   fetchEncodedAccounts,
-} from '@solana/accounts';
-import {
-  Address,
   getAddressDecoder,
   getAddressEncoder,
-} from '@solana/addresses';
-import {
-  Codec,
-  Decoder,
-  Encoder,
-  combineCodec,
   getStructDecoder,
   getStructEncoder,
   getU64Decoder,
   getU64Encoder,
-} from '@solana/codecs';
+} from '@solana/web3.js';
 import {
   NonceState,
   NonceStateArgs,
@@ -45,17 +41,7 @@ import {
   getNonceVersionEncoder,
 } from '../types';
 
-export type Nonce<TAddress extends string = string> = Account<
-  NonceAccountData,
-  TAddress
->;
-
-export type MaybeNonce<TAddress extends string = string> = MaybeAccount<
-  NonceAccountData,
-  TAddress
->;
-
-export type NonceAccountData = {
+export type Nonce = {
   version: NonceVersion;
   state: NonceState;
   authority: Address;
@@ -63,7 +49,7 @@ export type NonceAccountData = {
   lamportsPerSignature: bigint;
 };
 
-export type NonceAccountDataArgs = {
+export type NonceArgs = {
   version: NonceVersionArgs;
   state: NonceStateArgs;
   authority: Address;
@@ -71,7 +57,7 @@ export type NonceAccountDataArgs = {
   lamportsPerSignature: number | bigint;
 };
 
-export function getNonceAccountDataEncoder(): Encoder<NonceAccountDataArgs> {
+export function getNonceEncoder(): Encoder<NonceArgs> {
   return getStructEncoder([
     ['version', getNonceVersionEncoder()],
     ['state', getNonceStateEncoder()],
@@ -81,7 +67,7 @@ export function getNonceAccountDataEncoder(): Encoder<NonceAccountDataArgs> {
   ]);
 }
 
-export function getNonceAccountDataDecoder(): Decoder<NonceAccountData> {
+export function getNonceDecoder(): Decoder<Nonce> {
   return getStructDecoder([
     ['version', getNonceVersionDecoder()],
     ['state', getNonceStateDecoder()],
@@ -91,28 +77,22 @@ export function getNonceAccountDataDecoder(): Decoder<NonceAccountData> {
   ]);
 }
 
-export function getNonceAccountDataCodec(): Codec<
-  NonceAccountDataArgs,
-  NonceAccountData
-> {
-  return combineCodec(
-    getNonceAccountDataEncoder(),
-    getNonceAccountDataDecoder()
-  );
+export function getNonceCodec(): Codec<NonceArgs, Nonce> {
+  return combineCodec(getNonceEncoder(), getNonceDecoder());
 }
 
 export function decodeNonce<TAddress extends string = string>(
   encodedAccount: EncodedAccount<TAddress>
-): Nonce<TAddress>;
+): Account<Nonce, TAddress>;
 export function decodeNonce<TAddress extends string = string>(
   encodedAccount: MaybeEncodedAccount<TAddress>
-): MaybeNonce<TAddress>;
+): MaybeAccount<Nonce, TAddress>;
 export function decodeNonce<TAddress extends string = string>(
   encodedAccount: EncodedAccount<TAddress> | MaybeEncodedAccount<TAddress>
-): Nonce<TAddress> | MaybeNonce<TAddress> {
+): Account<Nonce, TAddress> | MaybeAccount<Nonce, TAddress> {
   return decodeAccount(
     encodedAccount as MaybeEncodedAccount<TAddress>,
-    getNonceAccountDataDecoder()
+    getNonceDecoder()
   );
 }
 
@@ -120,7 +100,7 @@ export async function fetchNonce<TAddress extends string = string>(
   rpc: Parameters<typeof fetchEncodedAccount>[0],
   address: Address<TAddress>,
   config?: FetchAccountConfig
-): Promise<Nonce<TAddress>> {
+): Promise<Account<Nonce, TAddress>> {
   const maybeAccount = await fetchMaybeNonce(rpc, address, config);
   assertAccountExists(maybeAccount);
   return maybeAccount;
@@ -130,7 +110,7 @@ export async function fetchMaybeNonce<TAddress extends string = string>(
   rpc: Parameters<typeof fetchEncodedAccount>[0],
   address: Address<TAddress>,
   config?: FetchAccountConfig
-): Promise<MaybeNonce<TAddress>> {
+): Promise<MaybeAccount<Nonce, TAddress>> {
   const maybeAccount = await fetchEncodedAccount(rpc, address, config);
   return decodeNonce(maybeAccount);
 }
@@ -139,7 +119,7 @@ export async function fetchAllNonce(
   rpc: Parameters<typeof fetchEncodedAccounts>[0],
   addresses: Array<Address>,
   config?: FetchAccountsConfig
-): Promise<Nonce[]> {
+): Promise<Account<Nonce>[]> {
   const maybeAccounts = await fetchAllMaybeNonce(rpc, addresses, config);
   assertAccountsExist(maybeAccounts);
   return maybeAccounts;
@@ -149,7 +129,7 @@ export async function fetchAllMaybeNonce(
   rpc: Parameters<typeof fetchEncodedAccounts>[0],
   addresses: Array<Address>,
   config?: FetchAccountsConfig
-): Promise<MaybeNonce[]> {
+): Promise<MaybeAccount<Nonce>[]> {
   const maybeAccounts = await fetchEncodedAccounts(rpc, addresses, config);
   return maybeAccounts.map((maybeAccount) => decodeNonce(maybeAccount));
 }
