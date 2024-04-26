@@ -71,12 +71,12 @@ impl WithdrawNonceAccount {
 }
 
 #[derive(BorshDeserialize, BorshSerialize)]
-struct WithdrawNonceAccountInstructionData {
+pub struct WithdrawNonceAccountInstructionData {
     discriminator: u32,
 }
 
 impl WithdrawNonceAccountInstructionData {
-    fn new() -> Self {
+    pub fn new() -> Self {
         Self { discriminator: 5 }
     }
 }
@@ -96,7 +96,7 @@ pub struct WithdrawNonceAccountInstructionArgs {
 ///   2. `[optional]` recent_blockhashes_sysvar (default to `SysvarRecentB1ockHashes11111111111111111111`)
 ///   3. `[optional]` rent_sysvar (default to `SysvarRent111111111111111111111111111111111`)
 ///   4. `[signer]` nonce_authority
-#[derive(Default)]
+#[derive(Clone, Debug, Default)]
 pub struct WithdrawNonceAccountBuilder {
     nonce_account: Option<solana_program::pubkey::Pubkey>,
     recipient_account: Option<solana_program::pubkey::Pubkey>,
@@ -343,6 +343,7 @@ impl<'a, 'b> WithdrawNonceAccountCpi<'a, 'b> {
 ///   2. `[]` recent_blockhashes_sysvar
 ///   3. `[]` rent_sysvar
 ///   4. `[signer]` nonce_authority
+#[derive(Clone, Debug)]
 pub struct WithdrawNonceAccountCpiBuilder<'a, 'b> {
     instruction: Box<WithdrawNonceAccountCpiBuilderInstruction<'a, 'b>>,
 }
@@ -490,6 +491,7 @@ impl<'a, 'b> WithdrawNonceAccountCpiBuilder<'a, 'b> {
     }
 }
 
+#[derive(Clone, Debug)]
 struct WithdrawNonceAccountCpiBuilderInstruction<'a, 'b> {
     __program: &'b solana_program::account_info::AccountInfo<'a>,
     nonce_account: Option<&'b solana_program::account_info::AccountInfo<'a>>,

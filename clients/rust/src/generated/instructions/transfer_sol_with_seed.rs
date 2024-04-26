@@ -60,12 +60,12 @@ impl TransferSolWithSeed {
 }
 
 #[derive(BorshDeserialize, BorshSerialize)]
-struct TransferSolWithSeedInstructionData {
+pub struct TransferSolWithSeedInstructionData {
     discriminator: u32,
 }
 
 impl TransferSolWithSeedInstructionData {
-    fn new() -> Self {
+    pub fn new() -> Self {
         Self { discriminator: 11 }
     }
 }
@@ -85,7 +85,7 @@ pub struct TransferSolWithSeedInstructionArgs {
 ///   0. `[writable]` source
 ///   1. `[signer]` base_account
 ///   2. `[writable]` destination
-#[derive(Default)]
+#[derive(Clone, Debug, Default)]
 pub struct TransferSolWithSeedBuilder {
     source: Option<solana_program::pubkey::Pubkey>,
     base_account: Option<solana_program::pubkey::Pubkey>,
@@ -290,6 +290,7 @@ impl<'a, 'b> TransferSolWithSeedCpi<'a, 'b> {
 ///   0. `[writable]` source
 ///   1. `[signer]` base_account
 ///   2. `[writable]` destination
+#[derive(Clone, Debug)]
 pub struct TransferSolWithSeedCpiBuilder<'a, 'b> {
     instruction: Box<TransferSolWithSeedCpiBuilderInstruction<'a, 'b>>,
 }
@@ -424,6 +425,7 @@ impl<'a, 'b> TransferSolWithSeedCpiBuilder<'a, 'b> {
     }
 }
 
+#[derive(Clone, Debug)]
 struct TransferSolWithSeedCpiBuilderInstruction<'a, 'b> {
     __program: &'b solana_program::account_info::AccountInfo<'a>,
     source: Option<&'b solana_program::account_info::AccountInfo<'a>>,

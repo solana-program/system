@@ -52,12 +52,12 @@ impl AllocateWithSeed {
 }
 
 #[derive(BorshDeserialize, BorshSerialize)]
-struct AllocateWithSeedInstructionData {
+pub struct AllocateWithSeedInstructionData {
     discriminator: u32,
 }
 
 impl AllocateWithSeedInstructionData {
-    fn new() -> Self {
+    pub fn new() -> Self {
         Self { discriminator: 9 }
     }
 }
@@ -77,7 +77,7 @@ pub struct AllocateWithSeedInstructionArgs {
 ///
 ///   0. `[writable]` new_account
 ///   1. `[signer]` base_account
-#[derive(Default)]
+#[derive(Clone, Debug, Default)]
 pub struct AllocateWithSeedBuilder {
     new_account: Option<solana_program::pubkey::Pubkey>,
     base_account: Option<solana_program::pubkey::Pubkey>,
@@ -272,6 +272,7 @@ impl<'a, 'b> AllocateWithSeedCpi<'a, 'b> {
 ///
 ///   0. `[writable]` new_account
 ///   1. `[signer]` base_account
+#[derive(Clone, Debug)]
 pub struct AllocateWithSeedCpiBuilder<'a, 'b> {
     instruction: Box<AllocateWithSeedCpiBuilderInstruction<'a, 'b>>,
 }
@@ -398,6 +399,7 @@ impl<'a, 'b> AllocateWithSeedCpiBuilder<'a, 'b> {
     }
 }
 
+#[derive(Clone, Debug)]
 struct AllocateWithSeedCpiBuilderInstruction<'a, 'b> {
     __program: &'b solana_program::account_info::AccountInfo<'a>,
     new_account: Option<&'b solana_program::account_info::AccountInfo<'a>>,

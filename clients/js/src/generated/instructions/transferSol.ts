@@ -6,11 +6,19 @@
  * @see https://github.com/metaplex-foundation/kinobi
  */
 
-import { Address } from '@solana/addresses';
 import {
+  Address,
   Codec,
   Decoder,
   Encoder,
+  IAccountMeta,
+  IAccountSignerMeta,
+  IInstruction,
+  IInstructionWithAccounts,
+  IInstructionWithData,
+  TransactionSigner,
+  WritableAccount,
+  WritableSignerAccount,
   combineCodec,
   getStructDecoder,
   getStructEncoder,
@@ -18,17 +26,8 @@ import {
   getU32Encoder,
   getU64Decoder,
   getU64Encoder,
-  mapEncoder,
-} from '@solana/codecs';
-import {
-  IAccountMeta,
-  IInstruction,
-  IInstructionWithAccounts,
-  IInstructionWithData,
-  WritableAccount,
-  WritableSignerAccount,
-} from '@solana/instructions';
-import { IAccountSignerMeta, TransactionSigner } from '@solana/signers';
+  transformEncoder,
+} from '@solana/web3.js';
 import { SYSTEM_PROGRAM_ADDRESS } from '../programs';
 import { ResolvedAccount, getAccountMetaFactory } from '../shared';
 
@@ -60,7 +59,7 @@ export type TransferSolInstructionData = {
 export type TransferSolInstructionDataArgs = { amount: number | bigint };
 
 export function getTransferSolInstructionDataEncoder(): Encoder<TransferSolInstructionDataArgs> {
-  return mapEncoder(
+  return transformEncoder(
     getStructEncoder([
       ['discriminator', getU32Encoder()],
       ['amount', getU64Encoder()],

@@ -11,11 +11,11 @@ import {
   Decoder,
   Encoder,
   combineCodec,
-  getScalarEnumDecoder,
-  getScalarEnumEncoder,
+  getEnumDecoder,
+  getEnumEncoder,
   getU32Decoder,
   getU32Encoder,
-} from '@solana/codecs';
+} from '@solana/web3.js';
 
 export enum NonceState {
   Uninitialized,
@@ -25,11 +25,11 @@ export enum NonceState {
 export type NonceStateArgs = NonceState;
 
 export function getNonceStateEncoder(): Encoder<NonceStateArgs> {
-  return getScalarEnumEncoder(NonceState, { size: getU32Encoder() });
+  return getEnumEncoder(NonceState, { size: getU32Encoder() });
 }
 
 export function getNonceStateDecoder(): Decoder<NonceState> {
-  return getScalarEnumDecoder(NonceState, { size: getU32Decoder() });
+  return getEnumDecoder(NonceState, { size: getU32Decoder() });
 }
 
 export function getNonceStateCodec(): Codec<NonceStateArgs, NonceState> {

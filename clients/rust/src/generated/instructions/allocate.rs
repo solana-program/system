@@ -45,12 +45,12 @@ impl Allocate {
 }
 
 #[derive(BorshDeserialize, BorshSerialize)]
-struct AllocateInstructionData {
+pub struct AllocateInstructionData {
     discriminator: u32,
 }
 
 impl AllocateInstructionData {
-    fn new() -> Self {
+    pub fn new() -> Self {
         Self { discriminator: 8 }
     }
 }
@@ -66,7 +66,7 @@ pub struct AllocateInstructionArgs {
 /// ### Accounts:
 ///
 ///   0. `[writable, signer]` new_account
-#[derive(Default)]
+#[derive(Clone, Debug, Default)]
 pub struct AllocateBuilder {
     new_account: Option<solana_program::pubkey::Pubkey>,
     space: Option<u64>,
@@ -219,6 +219,7 @@ impl<'a, 'b> AllocateCpi<'a, 'b> {
 /// ### Accounts:
 ///
 ///   0. `[writable, signer]` new_account
+#[derive(Clone, Debug)]
 pub struct AllocateCpiBuilder<'a, 'b> {
     instruction: Box<AllocateCpiBuilderInstruction<'a, 'b>>,
 }
@@ -306,6 +307,7 @@ impl<'a, 'b> AllocateCpiBuilder<'a, 'b> {
     }
 }
 
+#[derive(Clone, Debug)]
 struct AllocateCpiBuilderInstruction<'a, 'b> {
     __program: &'b solana_program::account_info::AccountInfo<'a>,
     new_account: Option<&'b solana_program::account_info::AccountInfo<'a>>,

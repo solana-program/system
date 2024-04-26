@@ -8,29 +8,26 @@
 
 import {
   Address,
-  getAddressDecoder,
-  getAddressEncoder,
-} from '@solana/addresses';
-import {
   Codec,
   Decoder,
   Encoder,
-  combineCodec,
-  getStructDecoder,
-  getStructEncoder,
-  getU32Decoder,
-  getU32Encoder,
-  mapEncoder,
-} from '@solana/codecs';
-import {
   IAccountMeta,
+  IAccountSignerMeta,
   IInstruction,
   IInstructionWithAccounts,
   IInstructionWithData,
   ReadonlySignerAccount,
+  TransactionSigner,
   WritableAccount,
-} from '@solana/instructions';
-import { IAccountSignerMeta, TransactionSigner } from '@solana/signers';
+  combineCodec,
+  getAddressDecoder,
+  getAddressEncoder,
+  getStructDecoder,
+  getStructEncoder,
+  getU32Decoder,
+  getU32Encoder,
+  transformEncoder,
+} from '@solana/web3.js';
 import { SYSTEM_PROGRAM_ADDRESS } from '../programs';
 import { ResolvedAccount, getAccountMetaFactory } from '../shared';
 
@@ -64,7 +61,7 @@ export type AuthorizeNonceAccountInstructionDataArgs = {
 };
 
 export function getAuthorizeNonceAccountInstructionDataEncoder(): Encoder<AuthorizeNonceAccountInstructionDataArgs> {
-  return mapEncoder(
+  return transformEncoder(
     getStructEncoder([
       ['discriminator', getU32Encoder()],
       ['newNonceAuthority', getAddressEncoder()],

@@ -1,7 +1,7 @@
 import {
   AccountRole,
   Address,
-  appendTransactionInstruction,
+  appendTransactionMessageInstruction,
   generateKeyPairSigner,
   lamports,
   pipe,
@@ -33,7 +33,7 @@ test('it transfers SOL from one account to another', async (t) => {
   });
   await pipe(
     await createDefaultTransaction(client, source),
-    (tx) => appendTransactionInstruction(transferSol, tx),
+    (tx) => appendTransactionMessageInstruction(transferSol, tx),
     (tx) => signAndSendTransaction(client, tx)
   );
 

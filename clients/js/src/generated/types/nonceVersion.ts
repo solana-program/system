@@ -11,11 +11,11 @@ import {
   Decoder,
   Encoder,
   combineCodec,
-  getScalarEnumDecoder,
-  getScalarEnumEncoder,
+  getEnumDecoder,
+  getEnumEncoder,
   getU32Decoder,
   getU32Encoder,
-} from '@solana/codecs';
+} from '@solana/web3.js';
 
 export enum NonceVersion {
   Legacy,
@@ -25,11 +25,11 @@ export enum NonceVersion {
 export type NonceVersionArgs = NonceVersion;
 
 export function getNonceVersionEncoder(): Encoder<NonceVersionArgs> {
-  return getScalarEnumEncoder(NonceVersion, { size: getU32Encoder() });
+  return getEnumEncoder(NonceVersion, { size: getU32Encoder() });
 }
 
 export function getNonceVersionDecoder(): Decoder<NonceVersion> {
-  return getScalarEnumDecoder(NonceVersion, { size: getU32Decoder() });
+  return getEnumDecoder(NonceVersion, { size: getU32Decoder() });
 }
 
 export function getNonceVersionCodec(): Codec<NonceVersionArgs, NonceVersion> {

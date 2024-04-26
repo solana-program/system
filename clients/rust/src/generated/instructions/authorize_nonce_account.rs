@@ -54,12 +54,12 @@ impl AuthorizeNonceAccount {
 }
 
 #[derive(BorshDeserialize, BorshSerialize)]
-struct AuthorizeNonceAccountInstructionData {
+pub struct AuthorizeNonceAccountInstructionData {
     discriminator: u32,
 }
 
 impl AuthorizeNonceAccountInstructionData {
-    fn new() -> Self {
+    pub fn new() -> Self {
         Self { discriminator: 7 }
     }
 }
@@ -76,7 +76,7 @@ pub struct AuthorizeNonceAccountInstructionArgs {
 ///
 ///   0. `[writable]` nonce_account
 ///   1. `[signer]` nonce_authority
-#[derive(Default)]
+#[derive(Clone, Debug, Default)]
 pub struct AuthorizeNonceAccountBuilder {
     nonce_account: Option<solana_program::pubkey::Pubkey>,
     nonce_authority: Option<solana_program::pubkey::Pubkey>,
@@ -255,6 +255,7 @@ impl<'a, 'b> AuthorizeNonceAccountCpi<'a, 'b> {
 ///
 ///   0. `[writable]` nonce_account
 ///   1. `[signer]` nonce_authority
+#[derive(Clone, Debug)]
 pub struct AuthorizeNonceAccountCpiBuilder<'a, 'b> {
     instruction: Box<AuthorizeNonceAccountCpiBuilderInstruction<'a, 'b>>,
 }
@@ -360,6 +361,7 @@ impl<'a, 'b> AuthorizeNonceAccountCpiBuilder<'a, 'b> {
     }
 }
 
+#[derive(Clone, Debug)]
 struct AuthorizeNonceAccountCpiBuilderInstruction<'a, 'b> {
     __program: &'b solana_program::account_info::AccountInfo<'a>,
     nonce_account: Option<&'b solana_program::account_info::AccountInfo<'a>>,

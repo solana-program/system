@@ -6,14 +6,7 @@
  * @see https://github.com/metaplex-foundation/kinobi
  */
 
-import { Address } from '@solana/addresses';
-import { getU32Encoder } from '@solana/codecs';
-import { Program, ProgramWithErrors } from '@solana/programs';
-import {
-  SystemProgramError,
-  SystemProgramErrorCode,
-  getSystemProgramErrorFromCode,
-} from '../errors';
+import { Address, containsBytes, getU32Encoder } from '@solana/web3.js';
 import {
   ParsedAdvanceNonceAccountInstruction,
   ParsedAllocateInstruction,
@@ -29,23 +22,9 @@ import {
   ParsedUpgradeNonceAccountInstruction,
   ParsedWithdrawNonceAccountInstruction,
 } from '../instructions';
-import { memcmp } from '../shared';
 
 export const SYSTEM_PROGRAM_ADDRESS =
   '11111111111111111111111111111111' as Address<'11111111111111111111111111111111'>;
-
-export type SystemProgram = Program<'11111111111111111111111111111111'> &
-  ProgramWithErrors<SystemProgramErrorCode, SystemProgramError>;
-
-export function getSystemProgram(): SystemProgram {
-  return {
-    name: 'system',
-    address: SYSTEM_PROGRAM_ADDRESS,
-    getErrorFromCode(code: SystemProgramErrorCode, cause?: Error) {
-      return getSystemProgramErrorFromCode(code, cause);
-    },
-  };
-}
 
 export enum SystemAccount {
   Nonce,
@@ -72,43 +51,43 @@ export function identifySystemInstruction(
 ): SystemInstruction {
   const data =
     instruction instanceof Uint8Array ? instruction : instruction.data;
-  if (memcmp(data, getU32Encoder().encode(0), 0)) {
+  if (containsBytes(data, getU32Encoder().encode(0), 0)) {
     return SystemInstruction.CreateAccount;
   }
-  if (memcmp(data, getU32Encoder().encode(1), 0)) {
+  if (containsBytes(data, getU32Encoder().encode(1), 0)) {
     return SystemInstruction.Assign;
   }
-  if (memcmp(data, getU32Encoder().encode(2), 0)) {
+  if (containsBytes(data, getU32Encoder().encode(2), 0)) {
     return SystemInstruction.TransferSol;
   }
-  if (memcmp(data, getU32Encoder().encode(3), 0)) {
+  if (containsBytes(data, getU32Encoder().encode(3), 0)) {
     return SystemInstruction.CreateAccountWithSeed;
   }
-  if (memcmp(data, getU32Encoder().encode(4), 0)) {
+  if (containsBytes(data, getU32Encoder().encode(4), 0)) {
     return SystemInstruction.AdvanceNonceAccount;
   }
-  if (memcmp(data, getU32Encoder().encode(5), 0)) {
+  if (containsBytes(data, getU32Encoder().encode(5), 0)) {
     return SystemInstruction.WithdrawNonceAccount;
   }
-  if (memcmp(data, getU32Encoder().encode(6), 0)) {
+  if (containsBytes(data, getU32Encoder().encode(6), 0)) {
     return SystemInstruction.InitializeNonceAccount;
   }
-  if (memcmp(data, getU32Encoder().encode(7), 0)) {
+  if (containsBytes(data, getU32Encoder().encode(7), 0)) {
     return SystemInstruction.AuthorizeNonceAccount;
   }
-  if (memcmp(data, getU32Encoder().encode(8), 0)) {
+  if (containsBytes(data, getU32Encoder().encode(8), 0)) {
     return SystemInstruction.Allocate;
   }
-  if (memcmp(data, getU32Encoder().encode(9), 0)) {
+  if (containsBytes(data, getU32Encoder().encode(9), 0)) {
     return SystemInstruction.AllocateWithSeed;
   }
-  if (memcmp(data, getU32Encoder().encode(10), 0)) {
+  if (containsBytes(data, getU32Encoder().encode(10), 0)) {
     return SystemInstruction.AssignWithSeed;
   }
-  if (memcmp(data, getU32Encoder().encode(11), 0)) {
+  if (containsBytes(data, getU32Encoder().encode(11), 0)) {
     return SystemInstruction.TransferSolWithSeed;
   }
-  if (memcmp(data, getU32Encoder().encode(12), 0)) {
+  if (containsBytes(data, getU32Encoder().encode(12), 0)) {
     return SystemInstruction.UpgradeNonceAccount;
   }
   throw new Error(

@@ -59,12 +59,12 @@ impl CreateAccountWithSeed {
 }
 
 #[derive(BorshDeserialize, BorshSerialize)]
-struct CreateAccountWithSeedInstructionData {
+pub struct CreateAccountWithSeedInstructionData {
     discriminator: u32,
 }
 
 impl CreateAccountWithSeedInstructionData {
-    fn new() -> Self {
+    pub fn new() -> Self {
         Self { discriminator: 3 }
     }
 }
@@ -86,7 +86,7 @@ pub struct CreateAccountWithSeedInstructionArgs {
 ///   0. `[writable, signer]` payer
 ///   1. `[writable]` new_account
 ///   2. `[signer]` base_account
-#[derive(Default)]
+#[derive(Clone, Debug, Default)]
 pub struct CreateAccountWithSeedBuilder {
     payer: Option<solana_program::pubkey::Pubkey>,
     new_account: Option<solana_program::pubkey::Pubkey>,
@@ -308,6 +308,7 @@ impl<'a, 'b> CreateAccountWithSeedCpi<'a, 'b> {
 ///   0. `[writable, signer]` payer
 ///   1. `[writable]` new_account
 ///   2. `[signer]` base_account
+#[derive(Clone, Debug)]
 pub struct CreateAccountWithSeedCpiBuilder<'a, 'b> {
     instruction: Box<CreateAccountWithSeedCpiBuilderInstruction<'a, 'b>>,
 }
@@ -449,6 +450,7 @@ impl<'a, 'b> CreateAccountWithSeedCpiBuilder<'a, 'b> {
     }
 }
 
+#[derive(Clone, Debug)]
 struct CreateAccountWithSeedCpiBuilderInstruction<'a, 'b> {
     __program: &'b solana_program::account_info::AccountInfo<'a>,
     payer: Option<&'b solana_program::account_info::AccountInfo<'a>>,

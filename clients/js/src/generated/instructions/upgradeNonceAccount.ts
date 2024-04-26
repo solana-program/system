@@ -6,25 +6,23 @@
  * @see https://github.com/metaplex-foundation/kinobi
  */
 
-import { Address } from '@solana/addresses';
 import {
+  Address,
   Codec,
   Decoder,
   Encoder,
-  combineCodec,
-  getStructDecoder,
-  getStructEncoder,
-  getU32Decoder,
-  getU32Encoder,
-  mapEncoder,
-} from '@solana/codecs';
-import {
   IAccountMeta,
   IInstruction,
   IInstructionWithAccounts,
   IInstructionWithData,
   WritableAccount,
-} from '@solana/instructions';
+  combineCodec,
+  getStructDecoder,
+  getStructEncoder,
+  getU32Decoder,
+  getU32Encoder,
+  transformEncoder,
+} from '@solana/web3.js';
 import { SYSTEM_PROGRAM_ADDRESS } from '../programs';
 import { ResolvedAccount, getAccountMetaFactory } from '../shared';
 
@@ -48,7 +46,7 @@ export type UpgradeNonceAccountInstructionData = { discriminator: number };
 export type UpgradeNonceAccountInstructionDataArgs = {};
 
 export function getUpgradeNonceAccountInstructionDataEncoder(): Encoder<UpgradeNonceAccountInstructionDataArgs> {
-  return mapEncoder(
+  return transformEncoder(
     getStructEncoder([['discriminator', getU32Encoder()]]),
     (value) => ({ ...value, discriminator: 12 })
   );
