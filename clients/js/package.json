@@ -1,6 +1,6 @@
 {
   "name": "@solana-program/system",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "description": "JavaScript client for the System program",
   "sideEffects": false,
   "module": "./dist/src/index.js",
@@ -34,7 +34,7 @@
   },
   "license": "MIT",
   "peerDependencies": {
-    "@solana/web3.js": "tp3"
+    "@solana/web3.js": "2.0.0-preview.3"
   },
   "devDependencies": {
     "@ava/typescript": "^4.1.0",
