@@ -4,14 +4,14 @@ import {
   pipe,
 } from '@solana/web3.js';
 import test from 'ava';
-import { fetchNonce, getAdvanceNonceAccountInstruction } from '../src/index.js';
+import { fetchNonce, getAdvanceNonceAccountInstruction } from '../src';
 import {
   createDefaultSolanaClient,
   createDefaultTransaction,
   createNonceAccount,
   generateKeyPairSignerWithSol,
   signAndSendTransaction,
-} from './_setup.js';
+} from './_setup';
 
 test('it advances the nonce account', async (t) => {
   // Given an existing nonce account.
