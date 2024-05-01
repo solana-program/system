@@ -14,13 +14,13 @@ import {
   getCreateAccountInstruction,
   getInitializeNonceAccountInstruction,
   getNonceSize,
-} from '../src/index.js';
+} from '../src';
 import {
   createDefaultSolanaClient,
   createDefaultTransaction,
   generateKeyPairSignerWithSol,
   signAndSendTransaction,
-} from './_setup.js';
+} from './_setup';
 
 test('it creates and initialize a durable nonce account', async (t) => {
   // Given some brand now payer, authority, and nonce KeyPairSigners.
