@@ -11,7 +11,9 @@
   },
   "devDependencies": {
     "@iarna/toml": "^2.2.5",
-    "@metaplex-foundation/kinobi": "^0.19.0",
+    "kinobi": "^0.20.1",
+    "@kinobi-so/renderers-js": "^0.20.1",
+    "@kinobi-so/renderers-rust": "^0.20.1",
     "typescript": "^5.4.2",
     "zx": "^7.2.3"
   },
