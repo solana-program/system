@@ -8,9 +8,15 @@ devDependencies:
   '@iarna/toml':
     specifier: ^2.2.5
     version: 2.2.5
-  '@metaplex-foundation/kinobi':
-    specifier: ^0.19.0
-    version: 0.19.0(fastestsmallesttextencoderdecoder@1.0.22)
+  '@kinobi-so/renderers-js':
+    specifier: ^0.20.1
+    version: 0.20.1(fastestsmallesttextencoderdecoder@1.0.22)
+  '@kinobi-so/renderers-rust':
+    specifier: ^0.20.1
+    version: 0.20.1(fastestsmallesttextencoderdecoder@1.0.22)
+  kinobi:
+    specifier: ^0.20.1
+    version: 0.20.1
   typescript:
     specifier: ^5.4.2
     version: 5.4.2
@@ -24,14 +30,42 @@ packages:
     resolution: {integrity: sha512-trnsAYxU3xnS1gPHPyU961coFyLkh4gAD/0zQ5mymY4yOZ+CYvsPqUbOFSw0aDM4y0tV7tiFxL/1XfXPNC6IPg==}
     dev: true
 
-  /@metaplex-foundation/kinobi@0.19.0(fastestsmallesttextencoderdecoder@1.0.22):
-    resolution: {integrity: sha512-BbL/4V8ea18J9N89nx4hlvp9ZgLFUfPaV9ZQkxhaTT0ORTo+Ksf74ZgJPF35CMqS6x132OvLjWHN8I+LMAKLBQ==}
+  /@kinobi-so/errors@0.20.1:
+    resolution: {integrity: sha512-fXKuaJZpvXSqQmhdxrx8KatS31eFKjyTMTnQ9jkv2h5UQrZzbr6wyWH9ZceM96D8YGw+FopRovu9N1dUILuceA==}
+    hasBin: true
     dependencies:
-      '@noble/hashes': 1.4.0
-      '@prettier/sync': 0.5.1(prettier@3.2.5)
-      '@solana/codecs-strings': 2.0.0-preview.3(fastestsmallesttextencoderdecoder@1.0.22)
-      chalk: 4.1.2
-      json-stable-stringify: 1.1.1
+      '@kinobi-so/node-types': 0.20.1
+      chalk: 5.3.0
+      commander: 12.0.0
+    dev: true
+
+  /@kinobi-so/node-types@0.20.1:
+    resolution: {integrity: sha512-xdxJj613WOsS2Vr09uNrmoSkqASkZLhT+CebrMtvhGuCK5ndiHfNjT/7VQYQ7+EbMT9hK76MmVavzyP97uRfkg==}
+    dev: true
+
+  /@kinobi-so/nodes@0.20.1:
+    resolution: {integrity: sha512-dRX3kfjrcY81pmt7jAhBiEAygLHwTWVST8R20f7zpXyxm7dFWKmUX57litLsjchg7USEQYCcMAve47BVNO9QxQ==}
+    dependencies:
+      '@kinobi-so/errors': 0.20.1
+      '@kinobi-so/node-types': 0.20.1
+    dev: true
+
+  /@kinobi-so/renderers-core@0.20.1:
+    resolution: {integrity: sha512-bhzoGEPHOHIRK1q6CoRYY1pIy+O4PQ5WoBxCiuKaQ6zdQQP58o1AdTPY0Udmyf9swGTRaNKXLu1N0zcUo/G/5A==}
+    dependencies:
+      '@kinobi-so/errors': 0.20.1
+      '@kinobi-so/nodes': 0.20.1
+      '@kinobi-so/visitors-core': 0.20.1
+    dev: true
+
+  /@kinobi-so/renderers-js@0.20.1(fastestsmallesttextencoderdecoder@1.0.22):
+    resolution: {integrity: sha512-POSwrIvuoxv9ibxLeRVNWxxzLjwdS43R80pOmgIlq+4oCITzd1AKTYSBWhf4ioAi4il6RS/LJOJPuBmo9mx9wA==}
+    dependencies:
+      '@kinobi-so/errors': 0.20.1
+      '@kinobi-so/nodes': 0.20.1
+      '@kinobi-so/renderers-core': 0.20.1
+      '@kinobi-so/visitors-core': 0.20.1
+      '@solana/codecs-strings': 2.0.0-preview.2(fastestsmallesttextencoderdecoder@1.0.22)
       nunjucks: 3.2.4
       prettier: 3.2.5
     transitivePeerDependencies:
@@ -39,9 +73,42 @@ packages:
       - fastestsmallesttextencoderdecoder
     dev: true
 
-  /@noble/hashes@1.4.0:
-    resolution: {integrity: sha512-V1JJ1WTRUqHHrOSh597hURcMqVKVGL/ea3kv0gSnEdsEZ0/+VyPghM1lMNGc00z7CIQorSvbKpuJkxvuHbvdbg==}
-    engines: {node: '>= 16'}
+  /@kinobi-so/renderers-rust@0.20.1(fastestsmallesttextencoderdecoder@1.0.22):
+    resolution: {integrity: sha512-W7VfgBEVxbrq1/zq7KMSSbgDgfb9B2nYDMabM4EULGMnHuphmCpctsnaD5Ag6i9GhJWjgNMcFlRJuNj0328KiA==}
+    dependencies:
+      '@kinobi-so/errors': 0.20.1
+      '@kinobi-so/nodes': 0.20.1
+      '@kinobi-so/renderers-core': 0.20.1
+      '@kinobi-so/visitors-core': 0.20.1
+      '@solana/codecs-strings': 2.0.0-preview.2(fastestsmallesttextencoderdecoder@1.0.22)
+      nunjucks: 3.2.4
+    transitivePeerDependencies:
+      - chokidar
+      - fastestsmallesttextencoderdecoder
+    dev: true
+
+  /@kinobi-so/validators@0.20.1:
+    resolution: {integrity: sha512-rQ/3XPzY/z63nk+4I5g9JO7VAo3L/O8ZRCCgZkOlBRuRsU+kvR+LYPKu1NqRO1scFDU+uu57tUnycDiT0kzDRA==}
+    dependencies:
+      '@kinobi-so/errors': 0.20.1
+      '@kinobi-so/nodes': 0.20.1
+      '@kinobi-so/visitors-core': 0.20.1
+    dev: true
+
+  /@kinobi-so/visitors-core@0.20.1:
+    resolution: {integrity: sha512-jSCniUzty6b0AB+X9tCT52+9ypiJzuVjd39ZlUT7cOFqX4GNCYR5d+XE2N0r6nnn3Fyrwy9wTvm42/4jndKJMg==}
+    dependencies:
+      '@kinobi-so/errors': 0.20.1
+      '@kinobi-so/nodes': 0.20.1
+      json-stable-stringify: 1.1.1
+    dev: true
+
+  /@kinobi-so/visitors@0.20.1:
+    resolution: {integrity: sha512-lUlB6sCPnMyN6ytRkCxAcEfNBcSRD0Gr3Egd7CJexxrhtg0ngSrBU/BH1m6YuBSt8InuuuFjCdmwbmG3ALDj+w==}
+    dependencies:
+      '@kinobi-so/errors': 0.20.1
+      '@kinobi-so/nodes': 0.20.1
+      '@kinobi-so/visitors-core': 0.20.1
     dev: true
 
   /@nodelib/fs.scandir@2.1.5:
@@ -65,41 +132,32 @@ packages:
       fastq: 1.17.1
     dev: true
 
-  /@prettier/sync@0.5.1(prettier@3.2.5):
-    resolution: {integrity: sha512-tpF+A1e4ynO2U4fTH21Sjgm9EYENmqg4zmJCMLrmLVfzIzuDc1cKGXyxrxbFgcH8qQRfowyDCZFAUukwhiZlsw==}
-    peerDependencies:
-      prettier: '*'
+  /@solana/codecs-core@2.0.0-preview.2:
+    resolution: {integrity: sha512-gLhCJXieSCrAU7acUJjbXl+IbGnqovvxQLlimztPoGgfLQ1wFYu+XJswrEVQqknZYK1pgxpxH3rZ+OKFs0ndQg==}
     dependencies:
-      make-synchronized: 0.2.8
-      prettier: 3.2.5
+      '@solana/errors': 2.0.0-preview.2
     dev: true
 
-  /@solana/codecs-core@2.0.0-preview.3:
-    resolution: {integrity: sha512-xQz6USSBs82lUNoVa/wwnm6wa2y2eWtGwPLUwF/NOGGpR+QH9EODijXvJ8wuC9llyqerqdC+5mrmx9C8VSMNYg==}
+  /@solana/codecs-numbers@2.0.0-preview.2:
+    resolution: {integrity: sha512-aLZnDTf43z4qOnpTcDsUVy1Ci9im1Md8thWipSWbE+WM9ojZAx528oAql+Cv8M8N+6ALKwgVRhPZkto6E59ARw==}
     dependencies:
-      '@solana/errors': 2.0.0-preview.3
+      '@solana/codecs-core': 2.0.0-preview.2
+      '@solana/errors': 2.0.0-preview.2
     dev: true
 
-  /@solana/codecs-numbers@2.0.0-preview.3:
-    resolution: {integrity: sha512-cjsHexVAj4GveDtG0+WjW121TKMbWN7AkOvGlf1qauOJgzJvX3V7KXHWuEg8wGGfRiLiXKEgh7KieQiB17EI3Q==}
-    dependencies:
-      '@solana/codecs-core': 2.0.0-preview.3
-      '@solana/errors': 2.0.0-preview.3
-    dev: true
-
-  /@solana/codecs-strings@2.0.0-preview.3(fastestsmallesttextencoderdecoder@1.0.22):
-    resolution: {integrity: sha512-CUij3XgdoqbrEYncyy+kHCIXRHjqkcjiyJhf4hWVjMXM5nu2jreehhBiLFHFjlFw2U3vp1gig5QNxji8SjpQzw==}
+  /@solana/codecs-strings@2.0.0-preview.2(fastestsmallesttextencoderdecoder@1.0.22):
+    resolution: {integrity: sha512-EgBwY+lIaHHgMJIqVOGHfIfpdmmUDNoNO/GAUGeFPf+q0dF+DtwhJPEMShhzh64X2MeCZcmSO6Kinx0Bvmmz2g==}
     peerDependencies:
       fastestsmallesttextencoderdecoder: ^1.0.22
     dependencies:
-      '@solana/codecs-core': 2.0.0-preview.3
-      '@solana/codecs-numbers': 2.0.0-preview.3
-      '@solana/errors': 2.0.0-preview.3
+      '@solana/codecs-core': 2.0.0-preview.2
+      '@solana/codecs-numbers': 2.0.0-preview.2
+      '@solana/errors': 2.0.0-preview.2
       fastestsmallesttextencoderdecoder: 1.0.22
     dev: true
 
-  /@solana/errors@2.0.0-preview.3:
-    resolution: {integrity: sha512-IZAUMcKaV3Hn0QTfzlGmVsDaH1mVUq0uURJi+tm8K3n37cKrvXyS2GQsHtIMRaLdOVp1IbTtIc5YF3+qATlpyw==}
+  /@solana/errors@2.0.0-preview.2:
+    resolution: {integrity: sha512-H2DZ1l3iYF5Rp5pPbJpmmtCauWeQXRJapkDg8epQ8BJ7cA2Ut/QEtC3CMmw/iMTcuS6uemFNLcWvlOfoQhvQuA==}
     hasBin: true
     dependencies:
       chalk: 5.3.0
@@ -141,13 +199,6 @@ packages:
     resolution: {integrity: sha512-RYTOHHdWipFUliRFMCS4X2Yn2X8M87V/OpSqWzKKOGhzqyUxzyVmhHDH9sAvG+ZuQf/TAOFsLCpMw09I1ufUnA==}
     dev: true
 
-  /ansi-styles@4.3.0:
-    resolution: {integrity: sha512-zbB9rCJAT1rbjiVDb2hqKFHNYLxgtk8NURxZ3IZwD3F6NtxbXZQCnnSi1Lkx+IDohdPlFp222wVALIheZJQSEg==}
-    engines: {node: '>=8'}
-    dependencies:
-      color-convert: 2.0.1
-    dev: true
-
   /asap@2.0.6:
     resolution: {integrity: sha512-BSHWgDSAiKs50o2Re8ppvp3seVHXSRM44cdSsT9FfNEUUZLOGWVCsiWaRPWM1Znn+mqZ1OfVZ3z3DWEzSp7hRA==}
     dev: true
@@ -170,28 +221,9 @@ packages:
       set-function-length: 1.2.1
     dev: true
 
-  /chalk@4.1.2:
-    resolution: {integrity: sha512-oKnbhFyRIXpUuez8iBMmyEa4nbj4IOQyuhc/wy9kY7/WVPcwIO9VA668Pu8RkO7+0G76SLROeyw9CpQ061i4mA==}
-    engines: {node: '>=10'}
-    dependencies:
-      ansi-styles: 4.3.0
-      supports-color: 7.2.0
-    dev: true
-
   /chalk@5.3.0:
     resolution: {integrity: sha512-dLitG79d+GV1Nb/VYcCDFivJeK1hiukt9QjRNVOsUtTy1rR1YJsmpGGTZ3qJos+uw7WmWF4wUwBd9jxjocFC2w==}
     engines: {node: ^12.17.0 || ^14.13 || >=16.0.0}
-    dev: true
-
-  /color-convert@2.0.1:
-    resolution: {integrity: sha512-RRECPsj7iu/xb5oKYcsFHSppFNnsj/52OVTRKb4zP5onXwVF3zVmmToNcOfGC+CRDpfK/U584fMg38ZHCaElKQ==}
-    engines: {node: '>=7.0.0'}
-    dependencies:
-      color-name: 1.1.4
-    dev: true
-
-  /color-name@1.1.4:
-    resolution: {integrity: sha512-dOy+3AuW3a2wNbZHIuMZpTcgjGuLU/uBL/ubcZF9OXbDo8ff4O8yVp5Bf0efS8uEoYo5q4Fx7dY9OgQGXgAsQA==}
     dev: true
 
   /commander@12.0.0:
@@ -357,11 +389,6 @@ packages:
     resolution: {integrity: sha512-RbJ5/jmFcNNCcDV5o9eTnBLJ/HszWV0P73bc+Ff4nS/rJj+YaS6IGyiOL0VoBYX+l1Wrl3k63h/KrH+nhJ0XvQ==}
     dev: true
 
-  /has-flag@4.0.0:
-    resolution: {integrity: sha512-EykJT/Q1KjTWctppgIAgfSO0tKVuZUjhgMr17kqTumMl6Afv3EISleU7qZUzoXDFTAHTDC4NOoG/ZxU3EvlMPQ==}
-    engines: {node: '>=8'}
-    dev: true
-
   /has-property-descriptors@1.0.2:
     resolution: {integrity: sha512-55JNKuIW+vq4Ke1BjOTjM2YctQIvCT7GFzHwmfZPGo5wnrgkid0YQtnAleFSqumZm4az3n2BS+erby5ipJdgrg==}
     dependencies:
@@ -437,8 +464,13 @@ packages:
     resolution: {integrity: sha512-2/Ki0GcmuqSrgFyelQq9M05y7PS0mEwuIzrf3f1fPqkVDVRvZrPZtVSMHxdgo8Aq0sxAOb/cr2aqqA3LeWHVPg==}
     dev: true
 
-  /make-synchronized@0.2.8:
-    resolution: {integrity: sha512-jtXnKYCxjmGaXiZhXbDbGPbh4YyTvIIbOgcQjtAboc4RSm9k3nyhTFvFQB0cfs7QFKuZXKe2D2RvOkv1c+vpxg==}
+  /kinobi@0.20.1:
+    resolution: {integrity: sha512-oA/X2Q9yP2ZVt49dI9wvfVVoRGdyX6cHcd0Pm9QOInO7I5tCt8VS46fXw+sWxxkDzRFPVrKBJ11pE+K7tvIX4w==}
+    dependencies:
+      '@kinobi-so/errors': 0.20.1
+      '@kinobi-so/nodes': 0.20.1
+      '@kinobi-so/validators': 0.20.1
+      '@kinobi-so/visitors': 0.20.1
     dev: true
 
   /map-stream@0.1.0:
@@ -568,13 +600,6 @@ packages:
     resolution: {integrity: sha512-rT00SPnTVyRsaSz5zgSPma/aHSOic5U1prhYdRy5HS2kTZviFpmDgzilbtsJsxiroqACmayynDN/9VzIbX5DOw==}
     dependencies:
       duplexer: 0.1.2
-    dev: true
-
-  /supports-color@7.2.0:
-    resolution: {integrity: sha512-qpCAvRl9stuOHveKsn7HncJRvv501qIacKzQlO/+Lwxc9+0q2wLyv4Dfvt80/DPn2pqOBsJdDiogXGR9+OvwRw==}
-    engines: {node: '>=8'}
-    dependencies:
-      has-flag: 4.0.0
     dev: true
 
   /through@2.3.8:
