@@ -7,6 +7,7 @@
 
 use borsh::BorshDeserialize;
 use borsh::BorshSerialize;
+use kaigan::types::U64PrefixString;
 use solana_program::pubkey::Pubkey;
 
 /// Accounts.
@@ -74,7 +75,7 @@ impl TransferSolWithSeedInstructionData {
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct TransferSolWithSeedInstructionArgs {
     pub amount: u64,
-    pub from_seed: String,
+    pub from_seed: U64PrefixString,
     pub from_owner: Pubkey,
 }
 
@@ -91,7 +92,7 @@ pub struct TransferSolWithSeedBuilder {
     base_account: Option<solana_program::pubkey::Pubkey>,
     destination: Option<solana_program::pubkey::Pubkey>,
     amount: Option<u64>,
-    from_seed: Option<String>,
+    from_seed: Option<U64PrefixString>,
     from_owner: Option<Pubkey>,
     __remaining_accounts: Vec<solana_program::instruction::AccountMeta>,
 }
@@ -121,7 +122,7 @@ impl TransferSolWithSeedBuilder {
         self
     }
     #[inline(always)]
-    pub fn from_seed(&mut self, from_seed: String) -> &mut Self {
+    pub fn from_seed(&mut self, from_seed: U64PrefixString) -> &mut Self {
         self.from_seed = Some(from_seed);
         self
     }
@@ -339,7 +340,7 @@ impl<'a, 'b> TransferSolWithSeedCpiBuilder<'a, 'b> {
         self
     }
     #[inline(always)]
-    pub fn from_seed(&mut self, from_seed: String) -> &mut Self {
+    pub fn from_seed(&mut self, from_seed: U64PrefixString) -> &mut Self {
         self.instruction.from_seed = Some(from_seed);
         self
     }
@@ -432,7 +433,7 @@ struct TransferSolWithSeedCpiBuilderInstruction<'a, 'b> {
     base_account: Option<&'b solana_program::account_info::AccountInfo<'a>>,
     destination: Option<&'b solana_program::account_info::AccountInfo<'a>>,
     amount: Option<u64>,
-    from_seed: Option<String>,
+    from_seed: Option<U64PrefixString>,
     from_owner: Option<Pubkey>,
     /// Additional instruction accounts `(AccountInfo, is_writable, is_signer)`.
     __remaining_accounts: Vec<(

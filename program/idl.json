@@ -288,7 +288,7 @@
               "type": { "kind": "stringTypeNode", "encoding": "utf8" },
               "prefix": {
                 "kind": "numberTypeNode",
-                "format": "u32",
+                "format": "u64",
                 "endian": "le"
               }
             },
@@ -694,7 +694,7 @@
               "type": { "kind": "stringTypeNode", "encoding": "utf8" },
               "prefix": {
                 "kind": "numberTypeNode",
-                "format": "u32",
+                "format": "u64",
                 "endian": "le"
               }
             },
@@ -776,7 +776,7 @@
               "type": { "kind": "stringTypeNode", "encoding": "utf8" },
               "prefix": {
                 "kind": "numberTypeNode",
-                "format": "u32",
+                "format": "u64",
                 "endian": "le"
               }
             },
@@ -860,7 +860,7 @@
               "type": { "kind": "stringTypeNode", "encoding": "utf8" },
               "prefix": {
                 "kind": "numberTypeNode",
-                "format": "u32",
+                "format": "u64",
                 "endian": "le"
               }
             },

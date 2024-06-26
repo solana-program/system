@@ -7,6 +7,7 @@
 
 use borsh::BorshDeserialize;
 use borsh::BorshSerialize;
+use kaigan::types::U64PrefixString;
 use solana_program::pubkey::Pubkey;
 
 /// Accounts.
@@ -66,7 +67,7 @@ impl AssignWithSeedInstructionData {
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct AssignWithSeedInstructionArgs {
     pub base: Pubkey,
-    pub seed: String,
+    pub seed: U64PrefixString,
     pub program_address: Pubkey,
 }
 
@@ -81,7 +82,7 @@ pub struct AssignWithSeedBuilder {
     account: Option<solana_program::pubkey::Pubkey>,
     base_account: Option<solana_program::pubkey::Pubkey>,
     base: Option<Pubkey>,
-    seed: Option<String>,
+    seed: Option<U64PrefixString>,
     program_address: Option<Pubkey>,
     __remaining_accounts: Vec<solana_program::instruction::AccountMeta>,
 }
@@ -106,7 +107,7 @@ impl AssignWithSeedBuilder {
         self
     }
     #[inline(always)]
-    pub fn seed(&mut self, seed: String) -> &mut Self {
+    pub fn seed(&mut self, seed: U64PrefixString) -> &mut Self {
         self.seed = Some(seed);
         self
     }
@@ -304,7 +305,7 @@ impl<'a, 'b> AssignWithSeedCpiBuilder<'a, 'b> {
         self
     }
     #[inline(always)]
-    pub fn seed(&mut self, seed: String) -> &mut Self {
+    pub fn seed(&mut self, seed: U64PrefixString) -> &mut Self {
         self.instruction.seed = Some(seed);
         self
     }
@@ -387,7 +388,7 @@ struct AssignWithSeedCpiBuilderInstruction<'a, 'b> {
     account: Option<&'b solana_program::account_info::AccountInfo<'a>>,
     base_account: Option<&'b solana_program::account_info::AccountInfo<'a>>,
     base: Option<Pubkey>,
-    seed: Option<String>,
+    seed: Option<U64PrefixString>,
     program_address: Option<Pubkey>,
     /// Additional instruction accounts `(AccountInfo, is_writable, is_signer)`.
     __remaining_accounts: Vec<(
