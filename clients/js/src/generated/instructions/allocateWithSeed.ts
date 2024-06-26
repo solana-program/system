@@ -77,7 +77,7 @@ export function getAllocateWithSeedInstructionDataEncoder(): Encoder<AllocateWit
     getStructEncoder([
       ['discriminator', getU32Encoder()],
       ['base', getAddressEncoder()],
-      ['seed', addEncoderSizePrefix(getUtf8Encoder(), getU32Encoder())],
+      ['seed', addEncoderSizePrefix(getUtf8Encoder(), getU64Encoder())],
       ['space', getU64Encoder()],
       ['programAddress', getAddressEncoder()],
     ]),
@@ -89,7 +89,7 @@ export function getAllocateWithSeedInstructionDataDecoder(): Decoder<AllocateWit
   return getStructDecoder([
     ['discriminator', getU32Decoder()],
     ['base', getAddressDecoder()],
-    ['seed', addDecoderSizePrefix(getUtf8Decoder(), getU32Decoder())],
+    ['seed', addDecoderSizePrefix(getUtf8Decoder(), getU64Decoder())],
     ['space', getU64Decoder()],
     ['programAddress', getAddressDecoder()],
   ]);

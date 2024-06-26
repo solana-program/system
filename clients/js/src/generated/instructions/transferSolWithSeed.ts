@@ -79,7 +79,7 @@ export function getTransferSolWithSeedInstructionDataEncoder(): Encoder<Transfer
     getStructEncoder([
       ['discriminator', getU32Encoder()],
       ['amount', getU64Encoder()],
-      ['fromSeed', addEncoderSizePrefix(getUtf8Encoder(), getU32Encoder())],
+      ['fromSeed', addEncoderSizePrefix(getUtf8Encoder(), getU64Encoder())],
       ['fromOwner', getAddressEncoder()],
     ]),
     (value) => ({ ...value, discriminator: 11 })
@@ -90,7 +90,7 @@ export function getTransferSolWithSeedInstructionDataDecoder(): Decoder<Transfer
   return getStructDecoder([
     ['discriminator', getU32Decoder()],
     ['amount', getU64Decoder()],
-    ['fromSeed', addDecoderSizePrefix(getUtf8Decoder(), getU32Decoder())],
+    ['fromSeed', addDecoderSizePrefix(getUtf8Decoder(), getU64Decoder())],
     ['fromOwner', getAddressDecoder()],
   ]);
 }

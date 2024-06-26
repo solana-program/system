@@ -7,6 +7,7 @@
 
 use borsh::BorshDeserialize;
 use borsh::BorshSerialize;
+use kaigan::types::U64PrefixString;
 use solana_program::pubkey::Pubkey;
 
 /// Accounts.
@@ -73,7 +74,7 @@ impl CreateAccountWithSeedInstructionData {
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct CreateAccountWithSeedInstructionArgs {
     pub base: Pubkey,
-    pub seed: String,
+    pub seed: U64PrefixString,
     pub amount: u64,
     pub space: u64,
     pub program_address: Pubkey,
@@ -92,7 +93,7 @@ pub struct CreateAccountWithSeedBuilder {
     new_account: Option<solana_program::pubkey::Pubkey>,
     base_account: Option<solana_program::pubkey::Pubkey>,
     base: Option<Pubkey>,
-    seed: Option<String>,
+    seed: Option<U64PrefixString>,
     amount: Option<u64>,
     space: Option<u64>,
     program_address: Option<Pubkey>,
@@ -124,7 +125,7 @@ impl CreateAccountWithSeedBuilder {
         self
     }
     #[inline(always)]
-    pub fn seed(&mut self, seed: String) -> &mut Self {
+    pub fn seed(&mut self, seed: U64PrefixString) -> &mut Self {
         self.seed = Some(seed);
         self
     }
@@ -356,7 +357,7 @@ impl<'a, 'b> CreateAccountWithSeedCpiBuilder<'a, 'b> {
         self
     }
     #[inline(always)]
-    pub fn seed(&mut self, seed: String) -> &mut Self {
+    pub fn seed(&mut self, seed: U64PrefixString) -> &mut Self {
         self.instruction.seed = Some(seed);
         self
     }
@@ -457,7 +458,7 @@ struct CreateAccountWithSeedCpiBuilderInstruction<'a, 'b> {
     new_account: Option<&'b solana_program::account_info::AccountInfo<'a>>,
     base_account: Option<&'b solana_program::account_info::AccountInfo<'a>>,
     base: Option<Pubkey>,
-    seed: Option<String>,
+    seed: Option<U64PrefixString>,
     amount: Option<u64>,
     space: Option<u64>,
     program_address: Option<Pubkey>,

@@ -28,6 +28,8 @@ import {
   getStructEncoder,
   getU32Decoder,
   getU32Encoder,
+  getU64Decoder,
+  getU64Encoder,
   getUtf8Decoder,
   getUtf8Encoder,
   transformEncoder,
@@ -73,7 +75,7 @@ export function getAssignWithSeedInstructionDataEncoder(): Encoder<AssignWithSee
     getStructEncoder([
       ['discriminator', getU32Encoder()],
       ['base', getAddressEncoder()],
-      ['seed', addEncoderSizePrefix(getUtf8Encoder(), getU32Encoder())],
+      ['seed', addEncoderSizePrefix(getUtf8Encoder(), getU64Encoder())],
       ['programAddress', getAddressEncoder()],
     ]),
     (value) => ({ ...value, discriminator: 10 })
@@ -84,7 +86,7 @@ export function getAssignWithSeedInstructionDataDecoder(): Decoder<AssignWithSee
   return getStructDecoder([
     ['discriminator', getU32Decoder()],
     ['base', getAddressDecoder()],
-    ['seed', addDecoderSizePrefix(getUtf8Decoder(), getU32Decoder())],
+    ['seed', addDecoderSizePrefix(getUtf8Decoder(), getU64Decoder())],
     ['programAddress', getAddressDecoder()],
   ]);
 }

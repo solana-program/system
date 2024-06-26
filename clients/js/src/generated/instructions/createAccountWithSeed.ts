@@ -85,7 +85,7 @@ export function getCreateAccountWithSeedInstructionDataEncoder(): Encoder<Create
     getStructEncoder([
       ['discriminator', getU32Encoder()],
       ['base', getAddressEncoder()],
-      ['seed', addEncoderSizePrefix(getUtf8Encoder(), getU32Encoder())],
+      ['seed', addEncoderSizePrefix(getUtf8Encoder(), getU64Encoder())],
       ['amount', getU64Encoder()],
       ['space', getU64Encoder()],
       ['programAddress', getAddressEncoder()],
@@ -98,7 +98,7 @@ export function getCreateAccountWithSeedInstructionDataDecoder(): Decoder<Create
   return getStructDecoder([
     ['discriminator', getU32Decoder()],
     ['base', getAddressDecoder()],
-    ['seed', addDecoderSizePrefix(getUtf8Decoder(), getU32Decoder())],
+    ['seed', addDecoderSizePrefix(getUtf8Decoder(), getU64Decoder())],
     ['amount', getU64Decoder()],
     ['space', getU64Decoder()],
     ['programAddress', getAddressDecoder()],
