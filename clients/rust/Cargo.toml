@@ -1,5 +1,5 @@
 [package]
-name = "sbpf-system"
+name = "solana-system-client"
 version = "0.1.0"
 edition = "2021"
 readme = "README.md"
