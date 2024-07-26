@@ -3,14 +3,14 @@ import "zx/globals";
 
 $.quote = (command) => command;
 const unchangedGlobs = [
-  "clients/**/src/**",
-  "clients/js/test/**",
-  "clients/rust/tests/**",
-  "program/**",
+  "clients/**/src/**/*",
+  "clients/js/test/**/*",
+  "clients/rust/tests/**/*",
+  "program/**/*",
   "scripts/generate-clients.mjs",
   "scripts/generate-idls.mjs",
   "scripts/upgrade-template.mjs",
-  "scripts/program/**",
+  "scripts/program/**/*",
 ];
 
 cd("..");
