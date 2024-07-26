@@ -1,6 +1,7 @@
 #!/usr/bin/env zx
 import "zx/globals";
 
+$.quote = (command) => command;
 const unchangedPaths = [
   "clients/**/src/**/*",
   "clients/**/src/*",
