@@ -3,15 +3,11 @@ import "zx/globals";
 
 $.quote = (command) => command;
 const unchangedPaths = [
-  "clients/**/src/**/*",
-  "clients/**/src/*",
-  "clients/**/test/**/*",
-  "clients/**/test/*",
-  "clients/**/tests/**/*",
-  "clients/**/tests/*",
-  "program/**/*",
-  "program/*",
-  "scripts/program/*",
+  "clients/**/src/**",
+  "clients/js/test/**",
+  "clients/rust/tests/**",
+  "program/**",
+  "scripts/program/**",
   "scripts/upgrade-template.mjs",
 ];
 
