@@ -5,9 +5,7 @@ $.quote = (command) => command;
 const unchangedPaths = [
   "clients/**/src/**/*",
   "clients/**/src/*",
-  "clients/js/test/**/*",
   "clients/js/test/*",
-  "clients/rust/tests/**/*",
   "clients/rust/tests/*",
   "program/**/*",
   "program/*",
