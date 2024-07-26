@@ -3,7 +3,8 @@ import "zx/globals";
 
 $.quote = (command) => command;
 const unchangedGlobs = [
-  "clients/*/src",
+  "clients/js/src",
+  "clients/rust/src",
   "clients/js/test",
   "clients/rust/tests",
   "program",
