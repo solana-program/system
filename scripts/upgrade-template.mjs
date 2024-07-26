@@ -17,7 +17,7 @@ const unchangedGlobs = [
 cd("..");
 await $`pnpm create solana-program system --address 11111111111111111111111111111111 --default --force`;
 cd("system");
-const unchangedPaths = await glob(unchangedGlobs);
 await $`git add --all`;
+const unchangedPaths = await glob(unchangedGlobs);
 await $`git restore --worktree --staged ${unchangedPaths}`;
 await $`pnpm install`;
