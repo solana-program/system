@@ -3,21 +3,19 @@ import "zx/globals";
 
 $.quote = (command) => command;
 const unchangedGlobs = [
-  "clients/js/src",
-  "clients/rust/src",
-  "clients/js/test",
-  "clients/rust/tests",
-  "program",
+  "clients/**/src/**/*",
+  "clients/js/test/**/*",
+  "clients/rust/tests/**/*",
+  "program/**/*",
   "scripts/generate-clients.mjs",
   "scripts/generate-idls.mjs",
   "scripts/upgrade-template.mjs",
-  "scripts/program",
+  "scripts/program/**/*",
 ];
 
 cd("..");
 await $`pnpm create solana-program system --address 11111111111111111111111111111111 --default --force`;
 cd("system");
 await $`git add --all`;
-const unchangedPaths = await glob(unchangedGlobs);
-await $`git restore --worktree --staged ${unchangedPaths}`;
+await $`git restore --worktree --staged "${unchangedGlobs}"`;
 await $`pnpm install`;
