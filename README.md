@@ -17,21 +17,15 @@ pnpm install
 
 ## Generating clients
 
-Once your programs' IDLs have been generated, you can generate clients for them using the following command.
+You can generate clients for them using the following command.
 
 ```sh
 pnpm generate:clients
 ```
 
-Alternatively, you can use the `generate` script to generate both the IDLs and the clients at once.
-
-```sh
-pnpm generate
-```
-
 ## Managing clients
 
-The following clients are available for your programs. You may use the following links to learn more about each client.
+The following clients are available for the System program. You may use the following links to learn more about each client.
 
 - [JS client](./clients/js)
 - [Rust client](./clients/rust)
@@ -54,23 +48,4 @@ Finally, you may stop the local validator using the following command.
 
 ```sh
 pnpm validator:stop
-```
-
-## Using external programs in your validator
-
-If your program requires any external programs to be running, you'll want to in your local validator.
-
-You can do this by adding their program addresses to the `program-dependencies` array in the `Cargo.toml` of your program.
-
-```toml
-program-dependencies = [
-  "metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s",
-  "noopb9bkMVfRPU8AsbpTUg8AQkHtKwMYZiFUjNRtMmV",
-]
-```
-
-Next time you run your validator, these external programs will automatically be fetched from mainnet and used in your local validator.
-
-```sh
-pnpm validator:restart
 ```
