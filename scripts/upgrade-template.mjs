@@ -28,7 +28,6 @@ const unchangedGlobs = [
   'scripts/generate-idls.mjs',
   'scripts/upgrade-template.mjs',
   'scripts/program/*',
-  '**/Cargo.lock',
   'Cargo.lock',
   '**/pnpm-lock.yaml',
   'pnpm-lock.yaml',
