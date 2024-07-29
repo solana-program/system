@@ -10,7 +10,7 @@ const templateArgs = [
   'solana-program',
   '--rust-client-crate-name',
   'solana-system-client',
-  '--js-client-crate-name',
+  '--js-client-package-name',
   '@solana-program/system',
   '--default',
   '--force',
