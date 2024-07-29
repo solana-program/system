@@ -38,7 +38,7 @@ $.quote = (command) => command;
 
 // Re-generate the repo from the parent directory.
 cd('..');
-await $`pnpm create solana-program ${templateArgs}`;
+await $`pnpm create solana-program@latest ${templateArgs}`;
 
 // Go back inside the updated repo.
 cd('system');
