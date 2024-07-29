@@ -15,32 +15,6 @@ The first thing you'll want to do is install NPM dependencies which will allow y
 pnpm install
 ```
 
-## Managing programs
-
-You'll notice a `program` folder in the root of this repository. This is where your generated Solana program is located.
-
-Whilst only one program gets generated, note that you can have as many programs as you like in this repository.
-Whenever you add a new program folder to this repository, remember to add it to the `members` array of your root `Cargo.toml` file.
-That way, your programs will be recognized by the following scripts that allow you to build, test, format and lint your programs respectively.
-
-```sh
-pnpm programs:build
-pnpm programs:test
-pnpm programs:format
-pnpm programs:lint
-```
-
-## Generating IDLs
-
-You may use the following command to generate the IDLs for your programs.
-
-```sh
-pnpm generate:idls
-```
-
-Depending on your program's framework, this will either use Shank or Anchor to generate the IDLs.
-Note that, to ensure IDLs are generated using the correct framework version, the specific version used by the program will be downloaded and used locally.
-
 ## Generating clients
 
 Once your programs' IDLs have been generated, you can generate clients for them using the following command.
@@ -95,9 +69,8 @@ program-dependencies = [
 ]
 ```
 
-Next time you build your program and run your validator, these external programs will automatically be fetched from mainnet and used in your local validator.
+Next time you run your validator, these external programs will automatically be fetched from mainnet and used in your local validator.
 
 ```sh
-pnpm programs:build
 pnpm validator:restart
 ```
