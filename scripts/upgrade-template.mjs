@@ -1,7 +1,7 @@
 #!/usr/bin/env zx
 import 'zx/globals';
 import { getCargo } from './utils.mjs';
-import jsClientPkg from '../clients/js/package.json';
+import jsClientPkg from '../clients/js/package.json' with { type: 'json' };
 
 // Arguments to pass to the `create-solana-program` command.
 const rustClientCargo = getCargo(path.join(__dirname, '..', 'clients', 'rust'));
