@@ -4412,7 +4412,7 @@ dependencies = [
 
 [[package]]
 name = "solana-system-client"
-version = "0.1.0"
+version = "0.0.0"
 dependencies = [
  "assert_matches",
  "borsh 0.10.3",
