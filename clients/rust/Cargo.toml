@@ -1,6 +1,6 @@
 [package]
 name = "solana-system-client"
-version = "0.0.0"
+version = "0.0.1"
 description = "A generated Rust library for the System program"
 repository = "https://github.com/solana-program/system"
 edition = "2021"
