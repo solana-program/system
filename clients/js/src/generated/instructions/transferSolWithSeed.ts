@@ -37,6 +37,12 @@ import {
 import { SYSTEM_PROGRAM_ADDRESS } from '../programs';
 import { getAccountMetaFactory, type ResolvedAccount } from '../shared';
 
+export const TRANSFER_SOL_WITH_SEED_DISCRIMINATOR = 11;
+
+export function getTransferSolWithSeedDiscriminatorBytes() {
+  return getU32Encoder().encode(TRANSFER_SOL_WITH_SEED_DISCRIMINATOR);
+}
+
 export type TransferSolWithSeedInstruction<
   TProgram extends string = typeof SYSTEM_PROGRAM_ADDRESS,
   TAccountSource extends string | IAccountMeta<string> = string,
@@ -82,7 +88,10 @@ export function getTransferSolWithSeedInstructionDataEncoder(): Encoder<Transfer
       ['fromSeed', addEncoderSizePrefix(getUtf8Encoder(), getU64Encoder())],
       ['fromOwner', getAddressEncoder()],
     ]),
-    (value) => ({ ...value, discriminator: 11 })
+    (value) => ({
+      ...value,
+      discriminator: TRANSFER_SOL_WITH_SEED_DISCRIMINATOR,
+    })
   );
 }
 
@@ -122,20 +131,22 @@ export function getTransferSolWithSeedInstruction<
   TAccountSource extends string,
   TAccountBaseAccount extends string,
   TAccountDestination extends string,
+  TProgramAddress extends Address = typeof SYSTEM_PROGRAM_ADDRESS,
 >(
   input: TransferSolWithSeedInput<
     TAccountSource,
     TAccountBaseAccount,
     TAccountDestination
-  >
+  >,
+  config?: { programAddress?: TProgramAddress }
 ): TransferSolWithSeedInstruction<
-  typeof SYSTEM_PROGRAM_ADDRESS,
+  TProgramAddress,
   TAccountSource,
   TAccountBaseAccount,
   TAccountDestination
 > {
   // Program address.
-  const programAddress = SYSTEM_PROGRAM_ADDRESS;
+  const programAddress = config?.programAddress ?? SYSTEM_PROGRAM_ADDRESS;
 
   // Original accounts.
   const originalAccounts = {
@@ -163,7 +174,7 @@ export function getTransferSolWithSeedInstruction<
       args as TransferSolWithSeedInstructionDataArgs
     ),
   } as TransferSolWithSeedInstruction<
-    typeof SYSTEM_PROGRAM_ADDRESS,
+    TProgramAddress,
     TAccountSource,
     TAccountBaseAccount,
     TAccountDestination

@@ -32,6 +32,12 @@ import {
 import { SYSTEM_PROGRAM_ADDRESS } from '../programs';
 import { getAccountMetaFactory, type ResolvedAccount } from '../shared';
 
+export const WITHDRAW_NONCE_ACCOUNT_DISCRIMINATOR = 5;
+
+export function getWithdrawNonceAccountDiscriminatorBytes() {
+  return getU32Encoder().encode(WITHDRAW_NONCE_ACCOUNT_DISCRIMINATOR);
+}
+
 export type WithdrawNonceAccountInstruction<
   TProgram extends string = typeof SYSTEM_PROGRAM_ADDRESS,
   TAccountNonceAccount extends string | IAccountMeta<string> = string,
@@ -83,7 +89,10 @@ export function getWithdrawNonceAccountInstructionDataEncoder(): Encoder<Withdra
       ['discriminator', getU32Encoder()],
       ['withdrawAmount', getU64Encoder()],
     ]),
-    (value) => ({ ...value, discriminator: 5 })
+    (value) => ({
+      ...value,
+      discriminator: WITHDRAW_NONCE_ACCOUNT_DISCRIMINATOR,
+    })
   );
 }
 
@@ -125,6 +134,7 @@ export function getWithdrawNonceAccountInstruction<
   TAccountRecentBlockhashesSysvar extends string,
   TAccountRentSysvar extends string,
   TAccountNonceAuthority extends string,
+  TProgramAddress extends Address = typeof SYSTEM_PROGRAM_ADDRESS,
 >(
   input: WithdrawNonceAccountInput<
     TAccountNonceAccount,
@@ -132,9 +142,10 @@ export function getWithdrawNonceAccountInstruction<
     TAccountRecentBlockhashesSysvar,
     TAccountRentSysvar,
     TAccountNonceAuthority
-  >
+  >,
+  config?: { programAddress?: TProgramAddress }
 ): WithdrawNonceAccountInstruction<
-  typeof SYSTEM_PROGRAM_ADDRESS,
+  TProgramAddress,
   TAccountNonceAccount,
   TAccountRecipientAccount,
   TAccountRecentBlockhashesSysvar,
@@ -142,7 +153,7 @@ export function getWithdrawNonceAccountInstruction<
   TAccountNonceAuthority
 > {
   // Program address.
-  const programAddress = SYSTEM_PROGRAM_ADDRESS;
+  const programAddress = config?.programAddress ?? SYSTEM_PROGRAM_ADDRESS;
 
   // Original accounts.
   const originalAccounts = {
@@ -190,7 +201,7 @@ export function getWithdrawNonceAccountInstruction<
       args as WithdrawNonceAccountInstructionDataArgs
     ),
   } as WithdrawNonceAccountInstruction<
-    typeof SYSTEM_PROGRAM_ADDRESS,
+    TProgramAddress,
     TAccountNonceAccount,
     TAccountRecipientAccount,
     TAccountRecentBlockhashesSysvar,

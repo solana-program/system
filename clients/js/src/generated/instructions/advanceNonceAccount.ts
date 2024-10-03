@@ -30,6 +30,12 @@ import {
 import { SYSTEM_PROGRAM_ADDRESS } from '../programs';
 import { getAccountMetaFactory, type ResolvedAccount } from '../shared';
 
+export const ADVANCE_NONCE_ACCOUNT_DISCRIMINATOR = 4;
+
+export function getAdvanceNonceAccountDiscriminatorBytes() {
+  return getU32Encoder().encode(ADVANCE_NONCE_ACCOUNT_DISCRIMINATOR);
+}
+
 export type AdvanceNonceAccountInstruction<
   TProgram extends string = typeof SYSTEM_PROGRAM_ADDRESS,
   TAccountNonceAccount extends string | IAccountMeta<string> = string,
@@ -63,7 +69,10 @@ export type AdvanceNonceAccountInstructionDataArgs = {};
 export function getAdvanceNonceAccountInstructionDataEncoder(): Encoder<AdvanceNonceAccountInstructionDataArgs> {
   return transformEncoder(
     getStructEncoder([['discriminator', getU32Encoder()]]),
-    (value) => ({ ...value, discriminator: 4 })
+    (value) => ({
+      ...value,
+      discriminator: ADVANCE_NONCE_ACCOUNT_DISCRIMINATOR,
+    })
   );
 }
 
@@ -95,20 +104,22 @@ export function getAdvanceNonceAccountInstruction<
   TAccountNonceAccount extends string,
   TAccountRecentBlockhashesSysvar extends string,
   TAccountNonceAuthority extends string,
+  TProgramAddress extends Address = typeof SYSTEM_PROGRAM_ADDRESS,
 >(
   input: AdvanceNonceAccountInput<
     TAccountNonceAccount,
     TAccountRecentBlockhashesSysvar,
     TAccountNonceAuthority
-  >
+  >,
+  config?: { programAddress?: TProgramAddress }
 ): AdvanceNonceAccountInstruction<
-  typeof SYSTEM_PROGRAM_ADDRESS,
+  TProgramAddress,
   TAccountNonceAccount,
   TAccountRecentBlockhashesSysvar,
   TAccountNonceAuthority
 > {
   // Program address.
-  const programAddress = SYSTEM_PROGRAM_ADDRESS;
+  const programAddress = config?.programAddress ?? SYSTEM_PROGRAM_ADDRESS;
 
   // Original accounts.
   const originalAccounts = {
@@ -140,7 +151,7 @@ export function getAdvanceNonceAccountInstruction<
     programAddress,
     data: getAdvanceNonceAccountInstructionDataEncoder().encode({}),
   } as AdvanceNonceAccountInstruction<
-    typeof SYSTEM_PROGRAM_ADDRESS,
+    TProgramAddress,
     TAccountNonceAccount,
     TAccountRecentBlockhashesSysvar,
     TAccountNonceAuthority

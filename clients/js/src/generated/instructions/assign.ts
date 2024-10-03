@@ -30,6 +30,12 @@ import {
 import { SYSTEM_PROGRAM_ADDRESS } from '../programs';
 import { getAccountMetaFactory, type ResolvedAccount } from '../shared';
 
+export const ASSIGN_DISCRIMINATOR = 1;
+
+export function getAssignDiscriminatorBytes() {
+  return getU32Encoder().encode(ASSIGN_DISCRIMINATOR);
+}
+
 export type AssignInstruction<
   TProgram extends string = typeof SYSTEM_PROGRAM_ADDRESS,
   TAccountAccount extends string | IAccountMeta<string> = string,
@@ -59,7 +65,7 @@ export function getAssignInstructionDataEncoder(): Encoder<AssignInstructionData
       ['discriminator', getU32Encoder()],
       ['programAddress', getAddressEncoder()],
     ]),
-    (value) => ({ ...value, discriminator: 1 })
+    (value) => ({ ...value, discriminator: ASSIGN_DISCRIMINATOR })
   );
 }
 
@@ -85,11 +91,15 @@ export type AssignInput<TAccountAccount extends string = string> = {
   programAddress: AssignInstructionDataArgs['programAddress'];
 };
 
-export function getAssignInstruction<TAccountAccount extends string>(
-  input: AssignInput<TAccountAccount>
-): AssignInstruction<typeof SYSTEM_PROGRAM_ADDRESS, TAccountAccount> {
+export function getAssignInstruction<
+  TAccountAccount extends string,
+  TProgramAddress extends Address = typeof SYSTEM_PROGRAM_ADDRESS,
+>(
+  input: AssignInput<TAccountAccount>,
+  config?: { programAddress?: TProgramAddress }
+): AssignInstruction<TProgramAddress, TAccountAccount> {
   // Program address.
-  const programAddress = SYSTEM_PROGRAM_ADDRESS;
+  const programAddress = config?.programAddress ?? SYSTEM_PROGRAM_ADDRESS;
 
   // Original accounts.
   const originalAccounts = {
@@ -110,7 +120,7 @@ export function getAssignInstruction<TAccountAccount extends string>(
     data: getAssignInstructionDataEncoder().encode(
       args as AssignInstructionDataArgs
     ),
-  } as AssignInstruction<typeof SYSTEM_PROGRAM_ADDRESS, TAccountAccount>;
+  } as AssignInstruction<TProgramAddress, TAccountAccount>;
 
   return instruction;
 }

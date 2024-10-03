@@ -38,6 +38,12 @@ import {
 import { SYSTEM_PROGRAM_ADDRESS } from '../programs';
 import { getAccountMetaFactory, type ResolvedAccount } from '../shared';
 
+export const CREATE_ACCOUNT_WITH_SEED_DISCRIMINATOR = 3;
+
+export function getCreateAccountWithSeedDiscriminatorBytes() {
+  return getU32Encoder().encode(CREATE_ACCOUNT_WITH_SEED_DISCRIMINATOR);
+}
+
 export type CreateAccountWithSeedInstruction<
   TProgram extends string = typeof SYSTEM_PROGRAM_ADDRESS,
   TAccountPayer extends string | IAccountMeta<string> = string,
@@ -90,7 +96,10 @@ export function getCreateAccountWithSeedInstructionDataEncoder(): Encoder<Create
       ['space', getU64Encoder()],
       ['programAddress', getAddressEncoder()],
     ]),
-    (value) => ({ ...value, discriminator: 3 })
+    (value) => ({
+      ...value,
+      discriminator: CREATE_ACCOUNT_WITH_SEED_DISCRIMINATOR,
+    })
   );
 }
 
@@ -134,20 +143,22 @@ export function getCreateAccountWithSeedInstruction<
   TAccountPayer extends string,
   TAccountNewAccount extends string,
   TAccountBaseAccount extends string,
+  TProgramAddress extends Address = typeof SYSTEM_PROGRAM_ADDRESS,
 >(
   input: CreateAccountWithSeedInput<
     TAccountPayer,
     TAccountNewAccount,
     TAccountBaseAccount
-  >
+  >,
+  config?: { programAddress?: TProgramAddress }
 ): CreateAccountWithSeedInstruction<
-  typeof SYSTEM_PROGRAM_ADDRESS,
+  TProgramAddress,
   TAccountPayer,
   TAccountNewAccount,
   TAccountBaseAccount
 > {
   // Program address.
-  const programAddress = SYSTEM_PROGRAM_ADDRESS;
+  const programAddress = config?.programAddress ?? SYSTEM_PROGRAM_ADDRESS;
 
   // Original accounts.
   const originalAccounts = {
@@ -175,7 +186,7 @@ export function getCreateAccountWithSeedInstruction<
       args as CreateAccountWithSeedInstructionDataArgs
     ),
   } as CreateAccountWithSeedInstruction<
-    typeof SYSTEM_PROGRAM_ADDRESS,
+    TProgramAddress,
     TAccountPayer,
     TAccountNewAccount,
     TAccountBaseAccount
