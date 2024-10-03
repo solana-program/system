@@ -37,6 +37,12 @@ import {
   type ResolvedAccount,
 } from '../shared';
 
+export const CREATE_ACCOUNT_DISCRIMINATOR = 0;
+
+export function getCreateAccountDiscriminatorBytes() {
+  return getU32Encoder().encode(CREATE_ACCOUNT_DISCRIMINATOR);
+}
+
 export type CreateAccountInstruction<
   TProgram extends string = typeof SYSTEM_PROGRAM_ADDRESS,
   TAccountPayer extends string | IAccountMeta<string> = string,
@@ -79,7 +85,7 @@ export function getCreateAccountInstructionDataEncoder(): Encoder<CreateAccountI
       ['space', getU64Encoder()],
       ['programAddress', getAddressEncoder()],
     ]),
-    (value) => ({ ...value, discriminator: 0 })
+    (value) => ({ ...value, discriminator: CREATE_ACCOUNT_DISCRIMINATOR })
   );
 }
 
@@ -116,16 +122,18 @@ export type CreateAccountInput<
 export function getCreateAccountInstruction<
   TAccountPayer extends string,
   TAccountNewAccount extends string,
+  TProgramAddress extends Address = typeof SYSTEM_PROGRAM_ADDRESS,
 >(
-  input: CreateAccountInput<TAccountPayer, TAccountNewAccount>
+  input: CreateAccountInput<TAccountPayer, TAccountNewAccount>,
+  config?: { programAddress?: TProgramAddress }
 ): CreateAccountInstruction<
-  typeof SYSTEM_PROGRAM_ADDRESS,
+  TProgramAddress,
   TAccountPayer,
   TAccountNewAccount
 > &
   IInstructionWithByteDelta {
   // Program address.
-  const programAddress = SYSTEM_PROGRAM_ADDRESS;
+  const programAddress = config?.programAddress ?? SYSTEM_PROGRAM_ADDRESS;
 
   // Original accounts.
   const originalAccounts = {
@@ -157,7 +165,7 @@ export function getCreateAccountInstruction<
       args as CreateAccountInstructionDataArgs
     ),
   } as CreateAccountInstruction<
-    typeof SYSTEM_PROGRAM_ADDRESS,
+    TProgramAddress,
     TAccountPayer,
     TAccountNewAccount
   >;

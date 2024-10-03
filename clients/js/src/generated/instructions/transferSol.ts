@@ -31,6 +31,12 @@ import {
 import { SYSTEM_PROGRAM_ADDRESS } from '../programs';
 import { getAccountMetaFactory, type ResolvedAccount } from '../shared';
 
+export const TRANSFER_SOL_DISCRIMINATOR = 2;
+
+export function getTransferSolDiscriminatorBytes() {
+  return getU32Encoder().encode(TRANSFER_SOL_DISCRIMINATOR);
+}
+
 export type TransferSolInstruction<
   TProgram extends string = typeof SYSTEM_PROGRAM_ADDRESS,
   TAccountSource extends string | IAccountMeta<string> = string,
@@ -64,7 +70,7 @@ export function getTransferSolInstructionDataEncoder(): Encoder<TransferSolInstr
       ['discriminator', getU32Encoder()],
       ['amount', getU64Encoder()],
     ]),
-    (value) => ({ ...value, discriminator: 2 })
+    (value) => ({ ...value, discriminator: TRANSFER_SOL_DISCRIMINATOR })
   );
 }
 
@@ -97,15 +103,17 @@ export type TransferSolInput<
 export function getTransferSolInstruction<
   TAccountSource extends string,
   TAccountDestination extends string,
+  TProgramAddress extends Address = typeof SYSTEM_PROGRAM_ADDRESS,
 >(
-  input: TransferSolInput<TAccountSource, TAccountDestination>
+  input: TransferSolInput<TAccountSource, TAccountDestination>,
+  config?: { programAddress?: TProgramAddress }
 ): TransferSolInstruction<
-  typeof SYSTEM_PROGRAM_ADDRESS,
+  TProgramAddress,
   TAccountSource,
   TAccountDestination
 > {
   // Program address.
-  const programAddress = SYSTEM_PROGRAM_ADDRESS;
+  const programAddress = config?.programAddress ?? SYSTEM_PROGRAM_ADDRESS;
 
   // Original accounts.
   const originalAccounts = {
@@ -131,7 +139,7 @@ export function getTransferSolInstruction<
       args as TransferSolInstructionDataArgs
     ),
   } as TransferSolInstruction<
-    typeof SYSTEM_PROGRAM_ADDRESS,
+    TProgramAddress,
     TAccountSource,
     TAccountDestination
   >;
