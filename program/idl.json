@@ -1049,6 +1049,6 @@
     "origin": "shank"
   },
   "additionalPrograms": [],
-  "standard": "kinobi",
-  "version": "0.19.0"
+  "standard": "codama",
+  "version": "1.0.0"
 }
