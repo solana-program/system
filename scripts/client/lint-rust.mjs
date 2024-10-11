@@ -13,16 +13,16 @@ const lintArgs = cliArguments();
 
 const fix = popArgument(lintArgs, '--fix');
 const toolchain = getToolchainArgument('lint');
-const manifestPath = path.join(
-  workingDirectory,
-  'clients',
-  'rust',
-  'Cargo.toml'
-);
+const manifests = [
+  path.join(workingDirectory, 'clients', 'rust-client', 'Cargo.toml'),
+  path.join(workingDirectory, 'clients', 'rust-instruction', 'Cargo.toml'),
+];
 
 // Check the client using Clippy.
-if (fix) {
-  await $`cargo ${toolchain} clippy --manifest-path ${manifestPath} --fix ${lintArgs}`;
-} else {
-  await $`cargo ${toolchain} clippy --manifest-path ${manifestPath} ${lintArgs}`;
+for (const client of manifests) {
+  if (fix) {
+    await $`cargo ${toolchain} clippy --manifest-path ${client} --fix ${lintArgs}`;
+  } else {
+    await $`cargo ${toolchain} clippy --manifest-path ${client} ${lintArgs}`;
+  }
 }

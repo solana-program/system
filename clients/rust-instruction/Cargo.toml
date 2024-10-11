@@ -10,13 +10,10 @@ license-file = "../../LICENSE"
 [dependencies]
 num-derive = "0.4"
 num-traits = "0.2"
-serde = { version="1.0.210", optional=true }
-serde_derive = { version="1.0.210", optional=true }
+serde = { version="1.0.210" }
+serde_derive = { version="1.0.210" }
 solana-instruction = { version="2.1.0", features=["bincode"], git="https://github.com/anza-xyz/agave.git" }
-solana-pubkey = { version="2.1.0", git="https://github.com/anza-xyz/agave.git" }
+solana-pubkey = { version="2.1.0", features=["serde"], git="https://github.com/anza-xyz/agave.git" }
 
 [dev-dependencies]
 static_assertions = "1.1.0"
-
-[features]
-serde = ["dep:serde", "dep:serde_derive", "solana-pubkey/serde"]

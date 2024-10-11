@@ -38,7 +38,6 @@
 //! [`AccountInfo`]: crate::account_info::AccountInfo
 
 use num_derive::{FromPrimitive, ToPrimitive};
-#[cfg(feature = "serde")]
 use serde_derive::{Deserialize, Serialize};
 use solana_instruction::{AccountMeta, Instruction};
 use solana_pubkey::Pubkey;
@@ -49,8 +48,7 @@ pub const ID: Pubkey = Pubkey::new_from_array([
 ]);
 
 #[allow(deprecated)]
-#[cfg_attr(feature = "serde", derive(Serialize))]
-#[derive(Debug, Clone, PartialEq, Eq, FromPrimitive, ToPrimitive)]
+#[derive(Serialize, Debug, Clone, PartialEq, Eq, FromPrimitive, ToPrimitive)]
 pub enum SystemError {
     /// An account with the same address already exists.
     AccountAlreadyInUse,
@@ -142,8 +140,7 @@ static_assertions::const_assert_eq!(MAX_PERMITTED_DATA_LENGTH, 10_485_760);
     frozen_abi(digest = "2LnVTnJg7LxB1FawNZLoQEY8yiYx3MT3paTdx4s5kAXU"),
     derive(AbiExample, AbiEnumVisitor)
 )]
-#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq)]
 pub enum SystemInstruction {
     /// Create a new account
     ///
