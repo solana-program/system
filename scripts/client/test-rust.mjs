@@ -9,7 +9,7 @@ const testArgs = cliArguments();
 const hasSolfmt = await which('solfmt', { nothrow: true });
 
 // Run the tests.
-cd(path.join(workingDirectory, 'clients', 'rust'));
+cd(path.join(workingDirectory, 'clients', 'rust-client'));
 if (hasSolfmt) {
   await $`cargo test-sbf ${testArgs} 2>&1 | solfmt`;
 } else {

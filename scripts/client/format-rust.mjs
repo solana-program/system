@@ -15,16 +15,16 @@ const formatArgs = cliArguments();
 const fix = popArgument(formatArgs, '--fix');
 const [cargoArgs, fmtArgs] = partitionArguments(formatArgs, '--');
 const toolchain = getToolchainArgument('format');
-const manifestPath = path.join(
-  workingDirectory,
-  'clients',
-  'rust',
-  'Cargo.toml'
-);
+const manifests = [
+  path.join(workingDirectory, 'clients', 'rust-client', 'Cargo.toml'),
+  path.join(workingDirectory, 'clients', 'rust-instruction', 'Cargo.toml'),
+];
 
-// Format the client.
-if (fix) {
-  await $`cargo ${toolchain} fmt --manifest-path ${manifestPath} ${cargoArgs} -- ${fmtArgs}`;
-} else {
-  await $`cargo ${toolchain} fmt --manifest-path ${manifestPath} ${cargoArgs} -- --check ${fmtArgs}`;
+// Format each client.
+for (const client of manifests) {
+  if (fix) {
+    await $`cargo ${toolchain} fmt --manifest-path ${client} ${cargoArgs} -- ${fmtArgs}`;
+  } else {
+    await $`cargo ${toolchain} fmt --manifest-path ${client} ${cargoArgs} -- --check ${fmtArgs}`;
+  }
 }
