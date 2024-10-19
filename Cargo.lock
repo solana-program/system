@@ -864,7 +864,7 @@ version = "0.1.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "1d6ea3c4595b96363c13943497db34af4460fb474a95c43f4446ad341b8c9785"
 dependencies = [
- "toml 0.5.11",
+ "toml",
 ]
 
 [[package]]
@@ -1220,14 +1220,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "solana-atomic-u64"
-version = "2.1.0"
-source = "git+https://github.com/anza-xyz/agave.git#b24d7e180ccb6eff43318232926b05d432a09bd5"
-dependencies = [
- "parking_lot",
-]
-
-[[package]]
 name = "solana-borsh"
 version = "2.1.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1300,19 +1292,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "solana-decode-error"
-version = "2.1.0"
-source = "git+https://github.com/anza-xyz/agave.git#b24d7e180ccb6eff43318232926b05d432a09bd5"
-dependencies = [
- "num-traits",
-]
-
-[[package]]
-name = "solana-define-syscall"
-version = "2.1.0"
-source = "git+https://github.com/anza-xyz/agave.git#b24d7e180ccb6eff43318232926b05d432a09bd5"
-
-[[package]]
 name = "solana-frozen-abi"
 version = "2.1.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1329,25 +1308,6 @@ dependencies = [
  "serde_with",
  "sha2 0.10.8",
  "solana-frozen-abi-macro",
- "thiserror",
-]
-
-[[package]]
-name = "solana-frozen-abi"
-version = "2.1.0"
-source = "git+https://github.com/anza-xyz/agave.git#b24d7e180ccb6eff43318232926b05d432a09bd5"
-dependencies = [
- "bs58 0.5.1",
- "bv",
- "generic-array",
- "im",
- "log",
- "memmap2",
- "serde",
- "serde_derive",
- "serde_with 3.11.0",
- "sha2 0.10.8",
- "solana-frozen-abi-macro 2.1.0",
  "thiserror",
 ]
 
@@ -1586,11 +1546,6 @@ dependencies = [
  "solana-sha256-hasher",
  "wasm-bindgen",
 ]
-
-[[package]]
-name = "solana-sanitize"
-version = "2.1.0"
-source = "git+https://github.com/anza-xyz/agave.git#b24d7e180ccb6eff43318232926b05d432a09bd5"
 
 [[package]]
 name = "solana-rent"
@@ -1898,18 +1853,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "toml"
-version = "0.8.19"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "a1ed1f98e3fdc28d6d910e6737ae6ab1a93bf1985935a1193e68f93eeb68d24e"
-dependencies = [
- "serde",
- "serde_spanned",
- "toml_datetime",
- "toml_edit 0.22.22",
-]
-
-[[package]]
 name = "toml_datetime"
 version = "0.6.8"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1923,7 +1866,7 @@ checksum = "4ae48d6208a266e853d946088ed816055e556cc6028c5e8e2b84d9fa5dd7c7f5"
 dependencies = [
  "indexmap 2.6.0",
  "toml_datetime",
- "winnow 0.5.40",
+ "winnow",
 ]
 
 [[package]]
