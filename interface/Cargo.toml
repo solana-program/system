@@ -1,0 +1,37 @@
+[package]
+name = "solana-system-interface"
+version = "0.0.1"
+description = "Instructions and constructors for the System program"
+repository = "https://github.com/solana-program/system"
+edition = "2021"
+readme = "README.md"
+license-file = "../LICENSE"
+
+[package.metadata.docs.rs]
+targets = ["x86_64-unknown-linux-gnu", "wasm32-unknown-unknown"]
+all-features = true
+rustdoc-args = ["--cfg=docsrs"]
+
+[dependencies]
+num-derive = "0.4"
+num-traits = "0.2"
+serde = { version = "1.0.210" }
+serde_derive = { version = "1.0.210" }
+solana-decode-error = { version = "2.1.0", git = "https://github.com/anza-xyz/agave.git" }
+solana-frozen-abi = { version = "2.1.0", optional = true, git = "https://github.com/anza-xyz/agave.git" }
+solana-frozen-abi-macro = { version = "2.1.0", optional = true, git = "https://github.com/anza-xyz/agave.git" }
+solana-instruction = { version = "2.1.0", features = ["bincode", "std"], git = "https://github.com/anza-xyz/agave.git" }
+solana-logger = { version = "2.1.0", optional = true, git = "https://github.com/anza-xyz/agave.git" }
+solana-pubkey = { version = "2.1.0", default-features = false, features = ["serde"], git = "https://github.com/anza-xyz/agave.git" }
+
+[dev-dependencies]
+static_assertions = "1.1.0"
+strum = "0.24"
+strum_macros = "0.24"
+
+[features]
+frozen-abi = [
+    "dep:solana-frozen-abi",
+    "dep:solana-frozen-abi-macro",
+    "dep:solana-logger"
+]
