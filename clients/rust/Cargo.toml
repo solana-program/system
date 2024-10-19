@@ -9,6 +9,7 @@ license-file = "../../LICENSE"
 
 [features]
 anchor = ["dep:anchor-lang"]
+anchor-idl-build = ["anchor", "anchor-lang?/idl-build"]
 test-sbf = []
 serde = ["dep:serde", "dep:serde_with", "kaigan/serde"]
 
