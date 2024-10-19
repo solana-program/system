@@ -2187,7 +2187,7 @@ version = "0.2.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "b6dd100976df9dd59d0c3fecf6f9ad3f161a087374d1b2a77ebb4ad8920f11bb"
 dependencies = [
- "borsh 0.10.3",
+ "borsh 0.10.4",
  "serde",
 ]
 
@@ -4822,6 +4822,7 @@ dependencies = [
 name = "solana-system-interface"
 version = "0.0.1"
 dependencies = [
+ "js-sys",
  "num-derive 0.4.2",
  "num-traits",
  "serde",
@@ -4835,6 +4836,7 @@ dependencies = [
  "static_assertions",
  "strum",
  "strum_macros",
+ "wasm-bindgen",
 ]
 
 [[package]]
