@@ -4822,6 +4822,7 @@ dependencies = [
 name = "solana-system-interface"
 version = "0.0.1"
 dependencies = [
+ "js-sys",
  "num-derive 0.4.2",
  "num-traits",
  "serde",
@@ -4835,6 +4836,7 @@ dependencies = [
  "static_assertions",
  "strum",
  "strum_macros",
+ "wasm-bindgen",
 ]
 
 [[package]]
