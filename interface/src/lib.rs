@@ -19,7 +19,7 @@
 //! or they can be [program derived addresses][pda],
 //! where write access to accounts is granted by an owning program.
 //!
-//! [pda]: crate::pubkey::Pubkey::find_program_address
+//! [pda]: solana_pubkey::Pubkey::find_program_address
 //!
 //! Most of the functions in this module construct an [`Instruction`], that must
 //! be submitted to the runtime for execution, either via RPC, typically with
@@ -32,10 +32,10 @@
 //! and these variants are linked from the documentation for their constructors.
 //!
 //! [`RpcClient`]: https://docs.rs/solana-client/latest/solana_client/rpc_client/struct.RpcClient.html
-//! [cpi]: crate::program
-//! [`invoke`]: crate::program::invoke
-//! [`invoke_signed`]: crate::program::invoke_signed
-//! [`AccountInfo`]: crate::account_info::AccountInfo
+//! [cpi]: solana_program::program
+//! [`invoke`]: solana_program::program::invoke
+//! [`invoke_signed`]: solana_program::program::invoke_signed
+//! [`AccountInfo`]: solana_account_info::AccountInfo
 #![cfg_attr(feature = "frozen-abi", feature(min_specialization))]
 #![cfg_attr(docsrs, feature(doc_auto_cfg))]
 
