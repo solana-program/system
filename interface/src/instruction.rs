@@ -1,110 +1,17 @@
-//! Instructions and constructors for the system program.
-//!
-//! The system program is responsible for the creation of accounts and [nonce
-//! accounts][na]. It is responsible for transferring lamports from accounts
-//! owned by the system program, including typical user wallet accounts.
-//!
-//! [na]: https://docs.solanalabs.com/implemented-proposals/durable-tx-nonces
-//!
-//! Account creation typically involves three steps: [`allocate`] space,
-//! [`transfer`] lamports for rent, [`assign`] to its owning program. The
-//! [`create_account`] function does all three at once. All new accounts must
-//! contain enough lamports to be [rent exempt], or else the creation
-//! instruction will fail.
-//!
-//! [rent exempt]: https://solana.com/docs/core/accounts#rent-exemption
-//!
-//! The accounts created by the system program can either be user-controlled,
-//! where the secret keys are held outside the blockchain,
-//! or they can be [program derived addresses][pda],
-//! where write access to accounts is granted by an owning program.
-//!
-//! [pda]: crate::pubkey::Pubkey::find_program_address
-//!
-//! The system program ID is defined in [`system_program`].
-//!
-//! Most of the functions in this module construct an [`Instruction`], that must
-//! be submitted to the runtime for execution, either via RPC, typically with
-//! [`RpcClient`], or through [cross-program invocation][cpi].
-//!
-//! When invoking through CPI, the [`invoke`] or [`invoke_signed`] instruction
-//! requires all account references to be provided explicitly as [`AccountInfo`]
-//! values. The account references required are specified in the documentation
-//! for the [`SystemInstruction`] variants for each system program instruction,
-//! and these variants are linked from the documentation for their constructors.
-//!
-//! [`RpcClient`]: https://docs.rs/solana-client/latest/solana_client/rpc_client/struct.RpcClient.html
-//! [cpi]: crate::program
-//! [`invoke`]: crate::program::invoke
-//! [`invoke_signed`]: crate::program::invoke_signed
-//! [`AccountInfo`]: crate::account_info::AccountInfo
+use serde_derive::{Deserialize, Serialize};
+use solana_instruction::{AccountMeta, Instruction};
+use solana_pubkey::Pubkey;
 
-#[allow(deprecated)]
-use {
-    crate::{
-        instruction::{AccountMeta, Instruction},
-        nonce,
-        pubkey::Pubkey,
-        system_program,
-        sysvar::{recent_blockhashes, rent},
-    },
-    num_derive::{FromPrimitive, ToPrimitive},
-    solana_decode_error::DecodeError,
-    thiserror::Error,
-};
-
-#[derive(Error, Debug, Serialize, Clone, PartialEq, Eq, FromPrimitive, ToPrimitive)]
-pub enum SystemError {
-    #[error("an account with the same address already exists")]
-    AccountAlreadyInUse,
-    #[error("account does not have enough SOL to perform the operation")]
-    ResultWithNegativeLamports,
-    #[error("cannot assign account to this program id")]
-    InvalidProgramId,
-    #[error("cannot allocate account data of this length")]
-    InvalidAccountDataLength,
-    #[error("length of requested seed is too long")]
-    MaxSeedLengthExceeded,
-    #[error("provided address does not match addressed derived from seed")]
-    AddressWithSeedMismatch,
-    #[error("advancing stored nonce requires a populated RecentBlockhashes sysvar")]
-    NonceNoRecentBlockhashes,
-    #[error("stored nonce is still in recent_blockhashes")]
-    NonceBlockhashNotExpired,
-    #[error("specified nonce does not match stored nonce")]
-    NonceUnexpectedBlockhashValue,
-}
-
-impl<T> DecodeError<T> for SystemError {
-    fn type_of() -> &'static str {
-        "SystemError"
-    }
-}
-
-/// Maximum permitted size of account data (10 MiB).
-pub const MAX_PERMITTED_DATA_LENGTH: u64 = 10 * 1024 * 1024;
-
-/// Maximum permitted size of new allocations per transaction, in bytes.
-///
-/// The value was chosen such that at least one max sized account could be created,
-/// plus some additional resize allocations.
-pub const MAX_PERMITTED_ACCOUNTS_DATA_ALLOCATIONS_PER_TRANSACTION: i64 =
-    MAX_PERMITTED_DATA_LENGTH as i64 * 2;
-
-// SBF program entrypoint assumes that the max account data length
-// will fit inside a u32. If this constant no longer fits in a u32,
-// the entrypoint deserialization code in the SDK must be updated.
-#[cfg(test)]
-static_assertions::const_assert!(MAX_PERMITTED_DATA_LENGTH <= u32::MAX as u64);
-
-#[cfg(test)]
-static_assertions::const_assert_eq!(MAX_PERMITTED_DATA_LENGTH, 10_485_760);
+use crate::{program::ID, NONCE_STATE_SIZE, RECENT_BLOCKHASHES_ID, RENT_ID};
 
 /// An instruction to the system program.
 #[cfg_attr(
     feature = "frozen-abi",
-    frozen_abi(digest = "2LnVTnJg7LxB1FawNZLoQEY8yiYx3MT3paTdx4s5kAXU"),
-    derive(AbiExample, AbiEnumVisitor)
+    solana_frozen_abi_macro::frozen_abi(digest = "2LnVTnJg7LxB1FawNZLoQEY8yiYx3MT3paTdx4s5kAXU"),
+    derive(
+        solana_frozen_abi_macro::AbiExample,
+        solana_frozen_abi_macro::AbiEnumVisitor
+    )
 )]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq)]
 pub enum SystemInstruction {
@@ -450,7 +357,7 @@ pub fn create_account(
         AccountMeta::new(*to_pubkey, true),
     ];
     Instruction::new_with_bincode(
-        system_program::id(),
+        ID,
         &SystemInstruction::CreateAccount {
             lamports,
             space,
@@ -478,7 +385,7 @@ pub fn create_account_with_seed(
     ];
 
     Instruction::new_with_bincode(
-        system_program::id(),
+        ID,
         &SystemInstruction::CreateAccountWithSeed {
             base: *base,
             seed: seed.to_string(),
@@ -674,7 +581,7 @@ pub fn create_account_with_seed(
 pub fn assign(pubkey: &Pubkey, owner: &Pubkey) -> Instruction {
     let account_metas = vec![AccountMeta::new(*pubkey, true)];
     Instruction::new_with_bincode(
-        system_program::id(),
+        ID,
         &SystemInstruction::Assign { owner: *owner },
         account_metas,
     )
@@ -691,7 +598,7 @@ pub fn assign_with_seed(
         AccountMeta::new_readonly(*base, true),
     ];
     Instruction::new_with_bincode(
-        system_program::id(),
+        ID,
         &SystemInstruction::AssignWithSeed {
             base: *base,
             seed: seed.to_string(),
@@ -887,11 +794,7 @@ pub fn transfer(from_pubkey: &Pubkey, to_pubkey: &Pubkey, lamports: u64) -> Inst
         AccountMeta::new(*from_pubkey, true),
         AccountMeta::new(*to_pubkey, false),
     ];
-    Instruction::new_with_bincode(
-        system_program::id(),
-        &SystemInstruction::Transfer { lamports },
-        account_metas,
-    )
+    Instruction::new_with_bincode(ID, &SystemInstruction::Transfer { lamports }, account_metas)
 }
 
 pub fn transfer_with_seed(
@@ -908,7 +811,7 @@ pub fn transfer_with_seed(
         AccountMeta::new(*to_pubkey, false),
     ];
     Instruction::new_with_bincode(
-        system_program::id(),
+        ID,
         &SystemInstruction::TransferWithSeed {
             lamports,
             from_seed,
@@ -1104,11 +1007,7 @@ pub fn transfer_with_seed(
 /// ```
 pub fn allocate(pubkey: &Pubkey, space: u64) -> Instruction {
     let account_metas = vec![AccountMeta::new(*pubkey, true)];
-    Instruction::new_with_bincode(
-        system_program::id(),
-        &SystemInstruction::Allocate { space },
-        account_metas,
-    )
+    Instruction::new_with_bincode(ID, &SystemInstruction::Allocate { space }, account_metas)
 }
 
 pub fn allocate_with_seed(
@@ -1123,7 +1022,7 @@ pub fn allocate_with_seed(
         AccountMeta::new_readonly(*base, true),
     ];
     Instruction::new_with_bincode(
-        system_program::id(),
+        ID,
         &SystemInstruction::AllocateWithSeed {
             base: *base,
             seed: seed.to_string(),
@@ -1297,17 +1196,17 @@ pub fn create_nonce_account_with_seed(
             base,
             seed,
             lamports,
-            nonce::State::size() as u64,
-            &system_program::id(),
+            NONCE_STATE_SIZE as u64,
+            &ID,
         ),
         Instruction::new_with_bincode(
-            system_program::id(),
+            ID,
             &SystemInstruction::InitializeNonceAccount(*authority),
             vec![
                 AccountMeta::new(*nonce_pubkey, false),
                 #[allow(deprecated)]
-                AccountMeta::new_readonly(recent_blockhashes::id(), false),
-                AccountMeta::new_readonly(rent::id(), false),
+                AccountMeta::new_readonly(RECENT_BLOCKHASHES_ID, false),
+                AccountMeta::new_readonly(RENT_ID, false),
             ],
         ),
     ]
@@ -1435,17 +1334,17 @@ pub fn create_nonce_account(
             from_pubkey,
             nonce_pubkey,
             lamports,
-            nonce::State::size() as u64,
-            &system_program::id(),
+            NONCE_STATE_SIZE as u64,
+            &ID,
         ),
         Instruction::new_with_bincode(
-            system_program::id(),
+            ID,
             &SystemInstruction::InitializeNonceAccount(*authority),
             vec![
                 AccountMeta::new(*nonce_pubkey, false),
                 #[allow(deprecated)]
-                AccountMeta::new_readonly(recent_blockhashes::id(), false),
-                AccountMeta::new_readonly(rent::id(), false),
+                AccountMeta::new_readonly(RECENT_BLOCKHASHES_ID, false),
+                AccountMeta::new_readonly(RENT_ID, false),
             ],
         ),
     ]
@@ -1578,14 +1477,10 @@ pub fn advance_nonce_account(nonce_pubkey: &Pubkey, authorized_pubkey: &Pubkey) 
     let account_metas = vec![
         AccountMeta::new(*nonce_pubkey, false),
         #[allow(deprecated)]
-        AccountMeta::new_readonly(recent_blockhashes::id(), false),
+        AccountMeta::new_readonly(RECENT_BLOCKHASHES_ID, false),
         AccountMeta::new_readonly(*authorized_pubkey, true),
     ];
-    Instruction::new_with_bincode(
-        system_program::id(),
-        &SystemInstruction::AdvanceNonceAccount,
-        account_metas,
-    )
+    Instruction::new_with_bincode(ID, &SystemInstruction::AdvanceNonceAccount, account_metas)
 }
 
 /// Withdraw lamports from a durable transaction nonce account.
@@ -1670,12 +1565,12 @@ pub fn withdraw_nonce_account(
         AccountMeta::new(*nonce_pubkey, false),
         AccountMeta::new(*to_pubkey, false),
         #[allow(deprecated)]
-        AccountMeta::new_readonly(recent_blockhashes::id(), false),
-        AccountMeta::new_readonly(rent::id(), false),
+        AccountMeta::new_readonly(RECENT_BLOCKHASHES_ID, false),
+        AccountMeta::new_readonly(RENT_ID, false),
         AccountMeta::new_readonly(*authorized_pubkey, true),
     ];
     Instruction::new_with_bincode(
-        system_program::id(),
+        ID,
         &SystemInstruction::WithdrawNonceAccount(lamports),
         account_metas,
     )
@@ -1752,7 +1647,7 @@ pub fn authorize_nonce_account(
         AccountMeta::new_readonly(*authorized_pubkey, true),
     ];
     Instruction::new_with_bincode(
-        system_program::id(),
+        ID,
         &SystemInstruction::AuthorizeNonceAccount(*new_authority),
         account_metas,
     )
@@ -1762,16 +1657,12 @@ pub fn authorize_nonce_account(
 /// them out of chain blockhash domain.
 pub fn upgrade_nonce_account(nonce_pubkey: Pubkey) -> Instruction {
     let account_metas = vec![AccountMeta::new(nonce_pubkey, /*is_signer:*/ false)];
-    Instruction::new_with_bincode(
-        system_program::id(),
-        &SystemInstruction::UpgradeNonceAccount,
-        account_metas,
-    )
+    Instruction::new_with_bincode(ID, &SystemInstruction::UpgradeNonceAccount, account_metas)
 }
 
 #[cfg(test)]
 mod tests {
-    use {super::*, crate::instruction::Instruction};
+    use super::*;
 
     fn get_keys(instruction: &Instruction) -> Vec<Pubkey> {
         instruction.accounts.iter().map(|x| x.pubkey).collect()
@@ -1798,7 +1689,7 @@ mod tests {
         let ixs = create_nonce_account(&from_pubkey, &nonce_pubkey, &authorized, 42);
         assert_eq!(ixs.len(), 2);
         let ix = &ixs[0];
-        assert_eq!(ix.program_id, system_program::id());
+        assert_eq!(ix.program_id, ID);
         let pubkeys: Vec<_> = ix.accounts.iter().map(|am| am.pubkey).collect();
         assert!(pubkeys.contains(&from_pubkey));
         assert!(pubkeys.contains(&nonce_pubkey));

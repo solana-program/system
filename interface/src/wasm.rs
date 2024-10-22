@@ -2,7 +2,13 @@
 #![cfg(target_arch = "wasm32")]
 #![allow(non_snake_case)]
 use {
-    crate::{instruction::Instruction, pubkey::Pubkey, system_instruction::*},
+    crate::instruction::{
+        advance_nonce_account, allocate, allocate_with_seed, assign, assign_with_seed,
+        authorize_nonce_account, create_account, create_account_with_seed, create_nonce_account,
+        transfer, transfer_with_seed, withdraw_nonce_account, SystemInstruction,
+    },
+    solana_instruction::Instruction,
+    solana_pubkey::Pubkey,
     wasm_bindgen::prelude::*,
 };
 
