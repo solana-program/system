@@ -36,12 +36,16 @@
 //! [`invoke`]: crate::program::invoke
 //! [`invoke_signed`]: crate::program::invoke_signed
 //! [`AccountInfo`]: crate::account_info::AccountInfo
+#![cfg_attr(feature = "frozen-abi", feature(min_specialization))]
+#![cfg_attr(docsrs, feature(doc_auto_cfg))]
 
 use num_traits::{FromPrimitive, ToPrimitive};
 use serde_derive::{Deserialize, Serialize};
 use solana_decode_error::DecodeError;
 use solana_instruction::{AccountMeta, Instruction};
 use solana_pubkey::Pubkey;
+#[cfg(target_arch = "wasm32")]
+mod wasm;
 
 const SYSTEM_PROGRAM_ID: Pubkey = Pubkey::from_str_const("11111111111111111111111111111111");
 // inline some constants to avoid dependencies
