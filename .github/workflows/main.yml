@@ -42,6 +42,42 @@ jobs:
       - name: Lint Client Rust
         run: pnpm clients:rust:lint
 
+  format_and_lint_interface:
+    name: Format & Lint Interface
+    runs-on: ubuntu-latest
+    steps:
+      - name: Git Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Environment
+        uses: ./.github/actions/setup
+        with:
+          clippy: true
+          rustfmt: true
+
+      - name: Format Interface
+        run: pnpm interface:format
+
+      - name: Lint Interface
+        run: pnpm interface:lint
+
+  build_interface:
+    name: Build Interface
+    runs-on: ubuntu-latest
+    needs: format_and_lint_interface
+    steps:
+      - name: Git Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Environment
+        uses: ./.github/actions/setup
+        with:
+          cargo-cache-key: cargo-interface
+          solana: true
+
+      - name: Build Interface
+        run: pnpm interface:build
+
   generate_clients:
     name: Check Client Generation
     runs-on: ubuntu-latest
