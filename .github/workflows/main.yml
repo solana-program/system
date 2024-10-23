@@ -71,6 +71,7 @@ jobs:
       - name: Setup Environment
         uses: ./.github/actions/setup
         with:
+          rust-toolchain: true
           cargo-cache-key: cargo-interface
           solana: true
 

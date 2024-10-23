@@ -16,6 +16,9 @@ inputs:
   rustfmt:
     description: Install Rustfmt if `true`. Defaults to `false`.
     required: false
+  rust-toolchain:
+    description: Install Rust toolchain if `true`. Defaults to `false`.
+    required: false
   solana:
     description: Install Solana if `true`. Defaults to `false`.
     required: false
@@ -53,6 +56,12 @@ runs:
       with:
         toolchain: ${{ env.TOOLCHAIN_LINT }}
         components: clippy
+
+    - name: Install Rust Toolchain
+      if: ${{ inputs.rust-toolchain == 'true' }}
+      uses: dtolnay/rust-toolchain@master
+      with:
+        toolchain: ${{ env.TOOLCHAIN_BUILD }}
 
     - name: Install Solana
       if: ${{ inputs.solana == 'true' }}
