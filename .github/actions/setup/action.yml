@@ -10,14 +10,8 @@ inputs:
   cargo-cache-local-key:
     description: The key to cache local cargo dependencies. Skips local cargo caching if not provided.
     required: false
-  clippy:
-    description: Install Clippy if `true`. Defaults to `false`.
-    required: false
-  rustfmt:
-    description: Install Rustfmt if `true`. Defaults to `false`.
-    required: false
-  rust-toolchain:
-    description: Install Rust toolchain if `true`. Defaults to `false`.
+  toolchain:
+    description: Rust toolchain to install. Comma-separated string of [`build`, `format`, `lint`].
     required: false
   solana:
     description: Install Solana if `true`. Defaults to `false`.
@@ -43,25 +37,25 @@ runs:
       shell: bash
       run: pnpm zx ./scripts/ci/set-env.mjs
 
-    - name: Install Rustfmt
-      if: ${{ inputs.rustfmt == 'true' }}
+    - name: Install Rust 'build' Toolchain
+      if: ${{ contains(inputs.toolchain, 'build') }}
+      uses: dtolnay/rust-toolchain@master
+      with:
+        toolchain: ${{ env.TOOLCHAIN_BUILD }}
+
+    - name: Install Rust 'format' Toolchain
+      if: ${{ contains(inputs.toolchain, 'format') }}
       uses: dtolnay/rust-toolchain@master
       with:
         toolchain: ${{ env.TOOLCHAIN_FORMAT }}
         components: rustfmt
 
-    - name: Install Clippy
-      if: ${{ inputs.clippy == 'true' }}
+    - name: Install Rust 'lint' Toolchain
+      if: ${{ contains(inputs.toolchain, 'lint') }}
       uses: dtolnay/rust-toolchain@master
       with:
         toolchain: ${{ env.TOOLCHAIN_LINT }}
         components: clippy
-
-    - name: Install Rust Toolchain
-      if: ${{ inputs.rust-toolchain == 'true' }}
-      uses: dtolnay/rust-toolchain@master
-      with:
-        toolchain: ${{ env.TOOLCHAIN_BUILD }}
 
     - name: Install Solana
       if: ${{ inputs.solana == 'true' }}

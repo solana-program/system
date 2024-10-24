@@ -32,8 +32,7 @@ jobs:
       - name: Setup Environment
         uses: ./.github/actions/setup
         with:
-          clippy: true
-          rustfmt: true
+          toolchain: format, lint
 
       - name: Format Client Rust
         run: pnpm clients:rust:format
@@ -51,8 +50,7 @@ jobs:
       - name: Setup Environment
         uses: ./.github/actions/setup
         with:
-          clippy: true
-          rustfmt: true
+          toolchain: format, lint
 
       - name: Format Interface
         run: pnpm interface:format
@@ -71,7 +69,7 @@ jobs:
       - name: Setup Environment
         uses: ./.github/actions/setup
         with:
-          rust-toolchain: true
+          toolchain: build
           cargo-cache-key: cargo-interface
           solana: true
 
@@ -88,7 +86,7 @@ jobs:
       - name: Setup Environment
         uses: ./.github/actions/setup
         with:
-          rustfmt: true
+          toolchain: format
 
       - name: Generate Clients
         run: pnpm generate:clients
