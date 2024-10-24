@@ -1,5 +1,5 @@
 use num_traits::{FromPrimitive, ToPrimitive};
-use serde::Serialize;
+use serde_derive::Serialize;
 use solana_decode_error::DecodeError;
 
 // Use strum when testing to ensure our FromPrimitive
