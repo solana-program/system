@@ -59,7 +59,7 @@ jobs:
         run: pnpm interface:lint
 
   test_interface:
-    name: Build Interface
+    name: Test Interface
     runs-on: ubuntu-latest
     needs: format_and_lint_interface
     steps:
