@@ -73,8 +73,8 @@ jobs:
           cargo-cache-key: cargo-interface
           solana: true
 
-      - name: Build Interface
-        run: pnpm interface:build
+      - name: Test Interface
+        run: pnpm interface:test
 
   generate_clients:
     name: Check Client Generation
