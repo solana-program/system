@@ -9,8 +9,8 @@ import {
 // Configure additional arguments here, e.g.:
 // ['--arg1', '--arg2', ...cliArguments()]
 const buildArgs = cliArguments();
-const toolchain = getToolchainArgument('build');
+const toolchain = getToolchainArgument('test');
 const manifestPath = path.join(workingDirectory, 'interface', 'Cargo.toml');
 
 // Build the programs.
-await $`cargo ${toolchain} build --all-features --manifest-path ${manifestPath} ${buildArgs}`;
+await $`cargo ${toolchain} test --all-features --manifest-path ${manifestPath} ${buildArgs}`;

@@ -58,7 +58,7 @@ jobs:
       - name: Lint Interface
         run: pnpm interface:lint
 
-  build_interface:
+  test_interface:
     name: Build Interface
     runs-on: ubuntu-latest
     needs: format_and_lint_interface
@@ -69,7 +69,7 @@ jobs:
       - name: Setup Environment
         uses: ./.github/actions/setup
         with:
-          toolchain: build
+          toolchain: test
           cargo-cache-key: cargo-interface
           solana: true
 

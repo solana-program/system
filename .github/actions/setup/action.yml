@@ -11,7 +11,7 @@ inputs:
     description: The key to cache local cargo dependencies. Skips local cargo caching if not provided.
     required: false
   toolchain:
-    description: Rust toolchain to install. Comma-separated string of [`build`, `format`, `lint`].
+    description: Rust toolchain to install. Comma-separated string of [`build`, `format`, `lint`, `test`].
     required: false
   solana:
     description: Install Solana if `true`. Defaults to `false`.
@@ -56,6 +56,12 @@ runs:
       with:
         toolchain: ${{ env.TOOLCHAIN_LINT }}
         components: clippy
+
+    - name: Install Rust 'test' Toolchain
+      if: ${{ contains(inputs.toolchain, 'test') }}
+      uses: dtolnay/rust-toolchain@master
+      with:
+        toolchain: ${{ env.TOOLCHAIN_TEST }}
 
     - name: Install Solana
       if: ${{ inputs.solana == 'true' }}
