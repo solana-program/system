@@ -9,7 +9,7 @@ import {
 
 // Configure additional arguments here, e.g.:
 // ['--arg1', '--arg2', ...cliArguments()]
-const lintArgs = ['--features', 'frozen-abi', ...cliArguments()];
+const lintArgs = ['--all-targets', '--all-features', ...cliArguments()];
 // Check whether a '--' was already used.
 if (lintArgs.indexOf('--') === -1) {
   lintArgs.push('--');
@@ -24,13 +24,14 @@ lintArgs.push(
 );
 
 const fix = popArgument(lintArgs, '--fix');
+// Note: need to use nightly clippy as frozen-abi proc-macro generates
+// a lot of code (frozen-abi is enabled only under nightly due to the
+// use of unstable rust feature). Likewise, frozen-abi(-macro) crates'
+// unit tests are only compiled under nightly.
 const toolchain = getToolchainArgument('lint');
 const manifestPath = path.join(workingDirectory, 'interface', 'Cargo.toml');
 
-// Use nightly clippy, as frozen-abi proc-macro generates a lot of code across
-// various crates in this whole monorepo (frozen-abi is enabled only under nightly
-// due to the use of unstable rust feature). Likewise, frozen-abi(-macro) crates'
-// unit tests are only compiled under nightly.
+// Lint the interface.
 if (fix) {
   await $`cargo ${toolchain} clippy --manifest-path ${manifestPath} --fix ${lintArgs}`;
 } else {

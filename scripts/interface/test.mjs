@@ -12,5 +12,5 @@ const buildArgs = cliArguments();
 const toolchain = getToolchainArgument('test');
 const manifestPath = path.join(workingDirectory, 'interface', 'Cargo.toml');
 
-// Build the programs.
+// Test the interface.
 await $`cargo ${toolchain} test --all-features --manifest-path ${manifestPath} ${buildArgs}`;
