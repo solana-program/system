@@ -2147,6 +2147,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "b6dd100976df9dd59d0c3fecf6f9ad3f161a087374d1b2a77ebb4ad8920f11bb"
 dependencies = [
  "borsh 0.10.3",
+ "serde",
 ]
 
 [[package]]
