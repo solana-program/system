@@ -10,7 +10,7 @@ license-file = "../../LICENSE"
 [features]
 anchor = ["dep:anchor-lang"]
 test-sbf = []
-serde = ["dep:serde", "dep:serde_with"]
+serde = ["dep:serde", "dep:serde_with", "kaigan/serde"]
 
 [dependencies]
 anchor-lang = { version = "0.30.0", optional = true }
