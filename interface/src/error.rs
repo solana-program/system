@@ -1,11 +1,11 @@
 use num_traits::{FromPrimitive, ToPrimitive};
-use serde::Serialize;
 use solana_decode_error::DecodeError;
 
 // Use strum when testing to ensure our FromPrimitive
 // impl is exhaustive
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 #[cfg_attr(test, derive(strum_macros::FromRepr, strum_macros::EnumIter))]
-#[derive(Serialize, Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub enum SystemError {
     /// An account with the same address already exists.
     AccountAlreadyInUse,
@@ -118,5 +118,39 @@ impl core::fmt::Display for SystemError {
 impl<T> DecodeError<T> for SystemError {
     fn type_of() -> &'static str {
         "SystemError"
+    }
+}
+
+impl From<u64> for SystemError {
+    fn from(error: u64) -> Self {
+        match error {
+            0 => SystemError::AccountAlreadyInUse,
+            1 => SystemError::ResultWithNegativeLamports,
+            2 => SystemError::InvalidProgramId,
+            3 => SystemError::InvalidAccountDataLength,
+            4 => SystemError::MaxSeedLengthExceeded,
+            5 => SystemError::AddressWithSeedMismatch,
+            6 => SystemError::NonceNoRecentBlockhashes,
+            7 => SystemError::NonceBlockhashNotExpired,
+            8 => SystemError::NonceUnexpectedBlockhashValue,
+            _ => panic!("Unsupported SsytemError"),
+        }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use {super::SystemError, num_traits::FromPrimitive, strum::IntoEnumIterator};
+
+    #[test]
+    fn test_system_error_from_primitive_exhaustive() {
+        for variant in SystemError::iter() {
+            let variant_i64 = variant.clone() as i64;
+            assert_eq!(
+                SystemError::from_repr(variant_i64 as usize),
+                SystemError::from_i64(variant_i64)
+            );
+            assert_eq!(SystemError::from(variant_i64 as u64), variant);
+        }
     }
 }

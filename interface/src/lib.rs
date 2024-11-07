@@ -1,4 +1,4 @@
-//! The [system native program][np].
+//! The [system native program interface][np].
 //!
 //! [rent exempt]: https://solana.com/docs/core/accounts#rent-exemption
 //!
@@ -7,7 +7,7 @@
 //! or they can be [program derived addresses][pda],
 //! where write access to accounts is granted by an owning program.
 //!
-//! [pda]: solana_pubkey::Pubkey::find_program_address
+//! [pda]: https://docs.rs/solana-pubkey/latest/solana_pubkey/struct.Pubkey.html#method.find_program_address
 //!
 //! Most of the functions in this module construct an [`Instruction`], that must
 //! be submitted to the runtime for execution, either via RPC, typically with
@@ -20,10 +20,11 @@
 //! and these variants are linked from the documentation for their constructors.
 //!
 //! [`RpcClient`]: https://docs.rs/solana-client/latest/solana_client/rpc_client/struct.RpcClient.html
-//! [cpi]: solana_program::program
-//! [`invoke`]: solana_program::program::invoke
-//! [`invoke_signed`]: solana_program::program::invoke_signed
-//! [`AccountInfo`]: solana_account_info::AccountInfo
+//! [cpi]: https://docs.rs/solana-program/latest/solana_program/program/index.html
+//! [`invoke`]: https://docs.rs/solana-program/latest/solana_program/program/fn.invoke.html
+//! [`invoke_signed`]: https://docs.rs/solana-program/latest/solana_program/program/fn.invoke_signed.html
+//! [`AccountInfo`]: https://docs.rs/solana-account-info/2.1.0/solana_account_info/struct.AccountInfo.html
+
 #![cfg_attr(feature = "frozen-abi", feature(min_specialization))]
 #![cfg_attr(docsrs, feature(doc_auto_cfg))]
 
@@ -34,18 +35,29 @@ mod wasm;
 
 use solana_pubkey::Pubkey;
 
-// inline some constants to avoid dependencies
+// Inline some constants to avoid dependencies.
+
 const RECENT_BLOCKHASHES_ID: Pubkey =
     Pubkey::from_str_const("SysvarRecentB1ockHashes11111111111111111111");
-const RENT_ID: Pubkey = Pubkey::from_str_const("SysvarRent111111111111111111111111111111111");
-const NONCE_STATE_SIZE: usize = 80;
-//TODO: enable this assertion when the nonce crate is ready
-//#[cfg(test)]
-//static_assertions::const_assert_eq!(solana_program::nonce::State::size(), NONCE_STATE_SIZE);
 
+const RENT_ID: Pubkey = Pubkey::from_str_const("SysvarRent111111111111111111111111111111111");
+
+#[cfg(test)]
+static_assertions::const_assert_eq!(solana_nonce::state::State::size(), NONCE_STATE_SIZE);
+/// The serialized size of the nonce state.
+const NONCE_STATE_SIZE: usize = 80;
+
+#[cfg(test)]
+static_assertions::const_assert!(MAX_PERMITTED_DATA_LENGTH <= u32::MAX as u64);
 /// Maximum permitted size of account data (10 MiB).
+///
+// SBF program entrypoint assumes that the max account data length
+// will fit inside a u32. If this constant no longer fits in a u32,
+// the entrypoint deserialization code in the SDK must be updated.
 pub const MAX_PERMITTED_DATA_LENGTH: u64 = 10 * 1024 * 1024;
 
+#[cfg(test)]
+static_assertions::const_assert_eq!(MAX_PERMITTED_DATA_LENGTH, 10_485_760);
 /// Maximum permitted size of new allocations per transaction, in bytes.
 ///
 /// The value was chosen such that at least one max sized account could be created,
@@ -53,17 +65,26 @@ pub const MAX_PERMITTED_DATA_LENGTH: u64 = 10 * 1024 * 1024;
 pub const MAX_PERMITTED_ACCOUNTS_DATA_ALLOCATIONS_PER_TRANSACTION: i64 =
     MAX_PERMITTED_DATA_LENGTH as i64 * 2;
 
-// SBF program entrypoint assumes that the max account data length
-// will fit inside a u32. If this constant no longer fits in a u32,
-// the entrypoint deserialization code in the SDK must be updated.
-#[cfg(test)]
-static_assertions::const_assert!(MAX_PERMITTED_DATA_LENGTH <= u32::MAX as u64);
-
-#[cfg(test)]
-static_assertions::const_assert_eq!(MAX_PERMITTED_DATA_LENGTH, 10_485_760);
-
 pub mod program {
     use solana_pubkey::declare_id;
 
     declare_id!("11111111111111111111111111111111");
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[allow(deprecated)]
+    #[test]
+    fn test_constants() {
+        // Ensure that the constants are in sync with the solana program.
+        assert_eq!(
+            RECENT_BLOCKHASHES_ID,
+            solana_program::sysvar::recent_blockhashes::id(),
+        );
+
+        // Ensure that the constants are in sync with the solana rent.
+        assert_eq!(RENT_ID, solana_rent::sysvar::id(),);
+    }
 }
