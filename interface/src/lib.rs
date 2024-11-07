@@ -36,6 +36,9 @@ mod wasm;
 use solana_pubkey::Pubkey;
 
 // Inline some constants to avoid dependencies.
+//
+// Note: replace these inline IDs with the corresponding value from
+// `solana_sdk_ids` once the version is updated to 2.2.0.
 
 const RECENT_BLOCKHASHES_ID: Pubkey =
     Pubkey::from_str_const("SysvarRecentB1ockHashes11111111111111111111");
@@ -69,22 +72,4 @@ pub mod program {
     use solana_pubkey::declare_id;
 
     declare_id!("11111111111111111111111111111111");
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[allow(deprecated)]
-    #[test]
-    fn test_constants() {
-        // Ensure that the constants are in sync with the solana program.
-        assert_eq!(
-            RECENT_BLOCKHASHES_ID,
-            solana_program::sysvar::recent_blockhashes::id(),
-        );
-
-        // Ensure that the constants are in sync with the solana rent.
-        assert_eq!(RENT_ID, solana_rent::sysvar::id(),);
-    }
 }

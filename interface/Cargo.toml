@@ -16,11 +16,11 @@ rustdoc-args = ["--cfg=docsrs"]
 num-traits = "0.2"
 serde = { version = "1.0.210", optional = true }
 serde_derive = { version = "1.0.210", optional = true }
-solana-decode-error = { version = "2.2", git = "https://github.com/anza-xyz/agave.git" }
-solana-frozen-abi = { version = "2.2", optional = true, git = "https://github.com/anza-xyz/agave.git" }
-solana-frozen-abi-macro = { version = "2.2", optional = true, git = "https://github.com/anza-xyz/agave.git" }
-solana-instruction = { version = "2.2", features = ["bincode", "std"], git = "https://github.com/anza-xyz/agave.git" }
-solana-pubkey = { version = "2.2", default-features = false, git = "https://github.com/anza-xyz/agave.git" }
+solana-decode-error = "^2.1"
+solana-frozen-abi = { version = "^2.1", optional = true }
+solana-frozen-abi-macro = { version = "^2.1", optional = true }
+solana-instruction = { version = "^2.1", features = ["bincode", "std"] }
+solana-pubkey = { version = "^2.1", default-features = false }
 
 [target.'cfg(target_arch = "wasm32")'.dependencies]
 js-sys = "0.3.72"
@@ -29,9 +29,8 @@ wasm-bindgen = "0.2"
 [dev-dependencies]
 anyhow = "1.0.89"
 borsh = { version = "1.5.1", features = ["derive", "unstable__schema"] }
-solana-nonce = { version = "2.2", git = "https://github.com/anza-xyz/agave.git" }
-solana-program = { version = "2.2", default-features = false, git = "https://github.com/anza-xyz/agave.git" }
-solana-rent = { version = "2.2", features = ["sysvar"], git = "https://github.com/anza-xyz/agave.git" }
+solana-nonce = "^0.0.2"
+solana-program = { version = "^2.1", default-features = false }
 static_assertions = "1.1.0"
 strum = "0.24"
 strum_macros = "0.24"
