@@ -1892,6 +1892,7 @@ dependencies = [
  "solana-nonce",
  "solana-program",
  "solana-pubkey",
+ "solana-rent",
  "static_assertions",
  "strum",
  "strum_macros",
