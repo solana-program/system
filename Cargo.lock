@@ -1383,10 +1383,21 @@ source = "git+https://github.com/anza-xyz/agave.git#a0b2c73cfe0a3942e359a415f354
 dependencies = [
  "serde",
  "serde_derive",
- "solana-hash",
+ "solana-hash 2.2.0",
  "solana-sdk-ids",
- "solana-sdk-macro",
+ "solana-sdk-macro 2.2.0",
  "solana-sysvar-id",
+]
+
+[[package]]
+name = "solana-epoch-schedule"
+version = "2.1.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "65c4cf7d7c266d353169cf4feeada5e4bba3a55f33715535fa1ef49080eac3e0"
+dependencies = [
+ "serde",
+ "serde_derive",
+ "solana-sdk-macro 2.1.0",
 ]
 
 [[package]]
@@ -1550,9 +1561,9 @@ dependencies = [
  "serde_derive",
  "sha2 0.10.8",
  "sha3",
- "solana-account-info",
- "solana-atomic-u64",
- "solana-bincode",
+ "solana-account-info 2.1.0",
+ "solana-atomic-u64 2.1.0",
+ "solana-bincode 2.1.0",
  "solana-borsh",
  "solana-clock",
  "solana-cpi",
@@ -1629,6 +1640,15 @@ dependencies = [
 name = "solana-program-option"
 version = "2.2.0"
 source = "git+https://github.com/anza-xyz/agave.git#a0b2c73cfe0a3942e359a415f354a3147b8c3516"
+
+[[package]]
+name = "solana-program-pack"
+version = "2.1.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "b8fb28439d23e1f505e59c7a14ed5012365ab7aa0f20dc7bda048e02ff231cf6"
+dependencies = [
+ "solana-program-error 2.1.0",
+]
 
 [[package]]
 name = "solana-program-pack"
@@ -1765,6 +1785,12 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "203b90994371db8cade8e885f74ec9f68ee02a32b25d514594158b2551a4e5ed"
 
 [[package]]
+name = "solana-sanitize"
+version = "2.1.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "203b90994371db8cade8e885f74ec9f68ee02a32b25d514594158b2551a4e5ed"
+
+[[package]]
 name = "solana-sdk-macro"
 version = "2.1.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1871,7 +1897,7 @@ dependencies = [
  "num-traits",
  "serde",
  "serde_with",
- "solana-program",
+ "solana-program 2.1.0",
  "thiserror",
 ]
 
@@ -1888,11 +1914,11 @@ dependencies = [
  "serde_derive",
  "solana-frozen-abi",
  "solana-frozen-abi-macro",
- "solana-instruction",
+ "solana-instruction 2.2.0",
  "solana-nonce",
- "solana-program",
- "solana-pubkey",
- "solana-rent",
+ "solana-program 2.2.0",
+ "solana-pubkey 2.2.0",
+ "solana-rent 2.2.0",
  "static_assertions",
  "strum",
  "strum_macros",
@@ -1905,8 +1931,8 @@ version = "2.1.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "37a4bea6d80b34fe6e785d19bf928fe103928d1f6c9935ec23bb6a9d4d7a33d2"
 dependencies = [
- "solana-instruction",
- "solana-sanitize",
+ "solana-instruction 2.2.0",
+ "solana-sanitize 2.2.0",
 ]
 
 [[package]]
