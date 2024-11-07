@@ -6,5 +6,5 @@ members = ["clients/rust", "interface"]
 solana = "edge"
 
 [workspace.metadata.toolchains]
-format = "nightly-2024-08-08-aarch64-apple-darwin"
-lint = "nightly-2024-08-08-aarch64-apple-darwin"
+format = "nightly-2024-08-08"
+lint = "nightly-2024-08-08"
