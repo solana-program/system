@@ -133,7 +133,7 @@ impl From<u64> for SystemError {
             6 => SystemError::NonceNoRecentBlockhashes,
             7 => SystemError::NonceBlockhashNotExpired,
             8 => SystemError::NonceUnexpectedBlockhashValue,
-            _ => panic!("Unsupported SsytemError"),
+            _ => panic!("Unsupported SystemError"),
         }
     }
 }

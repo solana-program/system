@@ -3,7 +3,7 @@ resolver = "2"
 members = ["clients/rust", "interface"]
 
 [workspace.metadata.cli]
-solana = "edge"
+solana = "2.1.0"
 
 [workspace.metadata.toolchains]
 format = "nightly-2024-08-08"

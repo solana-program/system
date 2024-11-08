@@ -32,10 +32,10 @@
 //! and these variants are linked from the documentation for their constructors.
 //!
 //! [`RpcClient`]: https://docs.rs/solana-client/latest/solana_client/rpc_client/struct.RpcClient.html
-//! [cpi]: https://docs.rs/solana-program/latest/solana_program/program/index.html
-//! [`invoke`]: https://docs.rs/solana-program/latest/solana_program/program/fn.invoke.html
-//! [`invoke_signed`]: https://docs.rs/solana-program/latest/solana_program/program/fn.invoke_signed.html
-//! [`AccountInfo`]: https://docs.rs/solana-account-info/2.1.0/solana_account_info/struct.AccountInfo.html
+//! [cpi]: https://docs.rs/solana-cpi/latest/solana_cpi/index.html
+//! [`invoke`]: https://docs.rs/solana-cpi/latest/solana_cpi/fn.invoke.html
+//! [`invoke_signed`]: https://docs.rs/solana-cpi/latest/solana_cpi/fn.invoke_signed.html
+//! [`AccountInfo`]: https://docs.rs/solana-account-info/latest/solana_account_info/struct.AccountInfo.html
 
 use serde_derive::{Deserialize, Serialize};
 use solana_instruction::{AccountMeta, Instruction};
@@ -307,7 +307,7 @@ pub enum SystemInstruction {
 /// virtually by the program itself via [`invoke_signed`], `payer` being signed
 /// for by the client that submitted the transaction.
 ///
-/// [pda]: https://docs.rs/solana-pubkey/2.1.0/solana_pubkey/struct.Pubkey.html#method.find_program_address
+/// [pda]: https://docs.rs/solana-pubkey/latest/solana_pubkey/struct.Pubkey.html#method.find_program_address
 /// [`invoke_signed`]: https://docs.rs/solana-cpi/latest/solana_cpi/fn.invoke_signed.html
 ///
 /// ```
@@ -520,7 +520,7 @@ pub fn create_account_with_seed(
 /// itself via [`invoke_signed`], `payer` being signed for by the client that
 /// submitted the transaction.
 ///
-/// [pda]: https://docs.rs/solana-pubkey/2.1.0/solana_pubkey/struct.Pubkey.html#method.find_program_address
+/// [pda]: https://docs.rs/solana-pubkey/latest/solana_pubkey/struct.Pubkey.html#method.find_program_address
 /// [`invoke_signed`]: https://docs.rs/solana-cpi/latest/solana_cpi/fn.invoke_signed.html
 ///
 /// ```
@@ -711,7 +711,7 @@ pub fn assign_with_seed(
 /// itself via [`invoke_signed`], `payer` being signed for by the client that
 /// submitted the transaction.
 ///
-/// [pda]: https://docs.rs/solana-pubkey/2.1.0/solana_pubkey/struct.Pubkey.html#method.find_program_address
+/// [pda]: https://docs.rs/solana-pubkey/latest/solana_pubkey/struct.Pubkey.html#method.find_program_address
 /// [`invoke_signed`]: https://docs.rs/solana-cpi/latest/solana_cpi/fn.invoke_signed.html
 ///
 /// ```
@@ -907,7 +907,7 @@ pub fn transfer_with_seed(
 /// itself via [`invoke_signed`], `payer` being signed for by the client that
 /// submitted the transaction.
 ///
-/// [pda]: https://docs.rs/solana-pubkey/2.1.0/solana_pubkey/struct.Pubkey.html#method.find_program_address
+/// [pda]: https://docs.rs/solana-pubkey/latest/solana_pubkey/struct.Pubkey.html#method.find_program_address
 /// [`invoke_signed`]: https://docs.rs/solana-cpi/latest/solana_cpi/fn.invoke_signed.html
 ///
 /// ```
@@ -1078,7 +1078,7 @@ pub fn allocate_with_seed(
 /// [`invoke_signed`], `payer` being signed for by the client that submitted the
 /// transaction.
 ///
-/// [pda]: https://docs.rs/solana-pubkey/2.1.0/solana_pubkey/struct.Pubkey.html#method.find_program_address
+/// [pda]: https://docs.rs/solana-pubkey/latest/solana_pubkey/struct.Pubkey.html#method.find_program_address
 /// [`invoke_signed`]: https://docs.rs/solana-cpi/latest/solana_cpi/fn.invoke_signed.html
 ///
 /// ```
@@ -1200,7 +1200,7 @@ pub fn create_nonce_account_with_seed(
 /// minutes, then successfully execute that transaction.
 ///
 /// [dtn]: https://docs.solanalabs.com/implemented-proposals/durable-tx-nonces
-/// [rbh]: https://docs.rs/solana-program/2.1.0/solana_program/message/legacy/struct.Message.html#structfield.recent_blockhash
+/// [rbh]: https://docs.rs/solana-program/latest/solana_program/message/legacy/struct.Message.html#structfield.recent_blockhash
 /// [nonce]: https://en.wikipedia.org/wiki/Cryptographic_nonce
 ///
 /// Durable transaction nonces are an alternative to the standard recent
@@ -1215,8 +1215,8 @@ pub fn create_nonce_account_with_seed(
 /// the [`blockhash`] field of [`nonce::state::Data`], which is deserialized
 /// from the nonce account data.
 ///
-/// [`blockhash`]: https://docs.rs/solana-program/2.1.0/solana_program/message/legacy/struct.Message.html#structfield.recent_blockhash
-/// [`nonce::state::Data`]: https://docs.rs/solana-program/2.1.0/solana_program/nonce/state/struct.Data.html
+/// [`blockhash`]: https://docs.rs/solana-program/latest/solana_program/message/legacy/struct.Message.html#structfield.recent_blockhash
+/// [`nonce::state::Data`]: https://docs.rs/solana-nonce/latest/solana_nonce/state/struct.Data.html
 ///
 /// The basic durable transaction nonce lifecycle is
 ///
@@ -1342,9 +1342,9 @@ pub fn create_nonce_account(
 /// For further description of durable transaction nonces see
 /// [`create_nonce_account`].
 ///
-/// [`Message`]: https://docs.rs/solana-program/2.1.0/solana_program/message/legacy/struct.Message.html
-/// [`Message::new_with_nonce`]: https://docs.rs/solana-program/2.1.0/solana_program/message/legacy/struct.Message.html#method.new_with_nonce
-/// [`recent_blockhash`]: https://docs.rs/solana-program/2.1.0/solana_program/message/legacy/struct.Message.html#structfield.recent_blockhash
+/// [`Message`]: https://docs.rs/solana-program/latest/solana_program/message/legacy/struct.Message.html
+/// [`Message::new_with_nonce`]: https://docs.rs/solana-program/latest/solana_program/message/legacy/struct.Message.html#method.new_with_nonce
+/// [`recent_blockhash`]: https://docs.rs/solana-program/latest/solana_program/message/legacy/struct.Message.html#structfield.recent_blockhash
 /// [dfa]: https://docs.rs/solana-rpc-client-nonce-utils/latest/solana_rpc_client_nonce_utils/fn.data_from_account.html
 ///
 /// # Required signers
