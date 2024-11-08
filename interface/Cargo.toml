@@ -40,7 +40,6 @@ strum = "0.24"
 strum_macros = "0.24"
 
 [features]
-default = ["serde"]
 frozen-abi = [
     "dep:solana-frozen-abi",
     "dep:solana-frozen-abi-macro"
