@@ -1917,6 +1917,8 @@ dependencies = [
  "solana-instruction",
  "solana-nonce",
  "solana-program",
+ "solana-program-entrypoint",
+ "solana-program-error",
  "solana-pubkey",
  "static_assertions",
  "strum",
