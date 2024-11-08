@@ -14,13 +14,13 @@ rustdoc-args = ["--cfg=docsrs"]
 
 [dependencies]
 num-traits = "0.2"
-serde = { version = "1.0.210", optional = true }
-serde_derive = { version = "1.0.210", optional = true }
+serde = "1.0.210"
+serde_derive = "1.0.210"
 solana-decode-error = "^2.1"
 solana-frozen-abi = { version = "^2.1", optional = true }
 solana-frozen-abi-macro = { version = "^2.1", optional = true }
 solana-instruction = { version = "^2.1", features = ["bincode", "std"] }
-solana-pubkey = { version = "^2.1", default-features = false }
+solana-pubkey = { version = "^2.1", default-features = false, features = ["serde"] }
 
 [target.'cfg(target_arch = "wasm32")'.dependencies]
 js-sys = "0.3.72"
@@ -36,9 +36,7 @@ strum = "0.24"
 strum_macros = "0.24"
 
 [features]
-default = ["serde"]
 frozen-abi = [
     "dep:solana-frozen-abi",
     "dep:solana-frozen-abi-macro"
 ]
-serde = ["dep:serde", "dep:serde_derive", "solana-pubkey/serde"]

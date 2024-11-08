@@ -37,6 +37,7 @@
 //! [`invoke_signed`]: https://docs.rs/solana-program/latest/solana_program/program/fn.invoke_signed.html
 //! [`AccountInfo`]: https://docs.rs/solana-account-info/2.1.0/solana_account_info/struct.AccountInfo.html
 
+use serde_derive::{Deserialize, Serialize};
 use solana_instruction::{AccountMeta, Instruction};
 use solana_pubkey::Pubkey;
 
@@ -51,8 +52,7 @@ use crate::{program::ID, NONCE_STATE_SIZE, RECENT_BLOCKHASHES_ID, RENT_ID};
         solana_frozen_abi_macro::AbiEnumVisitor
     )
 )]
-#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Clone, Debug, Deserialize, Eq, PartialEq, Serialize)]
 pub enum SystemInstruction {
     /// Create a new account
     ///
