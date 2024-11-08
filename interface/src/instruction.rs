@@ -1,3 +1,42 @@
+//! Instructions and constructors for the system program.
+//!
+//! The system program is responsible for the creation of accounts and [nonce
+//! accounts][na]. It is responsible for transferring lamports from accounts
+//! owned by the system program, including typical user wallet accounts.
+//!
+//! [na]: https://docs.solanalabs.com/implemented-proposals/durable-tx-nonces
+//!
+//! Account creation typically involves three steps: [`allocate`] space,
+//! [`transfer`] lamports for rent, [`assign`] to its owning program. The
+//! [`create_account`] function does all three at once. All new accounts must
+//! contain enough lamports to be [rent exempt], or else the creation
+//! instruction will fail.
+//!
+//! [rent exempt]: https://solana.com/docs/core/accounts#rent-exemption
+//!
+//! The accounts created by the System program can either be user-controlled,
+//! where the secret keys are held outside the blockchain,
+//! or they can be [program derived addresses][pda],
+//! where write access to accounts is granted by an owning program.
+//!
+//! [pda]: https://docs.rs/solana-pubkey/latest/solana_pubkey/struct.Pubkey.html#method.find_program_address
+//!
+//! Most of the functions in this module construct an [`Instruction`], that must
+//! be submitted to the runtime for execution, either via RPC, typically with
+//! [`RpcClient`], or through [cross-program invocation][cpi].
+//!
+//! When invoking through CPI, the [`invoke`] or [`invoke_signed`] instruction
+//! requires all account references to be provided explicitly as [`AccountInfo`]
+//! values. The account references required are specified in the documentation
+//! for the [`SystemInstruction`] variants for each System program instruction,
+//! and these variants are linked from the documentation for their constructors.
+//!
+//! [`RpcClient`]: https://docs.rs/solana-client/latest/solana_client/rpc_client/struct.RpcClient.html
+//! [cpi]: https://docs.rs/solana-program/latest/solana_program/program/index.html
+//! [`invoke`]: https://docs.rs/solana-program/latest/solana_program/program/fn.invoke.html
+//! [`invoke_signed`]: https://docs.rs/solana-program/latest/solana_program/program/fn.invoke_signed.html
+//! [`AccountInfo`]: https://docs.rs/solana-account-info/2.1.0/solana_account_info/struct.AccountInfo.html
+
 use solana_instruction::{AccountMeta, Instruction};
 use solana_pubkey::Pubkey;
 
@@ -268,7 +307,7 @@ pub enum SystemInstruction {
 /// virtually by the program itself via [`invoke_signed`], `payer` being signed
 /// for by the client that submitted the transaction.
 ///
-/// [pda]: Pubkey::find_program_address
+/// [pda]: https://docs.rs/solana-pubkey/2.1.0/solana_pubkey/struct.Pubkey.html#method.find_program_address
 /// [`invoke_signed`]: https://docs.rs/solana-cpi/latest/solana_cpi/fn.invoke_signed.html
 ///
 /// ```
@@ -481,7 +520,7 @@ pub fn create_account_with_seed(
 /// itself via [`invoke_signed`], `payer` being signed for by the client that
 /// submitted the transaction.
 ///
-/// [pda]: Pubkey::find_program_address
+/// [pda]: https://docs.rs/solana-pubkey/2.1.0/solana_pubkey/struct.Pubkey.html#method.find_program_address
 /// [`invoke_signed`]: https://docs.rs/solana-cpi/latest/solana_cpi/fn.invoke_signed.html
 ///
 /// ```
@@ -672,7 +711,7 @@ pub fn assign_with_seed(
 /// itself via [`invoke_signed`], `payer` being signed for by the client that
 /// submitted the transaction.
 ///
-/// [pda]: Pubkey::find_program_address
+/// [pda]: https://docs.rs/solana-pubkey/2.1.0/solana_pubkey/struct.Pubkey.html#method.find_program_address
 /// [`invoke_signed`]: https://docs.rs/solana-cpi/latest/solana_cpi/fn.invoke_signed.html
 ///
 /// ```
@@ -785,7 +824,7 @@ pub fn transfer_with_seed(
 /// [invoked]: https://docs.rs/solana-cpi/latest/solana_cpi/fn.invoke.html
 ///
 /// The transaction will fail if the account already has size greater than 0,
-/// or if the requested size is greater than [`MAX_PERMITTED_DATA_LENGTH`].
+/// or if the requested size is greater than [`super::MAX_PERMITTED_DATA_LENGTH`].
 ///
 /// # Required signers
 ///
@@ -868,7 +907,7 @@ pub fn transfer_with_seed(
 /// itself via [`invoke_signed`], `payer` being signed for by the client that
 /// submitted the transaction.
 ///
-/// [pda]: Pubkey::find_program_address
+/// [pda]: https://docs.rs/solana-pubkey/2.1.0/solana_pubkey/struct.Pubkey.html#method.find_program_address
 /// [`invoke_signed`]: https://docs.rs/solana-cpi/latest/solana_cpi/fn.invoke_signed.html
 ///
 /// ```
@@ -990,6 +1029,7 @@ pub fn allocate_with_seed(
 /// # use solana_program::example_mocks::{solana_sdk, solana_rpc_client};
 /// use solana_rpc_client::rpc_client::RpcClient;
 /// use solana_pubkey::Pubkey;
+/// use solana_sdk::{
 ///     signature::{Keypair, Signer},
 ///     transaction::Transaction,
 /// };
@@ -1038,7 +1078,7 @@ pub fn allocate_with_seed(
 /// [`invoke_signed`], `payer` being signed for by the client that submitted the
 /// transaction.
 ///
-/// [pda]: Pubkey::find_program_address
+/// [pda]: https://docs.rs/solana-pubkey/2.1.0/solana_pubkey/struct.Pubkey.html#method.find_program_address
 /// [`invoke_signed`]: https://docs.rs/solana-cpi/latest/solana_cpi/fn.invoke_signed.html
 ///
 /// ```
@@ -1160,7 +1200,7 @@ pub fn create_nonce_account_with_seed(
 /// minutes, then successfully execute that transaction.
 ///
 /// [dtn]: https://docs.solanalabs.com/implemented-proposals/durable-tx-nonces
-/// [rbh]: crate::message::Message::recent_blockhash
+/// [rbh]: https://docs.rs/solana-program/2.1.0/solana_program/message/legacy/struct.Message.html#structfield.recent_blockhash
 /// [nonce]: https://en.wikipedia.org/wiki/Cryptographic_nonce
 ///
 /// Durable transaction nonces are an alternative to the standard recent
@@ -1175,8 +1215,8 @@ pub fn create_nonce_account_with_seed(
 /// the [`blockhash`] field of [`nonce::state::Data`], which is deserialized
 /// from the nonce account data.
 ///
-/// [`blockhash`]: crate::nonce::state::Data::blockhash
-/// [`nonce::state::Data`]: crate::nonce::state::Data
+/// [`blockhash`]: https://docs.rs/solana-program/2.1.0/solana_program/message/legacy/struct.Message.html#structfield.recent_blockhash
+/// [`nonce::state::Data`]: https://docs.rs/solana-program/2.1.0/solana_program/nonce/state/struct.Data.html
 ///
 /// The basic durable transaction nonce lifecycle is
 ///
@@ -1302,9 +1342,9 @@ pub fn create_nonce_account(
 /// For further description of durable transaction nonces see
 /// [`create_nonce_account`].
 ///
-/// [`Message`]: crate::message::Message
-/// [`Message::new_with_nonce`]: crate::message::Message::new_with_nonce
-/// [`recent_blockhash`]: crate::message::Message::recent_blockhash
+/// [`Message`]: https://docs.rs/solana-program/2.1.0/solana_program/message/legacy/struct.Message.html
+/// [`Message::new_with_nonce`]: https://docs.rs/solana-program/2.1.0/solana_program/message/legacy/struct.Message.html#method.new_with_nonce
+/// [`recent_blockhash`]: https://docs.rs/solana-program/2.1.0/solana_program/message/legacy/struct.Message.html#structfield.recent_blockhash
 /// [dfa]: https://docs.rs/solana-rpc-client-nonce-utils/latest/solana_rpc_client_nonce_utils/fn.data_from_account.html
 ///
 /// # Required signers

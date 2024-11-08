@@ -1,29 +1,4 @@
-//! The [system native program interface][np].
-//!
-//! [rent exempt]: https://solana.com/docs/core/accounts#rent-exemption
-//!
-//! The accounts created by the System program can either be user-controlled,
-//! where the secret keys are held outside the blockchain,
-//! or they can be [program derived addresses][pda],
-//! where write access to accounts is granted by an owning program.
-//!
-//! [pda]: https://docs.rs/solana-pubkey/latest/solana_pubkey/struct.Pubkey.html#method.find_program_address
-//!
-//! Most of the functions in this module construct an [`Instruction`], that must
-//! be submitted to the runtime for execution, either via RPC, typically with
-//! [`RpcClient`], or through [cross-program invocation][cpi].
-//!
-//! When invoking through CPI, the [`invoke`] or [`invoke_signed`] instruction
-//! requires all account references to be provided explicitly as [`AccountInfo`]
-//! values. The account references required are specified in the documentation
-//! for the [`SystemInstruction`] variants for each System program instruction,
-//! and these variants are linked from the documentation for their constructors.
-//!
-//! [`RpcClient`]: https://docs.rs/solana-client/latest/solana_client/rpc_client/struct.RpcClient.html
-//! [cpi]: https://docs.rs/solana-program/latest/solana_program/program/index.html
-//! [`invoke`]: https://docs.rs/solana-program/latest/solana_program/program/fn.invoke.html
-//! [`invoke_signed`]: https://docs.rs/solana-program/latest/solana_program/program/fn.invoke_signed.html
-//! [`AccountInfo`]: https://docs.rs/solana-account-info/2.1.0/solana_account_info/struct.AccountInfo.html
+//! The System program interface.
 
 #![cfg_attr(feature = "frozen-abi", feature(min_specialization))]
 #![cfg_attr(docsrs, feature(doc_auto_cfg))]
