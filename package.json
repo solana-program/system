@@ -16,6 +16,9 @@
     "clients:rust:lint": "zx ./scripts/client/lint-rust.mjs",
     "clients:rust:publish": "zx ./scripts/client/publish-rust.mjs",
     "clients:rust:test": "zx ./scripts/client/test-rust.mjs",
+    "interface:format": "zx ./scripts/interface/format.mjs",
+    "interface:lint": "zx ./scripts/interface/lint.mjs",
+    "interface:test": "zx ./scripts/interface/test.mjs",
     "template:upgrade": "zx ./scripts/upgrade-template.mjs"
   },
   "devDependencies": {

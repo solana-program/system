@@ -4,7 +4,6 @@ on:
   push:
     branches: [main]
   pull_request:
-    branches: [main]
 
 jobs:
   format_and_lint_client_js:
@@ -33,14 +32,49 @@ jobs:
       - name: Setup Environment
         uses: ./.github/actions/setup
         with:
-          clippy: true
-          rustfmt: true
+          toolchain: format, lint
 
       - name: Format Client Rust
         run: pnpm clients:rust:format
 
       - name: Lint Client Rust
         run: pnpm clients:rust:lint
+
+  format_and_lint_interface:
+    name: Format & Lint Interface
+    runs-on: ubuntu-latest
+    steps:
+      - name: Git Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Environment
+        uses: ./.github/actions/setup
+        with:
+          toolchain: format, lint
+
+      - name: Format Interface
+        run: pnpm interface:format
+
+      - name: Lint Interface
+        run: pnpm interface:lint
+
+  test_interface:
+    name: Test Interface
+    runs-on: ubuntu-latest
+    needs: format_and_lint_interface
+    steps:
+      - name: Git Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Environment
+        uses: ./.github/actions/setup
+        with:
+          toolchain: test
+          cargo-cache-key: cargo-interface
+          solana: true
+
+      - name: Test Interface
+        run: pnpm interface:test
 
   generate_clients:
     name: Check Client Generation
@@ -52,7 +86,7 @@ jobs:
       - name: Setup Environment
         uses: ./.github/actions/setup
         with:
-          rustfmt: true
+          toolchain: format
 
       - name: Generate Clients
         run: pnpm generate:clients
