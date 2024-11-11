@@ -70,6 +70,10 @@ runs:
         version: ${{ env.SOLANA_VERSION }}
         cache: true
 
+    - name: Install 'cargo-hack'
+      shell: bash
+      run: cargo install cargo-hack
+
     - name: Cache Cargo Dependencies
       if: ${{ inputs.cargo-cache-key && !inputs.cargo-cache-fallback-key }}
       uses: actions/cache@v4

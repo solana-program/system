@@ -40,6 +40,12 @@ jobs:
       - name: Lint Client Rust
         run: pnpm clients:rust:lint
 
+      - name: Check Client Rust Features
+        run: pnpm clients:rust:check-features
+
+      - name: Check Client Rust 'rustdoc'
+        run: pnpm clients:rust:rustdoc
+
   format_and_lint_interface:
     name: Format & Lint Interface
     runs-on: ubuntu-latest
@@ -57,6 +63,12 @@ jobs:
 
       - name: Lint Interface
         run: pnpm interface:lint
+
+      - name: Check Interface Features
+        run: pnpm interface:check-features
+
+      - name: Check Interface 'rustdoc'
+        run: pnpm interface:rustdoc
 
   test_interface:
     name: Test Interface
