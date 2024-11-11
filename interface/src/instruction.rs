@@ -14,14 +14,12 @@
 //!
 //! [rent exempt]: https://solana.com/docs/core/accounts#rent-exemption
 //!
-//! The accounts created by the system program can either be user-controlled,
+//! The accounts created by the System program can either be user-controlled,
 //! where the secret keys are held outside the blockchain,
 //! or they can be [program derived addresses][pda],
 //! where write access to accounts is granted by an owning program.
 //!
-//! [pda]: crate::pubkey::Pubkey::find_program_address
-//!
-//! The system program ID is defined in [`system_program`].
+//! [pda]: https://docs.rs/solana-pubkey/latest/solana_pubkey/struct.Pubkey.html#method.find_program_address
 //!
 //! Most of the functions in this module construct an [`Instruction`], that must
 //! be submitted to the runtime for execution, either via RPC, typically with
@@ -30,83 +28,31 @@
 //! When invoking through CPI, the [`invoke`] or [`invoke_signed`] instruction
 //! requires all account references to be provided explicitly as [`AccountInfo`]
 //! values. The account references required are specified in the documentation
-//! for the [`SystemInstruction`] variants for each system program instruction,
+//! for the [`SystemInstruction`] variants for each System program instruction,
 //! and these variants are linked from the documentation for their constructors.
 //!
 //! [`RpcClient`]: https://docs.rs/solana-client/latest/solana_client/rpc_client/struct.RpcClient.html
-//! [cpi]: crate::program
-//! [`invoke`]: crate::program::invoke
-//! [`invoke_signed`]: crate::program::invoke_signed
-//! [`AccountInfo`]: crate::account_info::AccountInfo
+//! [cpi]: https://docs.rs/solana-cpi/latest/solana_cpi/index.html
+//! [`invoke`]: https://docs.rs/solana-cpi/latest/solana_cpi/fn.invoke.html
+//! [`invoke_signed`]: https://docs.rs/solana-cpi/latest/solana_cpi/fn.invoke_signed.html
+//! [`AccountInfo`]: https://docs.rs/solana-account-info/latest/solana_account_info/struct.AccountInfo.html
 
-#[allow(deprecated)]
-use {
-    crate::{
-        instruction::{AccountMeta, Instruction},
-        nonce,
-        pubkey::Pubkey,
-        system_program,
-        sysvar::{recent_blockhashes, rent},
-    },
-    num_derive::{FromPrimitive, ToPrimitive},
-    solana_decode_error::DecodeError,
-    thiserror::Error,
-};
+use serde_derive::{Deserialize, Serialize};
+use solana_instruction::{AccountMeta, Instruction};
+use solana_pubkey::Pubkey;
 
-#[derive(Error, Debug, Serialize, Clone, PartialEq, Eq, FromPrimitive, ToPrimitive)]
-pub enum SystemError {
-    #[error("an account with the same address already exists")]
-    AccountAlreadyInUse,
-    #[error("account does not have enough SOL to perform the operation")]
-    ResultWithNegativeLamports,
-    #[error("cannot assign account to this program id")]
-    InvalidProgramId,
-    #[error("cannot allocate account data of this length")]
-    InvalidAccountDataLength,
-    #[error("length of requested seed is too long")]
-    MaxSeedLengthExceeded,
-    #[error("provided address does not match addressed derived from seed")]
-    AddressWithSeedMismatch,
-    #[error("advancing stored nonce requires a populated RecentBlockhashes sysvar")]
-    NonceNoRecentBlockhashes,
-    #[error("stored nonce is still in recent_blockhashes")]
-    NonceBlockhashNotExpired,
-    #[error("specified nonce does not match stored nonce")]
-    NonceUnexpectedBlockhashValue,
-}
-
-impl<T> DecodeError<T> for SystemError {
-    fn type_of() -> &'static str {
-        "SystemError"
-    }
-}
-
-/// Maximum permitted size of account data (10 MiB).
-pub const MAX_PERMITTED_DATA_LENGTH: u64 = 10 * 1024 * 1024;
-
-/// Maximum permitted size of new allocations per transaction, in bytes.
-///
-/// The value was chosen such that at least one max sized account could be created,
-/// plus some additional resize allocations.
-pub const MAX_PERMITTED_ACCOUNTS_DATA_ALLOCATIONS_PER_TRANSACTION: i64 =
-    MAX_PERMITTED_DATA_LENGTH as i64 * 2;
-
-// SBF program entrypoint assumes that the max account data length
-// will fit inside a u32. If this constant no longer fits in a u32,
-// the entrypoint deserialization code in the SDK must be updated.
-#[cfg(test)]
-static_assertions::const_assert!(MAX_PERMITTED_DATA_LENGTH <= u32::MAX as u64);
-
-#[cfg(test)]
-static_assertions::const_assert_eq!(MAX_PERMITTED_DATA_LENGTH, 10_485_760);
+use crate::{program::ID, NONCE_STATE_SIZE, RECENT_BLOCKHASHES_ID, RENT_ID};
 
 /// An instruction to the system program.
 #[cfg_attr(
     feature = "frozen-abi",
-    frozen_abi(digest = "2LnVTnJg7LxB1FawNZLoQEY8yiYx3MT3paTdx4s5kAXU"),
-    derive(AbiExample, AbiEnumVisitor)
+    solana_frozen_abi_macro::frozen_abi(digest = "2LnVTnJg7LxB1FawNZLoQEY8yiYx3MT3paTdx4s5kAXU"),
+    derive(
+        solana_frozen_abi_macro::AbiExample,
+        solana_frozen_abi_macro::AbiEnumVisitor
+    )
 )]
-#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(Clone, Debug, Deserialize, Eq, PartialEq, Serialize)]
 pub enum SystemInstruction {
     /// Create a new account
     ///
@@ -146,8 +92,8 @@ pub enum SystemInstruction {
     ///   0. `[WRITE, SIGNER]` Funding account
     ///   1. `[WRITE]` Created account
     ///   2. `[SIGNER]` (optional) Base account; the account matching the base Pubkey below must be
-    ///                          provided as a signer, but may be the same as the funding account
-    ///                          and provided as account 0
+    ///      provided as a signer, but may be the same as the funding account
+    ///      and provided as account 0
     CreateAccountWithSeed {
         /// Base public key
         base: Pubkey,
@@ -219,7 +165,7 @@ pub enum SystemInstruction {
     },
 
     /// Allocate space for and assign an account at an address
-    ///    derived from a base public key and a seed
+    /// derived from a base public key and a seed
     ///
     /// # Account references
     ///   0. `[WRITE]` Allocated account
@@ -286,7 +232,7 @@ pub enum SystemInstruction {
 /// [`SystemInstruction::CreateAccount`].
 ///
 /// [`Transaction`]: https://docs.rs/solana-sdk/latest/solana_sdk/transaction/struct.Transaction.html
-/// [invoked]: crate::program::invoke
+/// [invoked]: https://docs.rs/solana-cpi/latest/solana_cpi/fn.invoke.html
 ///
 /// Account creation typically involves three steps: [`allocate`] space,
 /// [`transfer`] lamports for rent, [`assign`] to its owning program. The
@@ -312,12 +258,10 @@ pub enum SystemInstruction {
 /// # use solana_program::example_mocks::{solana_sdk, solana_rpc_client};
 /// use solana_rpc_client::rpc_client::RpcClient;
 /// use solana_sdk::{
-///     pubkey::Pubkey,
 ///     signature::{Keypair, Signer},
-///     system_instruction,
-///     system_program,
 ///     transaction::Transaction,
 /// };
+/// use solana_system_interface::{instruction, program};
 /// use anyhow::Result;
 ///
 /// fn create_account(
@@ -327,12 +271,12 @@ pub enum SystemInstruction {
 ///     space: u64,
 /// ) -> Result<()> {
 ///     let rent = client.get_minimum_balance_for_rent_exemption(space.try_into()?)?;
-///     let instr = system_instruction::create_account(
+///     let instr = instruction::create_account(
 ///         &payer.pubkey(),
 ///         &new_account.pubkey(),
 ///         rent,
 ///         space,
-///         &system_program::ID,
+///         &program::ID,
 ///     );
 ///
 ///     let blockhash = client.get_latest_blockhash()?;
@@ -363,26 +307,20 @@ pub enum SystemInstruction {
 /// virtually by the program itself via [`invoke_signed`], `payer` being signed
 /// for by the client that submitted the transaction.
 ///
-/// [pda]: Pubkey::find_program_address
-/// [`invoke_signed`]: crate::program::invoke_signed
+/// [pda]: https://docs.rs/solana-pubkey/latest/solana_pubkey/struct.Pubkey.html#method.find_program_address
+/// [`invoke_signed`]: https://docs.rs/solana-cpi/latest/solana_cpi/fn.invoke_signed.html
 ///
 /// ```
-/// # use borsh::{BorshDeserialize, BorshSerialize};
-/// use solana_program::{
-///     account_info::{next_account_info, AccountInfo},
-///     entrypoint,
-///     entrypoint::ProgramResult,
-///     msg,
-///     program::invoke_signed,
-///     pubkey::Pubkey,
-///     system_instruction,
-///     system_program,
-///     sysvar::rent::Rent,
-///     sysvar::Sysvar,
-/// };
+/// use borsh::{BorshDeserialize, BorshSerialize};
+/// use solana_account_info::{next_account_info, AccountInfo};
+/// use solana_cpi::invoke_signed;
+/// use solana_program::sysvar::Sysvar;
+/// use solana_program_entrypoint::entrypoint;
+/// use solana_program_error::ProgramResult;
+/// use solana_pubkey::Pubkey;
+/// use solana_system_interface::{instruction, program};
 ///
 /// #[derive(BorshSerialize, BorshDeserialize, Debug)]
-/// # #[borsh(crate = "borsh")]
 /// pub struct CreateAccountInstruction {
 ///     /// The PDA seed used to distinguish the new account from other PDAs
 ///     pub new_account_seed: [u8; 16],
@@ -422,21 +360,23 @@ pub enum SystemInstruction {
 ///         .minimum_balance(instr.space.try_into().expect("overflow"));
 ///
 ///     invoke_signed(
-///         &system_instruction::create_account(
+///         &instruction::create_account(
 ///             payer.key,
 ///             new_account_pda.key,
 ///             rent,
 ///             instr.space,
-///             &system_program::ID
+///             &program::ID
 ///         ),
 ///         &[payer.clone(), new_account_pda.clone()],
-///         &[&[payer.key.as_ref(), new_account_seed, &[new_account_bump_seed]]],
+///         &[&[
+///             payer.key.as_ref(),
+///             new_account_seed,
+///             &[new_account_bump_seed],
+///         ]],
 ///     )?;
 ///
 ///     Ok(())
 /// }
-///
-/// # Ok::<(), anyhow::Error>(())
 /// ```
 pub fn create_account(
     from_pubkey: &Pubkey,
@@ -450,7 +390,7 @@ pub fn create_account(
         AccountMeta::new(*to_pubkey, true),
     ];
     Instruction::new_with_bincode(
-        system_program::id(),
+        ID,
         &SystemInstruction::CreateAccount {
             lamports,
             space,
@@ -478,7 +418,7 @@ pub fn create_account_with_seed(
     ];
 
     Instruction::new_with_bincode(
-        system_program::id(),
+        ID,
         &SystemInstruction::CreateAccountWithSeed {
             base: *base,
             seed: seed.to_string(),
@@ -497,7 +437,7 @@ pub fn create_account_with_seed(
 /// [`SystemInstruction::Assign`].
 ///
 /// [`Transaction`]: https://docs.rs/solana-sdk/latest/solana_sdk/transaction/struct.Transaction.html
-/// [invoked]: crate::program::invoke
+/// [invoked]: https://docs.rs/solana-cpi/latest/solana_cpi/fn.invoke.html
 ///
 /// # Required signers
 ///
@@ -517,12 +457,12 @@ pub fn create_account_with_seed(
 /// ```
 /// # use solana_program::example_mocks::{solana_sdk, solana_rpc_client};
 /// use solana_rpc_client::rpc_client::RpcClient;
+/// use solana_pubkey::Pubkey
 /// use solana_sdk::{
-///     pubkey::Pubkey,
 ///     signature::{Keypair, Signer},
-///     system_instruction,
 ///     transaction::Transaction,
 /// };
+/// use solana_system_interface::instruction;
 /// use anyhow::Result;
 ///
 /// fn create_account(
@@ -534,18 +474,18 @@ pub fn create_account_with_seed(
 /// ) -> Result<()> {
 ///     let rent = client.get_minimum_balance_for_rent_exemption(space.try_into()?)?;
 ///
-///     let transfer_instr = system_instruction::transfer(
+///     let transfer_instr = instruction::transfer(
 ///         &payer.pubkey(),
 ///         &new_account.pubkey(),
 ///         rent,
 ///     );
 ///
-///     let allocate_instr = system_instruction::allocate(
+///     let allocate_instr = instruction::allocate(
 ///         &new_account.pubkey(),
 ///         space,
 ///     );
 ///
-///     let assign_instr = system_instruction::assign(
+///     let assign_instr = instruction::assign(
 ///         &new_account.pubkey(),
 ///         owning_program,
 ///     );
@@ -580,26 +520,20 @@ pub fn create_account_with_seed(
 /// itself via [`invoke_signed`], `payer` being signed for by the client that
 /// submitted the transaction.
 ///
-/// [pda]: Pubkey::find_program_address
-/// [`invoke_signed`]: crate::program::invoke_signed
+/// [pda]: https://docs.rs/solana-pubkey/latest/solana_pubkey/struct.Pubkey.html#method.find_program_address
+/// [`invoke_signed`]: https://docs.rs/solana-cpi/latest/solana_cpi/fn.invoke_signed.html
 ///
 /// ```
-/// # use borsh::{BorshDeserialize, BorshSerialize};
-/// use solana_program::{
-///     account_info::{next_account_info, AccountInfo},
-///     entrypoint,
-///     entrypoint::ProgramResult,
-///     msg,
-///     program::invoke_signed,
-///     pubkey::Pubkey,
-///     system_instruction,
-///     system_program,
-///     sysvar::rent::Rent,
-///     sysvar::Sysvar,
-/// };
+/// use borsh::{BorshDeserialize, BorshSerialize};
+/// use solana_account_info::{next_account_info, AccountInfo};
+/// use solana_cpi::invoke_signed;
+/// use solana_program::sysvar::Sysvar;
+/// use solana_program_entrypoint::entrypoint;
+/// use solana_program_error::ProgramResult;
+/// use solana_pubkey::Pubkey;
+/// use solana_system_interface::{instruction, program};
 ///
 /// #[derive(BorshSerialize, BorshDeserialize, Debug)]
-/// # #[borsh(crate = "borsh")]
 /// pub struct CreateAccountInstruction {
 ///     /// The PDA seed used to distinguish the new account from other PDAs
 ///     pub new_account_seed: [u8; 16],
@@ -639,42 +573,28 @@ pub fn create_account_with_seed(
 ///         .minimum_balance(instr.space.try_into().expect("overflow"));
 ///
 ///     invoke_signed(
-///         &system_instruction::transfer(
+///         &instruction::create_account(
 ///             payer.key,
 ///             new_account_pda.key,
 ///             rent,
+///             instr.space,
+///             &program::ID
 ///         ),
 ///         &[payer.clone(), new_account_pda.clone()],
-///         &[&[payer.key.as_ref(), new_account_seed, &[new_account_bump_seed]]],
-///     )?;
-///
-///     invoke_signed(
-///         &system_instruction::allocate(
-///             new_account_pda.key,
-///             instr.space,
-///         ),
-///         &[new_account_pda.clone()],
-///         &[&[payer.key.as_ref(), new_account_seed, &[new_account_bump_seed]]],
-///     )?;
-///
-///     invoke_signed(
-///         &system_instruction::assign(
-///             new_account_pda.key,
-///             &program_id,
-///         ),
-///         &[new_account_pda.clone()],
-///         &[&[payer.key.as_ref(), new_account_seed, &[new_account_bump_seed]]],
+///         &[&[
+///             payer.key.as_ref(),
+///             new_account_seed,
+///             &[new_account_bump_seed],
+///         ]],
 ///     )?;
 ///
 ///     Ok(())
 /// }
-///
-/// # Ok::<(), anyhow::Error>(())
 /// ```
 pub fn assign(pubkey: &Pubkey, owner: &Pubkey) -> Instruction {
     let account_metas = vec![AccountMeta::new(*pubkey, true)];
     Instruction::new_with_bincode(
-        system_program::id(),
+        ID,
         &SystemInstruction::Assign { owner: *owner },
         account_metas,
     )
@@ -691,7 +611,7 @@ pub fn assign_with_seed(
         AccountMeta::new_readonly(*base, true),
     ];
     Instruction::new_with_bincode(
-        system_program::id(),
+        ID,
         &SystemInstruction::AssignWithSeed {
             base: *base,
             seed: seed.to_string(),
@@ -708,7 +628,7 @@ pub fn assign_with_seed(
 /// [`SystemInstruction::Transfer`].
 ///
 /// [`Transaction`]: https://docs.rs/solana-sdk/latest/solana_sdk/transaction/struct.Transaction.html
-/// [invoked]: crate::program::invoke
+/// [invoked]: https://docs.rs/solana-cpi/latest/solana_cpi/fn.invoke.html
 ///
 /// # Required signers
 ///
@@ -728,12 +648,12 @@ pub fn assign_with_seed(
 /// ```
 /// # use solana_program::example_mocks::{solana_sdk, solana_rpc_client};
 /// use solana_rpc_client::rpc_client::RpcClient;
+/// use solana_pubkey::Pubkey
 /// use solana_sdk::{
-///     pubkey::Pubkey,
 ///     signature::{Keypair, Signer},
-///     system_instruction,
 ///     transaction::Transaction,
 /// };
+/// use solana_system_interface::instruction;
 /// use anyhow::Result;
 ///
 /// fn create_account(
@@ -745,18 +665,18 @@ pub fn assign_with_seed(
 /// ) -> Result<()> {
 ///     let rent = client.get_minimum_balance_for_rent_exemption(space.try_into()?)?;
 ///
-///     let transfer_instr = system_instruction::transfer(
+///     let transfer_instr = instruction::transfer(
 ///         &payer.pubkey(),
 ///         &new_account.pubkey(),
 ///         rent,
 ///     );
 ///
-///     let allocate_instr = system_instruction::allocate(
+///     let allocate_instr = instruction::allocate(
 ///         &new_account.pubkey(),
 ///         space,
 ///     );
 ///
-///     let assign_instr = system_instruction::assign(
+///     let assign_instr = instruction::assign(
 ///         &new_account.pubkey(),
 ///         owning_program,
 ///     );
@@ -791,26 +711,20 @@ pub fn assign_with_seed(
 /// itself via [`invoke_signed`], `payer` being signed for by the client that
 /// submitted the transaction.
 ///
-/// [pda]: Pubkey::find_program_address
-/// [`invoke_signed`]: crate::program::invoke_signed
+/// [pda]: https://docs.rs/solana-pubkey/latest/solana_pubkey/struct.Pubkey.html#method.find_program_address
+/// [`invoke_signed`]: https://docs.rs/solana-cpi/latest/solana_cpi/fn.invoke_signed.html
 ///
 /// ```
-/// # use borsh::{BorshDeserialize, BorshSerialize};
-/// use solana_program::{
-///     account_info::{next_account_info, AccountInfo},
-///     entrypoint,
-///     entrypoint::ProgramResult,
-///     msg,
-///     program::invoke_signed,
-///     pubkey::Pubkey,
-///     system_instruction,
-///     system_program,
-///     sysvar::rent::Rent,
-///     sysvar::Sysvar,
-/// };
+/// use borsh::{BorshDeserialize, BorshSerialize};
+/// use solana_account_info::{next_account_info, AccountInfo};
+/// use solana_cpi::invoke_signed;
+/// use solana_program::sysvar::Sysvar;
+/// use solana_program_entrypoint::entrypoint;
+/// use solana_program_error::ProgramResult;
+/// use solana_pubkey::Pubkey;
+/// use solana_system_interface::{instruction, program};
 ///
 /// #[derive(BorshSerialize, BorshDeserialize, Debug)]
-/// # #[borsh(crate = "borsh")]
 /// pub struct CreateAccountInstruction {
 ///     /// The PDA seed used to distinguish the new account from other PDAs
 ///     pub new_account_seed: [u8; 16],
@@ -850,48 +764,30 @@ pub fn assign_with_seed(
 ///         .minimum_balance(instr.space.try_into().expect("overflow"));
 ///
 ///     invoke_signed(
-///         &system_instruction::transfer(
+///         &instruction::create_account(
 ///             payer.key,
 ///             new_account_pda.key,
 ///             rent,
+///             instr.space,
+///             &program::ID
 ///         ),
 ///         &[payer.clone(), new_account_pda.clone()],
-///         &[&[payer.key.as_ref(), new_account_seed, &[new_account_bump_seed]]],
-///     )?;
-///
-///     invoke_signed(
-///         &system_instruction::allocate(
-///             new_account_pda.key,
-///             instr.space,
-///         ),
-///         &[new_account_pda.clone()],
-///         &[&[payer.key.as_ref(), new_account_seed, &[new_account_bump_seed]]],
-///     )?;
-///
-///     invoke_signed(
-///         &system_instruction::assign(
-///             new_account_pda.key,
-///             &program_id,
-///         ),
-///         &[new_account_pda.clone()],
-///         &[&[payer.key.as_ref(), new_account_seed, &[new_account_bump_seed]]],
+///         &[&[
+///             payer.key.as_ref(),
+///             new_account_seed,
+///             &[new_account_bump_seed],
+///         ]],
 ///     )?;
 ///
 ///     Ok(())
 /// }
-///
-/// # Ok::<(), anyhow::Error>(())
 /// ```
 pub fn transfer(from_pubkey: &Pubkey, to_pubkey: &Pubkey, lamports: u64) -> Instruction {
     let account_metas = vec![
         AccountMeta::new(*from_pubkey, true),
         AccountMeta::new(*to_pubkey, false),
     ];
-    Instruction::new_with_bincode(
-        system_program::id(),
-        &SystemInstruction::Transfer { lamports },
-        account_metas,
-    )
+    Instruction::new_with_bincode(ID, &SystemInstruction::Transfer { lamports }, account_metas)
 }
 
 pub fn transfer_with_seed(
@@ -908,7 +804,7 @@ pub fn transfer_with_seed(
         AccountMeta::new(*to_pubkey, false),
     ];
     Instruction::new_with_bincode(
-        system_program::id(),
+        ID,
         &SystemInstruction::TransferWithSeed {
             lamports,
             from_seed,
@@ -925,10 +821,10 @@ pub fn transfer_with_seed(
 /// [`SystemInstruction::Allocate`].
 ///
 /// [`Transaction`]: https://docs.rs/solana-sdk/latest/solana_sdk/transaction/struct.Transaction.html
-/// [invoked]: crate::program::invoke
+/// [invoked]: https://docs.rs/solana-cpi/latest/solana_cpi/fn.invoke.html
 ///
 /// The transaction will fail if the account already has size greater than 0,
-/// or if the requested size is greater than [`MAX_PERMITTED_DATA_LENGTH`].
+/// or if the requested size is greater than [`super::MAX_PERMITTED_DATA_LENGTH`].
 ///
 /// # Required signers
 ///
@@ -948,12 +844,12 @@ pub fn transfer_with_seed(
 /// ```
 /// # use solana_program::example_mocks::{solana_sdk, solana_rpc_client};
 /// use solana_rpc_client::rpc_client::RpcClient;
+/// use solana_pubkey::Pubkey
 /// use solana_sdk::{
-///     pubkey::Pubkey,
 ///     signature::{Keypair, Signer},
-///     system_instruction,
 ///     transaction::Transaction,
 /// };
+/// use solana_system_interface::instruction;
 /// use anyhow::Result;
 ///
 /// fn create_account(
@@ -965,18 +861,18 @@ pub fn transfer_with_seed(
 /// ) -> Result<()> {
 ///     let rent = client.get_minimum_balance_for_rent_exemption(space.try_into()?)?;
 ///
-///     let transfer_instr = system_instruction::transfer(
+///     let transfer_instr = instruction::transfer(
 ///         &payer.pubkey(),
 ///         &new_account.pubkey(),
 ///         rent,
 ///     );
 ///
-///     let allocate_instr = system_instruction::allocate(
+///     let allocate_instr = instruction::allocate(
 ///         &new_account.pubkey(),
 ///         space,
 ///     );
 ///
-///     let assign_instr = system_instruction::assign(
+///     let assign_instr = instruction::assign(
 ///         &new_account.pubkey(),
 ///         owning_program,
 ///     );
@@ -1011,26 +907,20 @@ pub fn transfer_with_seed(
 /// itself via [`invoke_signed`], `payer` being signed for by the client that
 /// submitted the transaction.
 ///
-/// [pda]: Pubkey::find_program_address
-/// [`invoke_signed`]: crate::program::invoke_signed
+/// [pda]: https://docs.rs/solana-pubkey/latest/solana_pubkey/struct.Pubkey.html#method.find_program_address
+/// [`invoke_signed`]: https://docs.rs/solana-cpi/latest/solana_cpi/fn.invoke_signed.html
 ///
 /// ```
-/// # use borsh::{BorshDeserialize, BorshSerialize};
-/// use solana_program::{
-///     account_info::{next_account_info, AccountInfo},
-///     entrypoint,
-///     entrypoint::ProgramResult,
-///     msg,
-///     program::invoke_signed,
-///     pubkey::Pubkey,
-///     system_instruction,
-///     system_program,
-///     sysvar::rent::Rent,
-///     sysvar::Sysvar,
-/// };
+/// use borsh::{BorshDeserialize, BorshSerialize};
+/// use solana_account_info::{next_account_info, AccountInfo};
+/// use solana_cpi::invoke_signed;
+/// use solana_program::sysvar::Sysvar;
+/// use solana_program_entrypoint::entrypoint;
+/// use solana_program_error::ProgramResult;
+/// use solana_pubkey::Pubkey;
+/// use solana_system_interface::{instruction, program};
 ///
 /// #[derive(BorshSerialize, BorshDeserialize, Debug)]
-/// # #[borsh(crate = "borsh")]
 /// pub struct CreateAccountInstruction {
 ///     /// The PDA seed used to distinguish the new account from other PDAs
 ///     pub new_account_seed: [u8; 16],
@@ -1070,45 +960,27 @@ pub fn transfer_with_seed(
 ///         .minimum_balance(instr.space.try_into().expect("overflow"));
 ///
 ///     invoke_signed(
-///         &system_instruction::transfer(
+///         &instruction::create_account(
 ///             payer.key,
 ///             new_account_pda.key,
 ///             rent,
+///             instr.space,
+///             &program::ID
 ///         ),
 ///         &[payer.clone(), new_account_pda.clone()],
-///         &[&[payer.key.as_ref(), new_account_seed, &[new_account_bump_seed]]],
-///     )?;
-///
-///     invoke_signed(
-///         &system_instruction::allocate(
-///             new_account_pda.key,
-///             instr.space,
-///         ),
-///         &[new_account_pda.clone()],
-///         &[&[payer.key.as_ref(), new_account_seed, &[new_account_bump_seed]]],
-///     )?;
-///
-///     invoke_signed(
-///         &system_instruction::assign(
-///             new_account_pda.key,
-///             &program_id,
-///         ),
-///         &[new_account_pda.clone()],
-///         &[&[payer.key.as_ref(), new_account_seed, &[new_account_bump_seed]]],
+///         &[&[
+///             payer.key.as_ref(),
+///             new_account_seed,
+///             &[new_account_bump_seed],
+///         ]],
 ///     )?;
 ///
 ///     Ok(())
 /// }
-///
-/// # Ok::<(), anyhow::Error>(())
 /// ```
 pub fn allocate(pubkey: &Pubkey, space: u64) -> Instruction {
     let account_metas = vec![AccountMeta::new(*pubkey, true)];
-    Instruction::new_with_bincode(
-        system_program::id(),
-        &SystemInstruction::Allocate { space },
-        account_metas,
-    )
+    Instruction::new_with_bincode(ID, &SystemInstruction::Allocate { space }, account_metas)
 }
 
 pub fn allocate_with_seed(
@@ -1123,7 +995,7 @@ pub fn allocate_with_seed(
         AccountMeta::new_readonly(*base, true),
     ];
     Instruction::new_with_bincode(
-        system_program::id(),
+        ID,
         &SystemInstruction::AllocateWithSeed {
             base: *base,
             seed: seed.to_string(),
@@ -1141,7 +1013,7 @@ pub fn allocate_with_seed(
 /// [`SystemInstruction::Transfer`]s.
 ///
 /// [`Transaction`]: https://docs.rs/solana-sdk/latest/solana_sdk/transaction/struct.Transaction.html
-/// [invoked]: crate::program::invoke
+/// [invoked]: https://docs.rs/solana-cpi/latest/solana_cpi/fn.invoke.html
 ///
 /// # Required signers
 ///
@@ -1156,12 +1028,12 @@ pub fn allocate_with_seed(
 /// ```
 /// # use solana_program::example_mocks::{solana_sdk, solana_rpc_client};
 /// use solana_rpc_client::rpc_client::RpcClient;
+/// use solana_pubkey::Pubkey;
 /// use solana_sdk::{
-///     pubkey::Pubkey,
 ///     signature::{Keypair, Signer},
-///     system_instruction,
 ///     transaction::Transaction,
 /// };
+/// use solana_system_interface::instruction;
 /// use anyhow::Result;
 ///
 /// fn transfer_lamports_to_many(
@@ -1169,7 +1041,7 @@ pub fn allocate_with_seed(
 ///     from: &Keypair,
 ///     to_and_amount: &[(Pubkey, u64)],
 /// ) -> Result<()> {
-///     let instrs = system_instruction::transfer_many(&from.pubkey(), to_and_amount);
+///     let instrs = instruction::transfer_many(&from.pubkey(), to_and_amount);
 ///
 ///     let blockhash = client.get_latest_blockhash()?;
 ///     let tx = Transaction::new_signed_with_payer(
@@ -1206,21 +1078,17 @@ pub fn allocate_with_seed(
 /// [`invoke_signed`], `payer` being signed for by the client that submitted the
 /// transaction.
 ///
-/// [pda]: Pubkey::find_program_address
-/// [`invoke_signed`]: crate::program::invoke_signed
+/// [pda]: https://docs.rs/solana-pubkey/latest/solana_pubkey/struct.Pubkey.html#method.find_program_address
+/// [`invoke_signed`]: https://docs.rs/solana-cpi/latest/solana_cpi/fn.invoke_signed.html
 ///
 /// ```
-/// # use borsh::{BorshDeserialize, BorshSerialize};
-/// use solana_program::{
-///     account_info::{next_account_info, next_account_infos, AccountInfo},
-///     entrypoint,
-///     entrypoint::ProgramResult,
-///     msg,
-///     program::invoke_signed,
-///     pubkey::Pubkey,
-///     system_instruction,
-///     system_program,
-/// };
+/// use borsh::{BorshDeserialize, BorshSerialize};
+/// use solana_account_info::{next_account_info, next_account_infos, AccountInfo};
+/// use solana_cpi::invoke_signed;
+/// use solana_program_entrypoint::entrypoint;
+/// use solana_program_error::ProgramResult;
+/// use solana_pubkey::Pubkey;
+/// use solana_system_interface::{instruction, program};
 ///
 /// /// # Accounts
 /// ///
@@ -1228,7 +1096,6 @@ pub fn allocate_with_seed(
 /// /// - 1: system_program - executable
 /// /// - *: to - writable
 /// #[derive(BorshSerialize, BorshDeserialize, Debug)]
-/// # #[borsh(crate = "borsh")]
 /// pub struct TransferLamportsToManyInstruction {
 ///     pub bank_pda_bump_seed: u8,
 ///     pub amount_list: Vec<u64>,
@@ -1249,7 +1116,7 @@ pub fn allocate_with_seed(
 ///     let bank_pda_bump_seed = instr.bank_pda_bump_seed;
 ///     let system_account = next_account_info(account_info_iter)?;
 ///
-///     assert!(system_program::check_id(system_account.key));
+///     assert!(program::check_id(system_account.key));
 ///
 ///     let to_accounts = next_account_infos(account_info_iter, account_info_iter.len())?;
 ///
@@ -1264,7 +1131,7 @@ pub fn allocate_with_seed(
 ///         .map(|(to, amount)| (*to.key, *amount))
 ///         .collect::<Vec<(Pubkey, u64)>>();
 ///
-///     let instrs = system_instruction::transfer_many(bank_pda.key, to_and_amount.as_ref());
+///     let instrs = instruction::transfer_many(bank_pda.key, to_and_amount.as_ref());
 ///
 ///     for instr in instrs {
 ///         invoke_signed(&instr, accounts, &[&[b"bank", &[bank_pda_bump_seed]]])?;
@@ -1272,8 +1139,6 @@ pub fn allocate_with_seed(
 ///
 ///     Ok(())
 /// }
-///
-/// # Ok::<(), anyhow::Error>(())
 /// ```
 pub fn transfer_many(from_pubkey: &Pubkey, to_lamports: &[(Pubkey, u64)]) -> Vec<Instruction> {
     to_lamports
@@ -1297,17 +1162,17 @@ pub fn create_nonce_account_with_seed(
             base,
             seed,
             lamports,
-            nonce::State::size() as u64,
-            &system_program::id(),
+            NONCE_STATE_SIZE as u64,
+            &ID,
         ),
         Instruction::new_with_bincode(
-            system_program::id(),
+            ID,
             &SystemInstruction::InitializeNonceAccount(*authority),
             vec![
                 AccountMeta::new(*nonce_pubkey, false),
                 #[allow(deprecated)]
-                AccountMeta::new_readonly(recent_blockhashes::id(), false),
-                AccountMeta::new_readonly(rent::id(), false),
+                AccountMeta::new_readonly(RECENT_BLOCKHASHES_ID, false),
+                AccountMeta::new_readonly(RENT_ID, false),
             ],
         ),
     ]
@@ -1321,7 +1186,7 @@ pub fn create_nonce_account_with_seed(
 /// [`SystemInstruction::InitializeNonceAccount`].
 ///
 /// [`Transaction`]: https://docs.rs/solana-sdk/latest/solana_sdk/transaction/struct.Transaction.html
-/// [invoked]: crate::program::invoke
+/// [invoked]: https://docs.rs/solana-cpi/latest/solana_cpi/fn.invoke.html
 ///
 /// A [durable transaction nonce][dtn] is a special account that enables
 /// execution of transactions that have been signed in the past.
@@ -1335,7 +1200,7 @@ pub fn create_nonce_account_with_seed(
 /// minutes, then successfully execute that transaction.
 ///
 /// [dtn]: https://docs.solanalabs.com/implemented-proposals/durable-tx-nonces
-/// [rbh]: crate::message::Message::recent_blockhash
+/// [rbh]: https://docs.rs/solana-program/latest/solana_program/message/legacy/struct.Message.html#structfield.recent_blockhash
 /// [nonce]: https://en.wikipedia.org/wiki/Cryptographic_nonce
 ///
 /// Durable transaction nonces are an alternative to the standard recent
@@ -1350,8 +1215,8 @@ pub fn create_nonce_account_with_seed(
 /// the [`blockhash`] field of [`nonce::state::Data`], which is deserialized
 /// from the nonce account data.
 ///
-/// [`blockhash`]: crate::nonce::state::Data::blockhash
-/// [`nonce::state::Data`]: crate::nonce::state::Data
+/// [`blockhash`]: https://docs.rs/solana-program/latest/solana_program/message/legacy/struct.Message.html#structfield.recent_blockhash
+/// [`nonce::state::Data`]: https://docs.rs/solana-nonce/latest/solana_nonce/state/struct.Data.html
 ///
 /// The basic durable transaction nonce lifecycle is
 ///
@@ -1385,12 +1250,11 @@ pub fn create_nonce_account_with_seed(
 /// # use solana_program::example_mocks::solana_rpc_client;
 /// use solana_rpc_client::rpc_client::RpcClient;
 /// use solana_sdk::{
-/// #   pubkey::Pubkey,
 ///     signature::{Keypair, Signer},
-///     system_instruction,
 ///     transaction::Transaction,
 ///     nonce::State,
 /// };
+/// use solana_system_interface::instruction;
 /// use anyhow::Result;
 ///
 /// fn submit_create_nonce_account_tx(
@@ -1401,7 +1265,7 @@ pub fn create_nonce_account_with_seed(
 ///     let nonce_account = Keypair::new();
 ///
 ///     let nonce_rent = client.get_minimum_balance_for_rent_exemption(State::size())?;
-///     let instr = system_instruction::create_nonce_account(
+///     let instr = instruction::create_nonce_account(
 ///         &payer.pubkey(),
 ///         &nonce_account.pubkey(),
 ///         &payer.pubkey(), // Make the fee payer the nonce account authority
@@ -1435,17 +1299,17 @@ pub fn create_nonce_account(
             from_pubkey,
             nonce_pubkey,
             lamports,
-            nonce::State::size() as u64,
-            &system_program::id(),
+            NONCE_STATE_SIZE as u64,
+            &ID,
         ),
         Instruction::new_with_bincode(
-            system_program::id(),
+            ID,
             &SystemInstruction::InitializeNonceAccount(*authority),
             vec![
                 AccountMeta::new(*nonce_pubkey, false),
                 #[allow(deprecated)]
-                AccountMeta::new_readonly(recent_blockhashes::id(), false),
-                AccountMeta::new_readonly(rent::id(), false),
+                AccountMeta::new_readonly(RECENT_BLOCKHASHES_ID, false),
+                AccountMeta::new_readonly(RENT_ID, false),
             ],
         ),
     ]
@@ -1458,7 +1322,7 @@ pub fn create_nonce_account(
 /// [`SystemInstruction::AdvanceNonceAccount`].
 ///
 /// [`Transaction`]: https://docs.rs/solana-sdk/latest/solana_sdk/transaction/struct.Transaction.html
-/// [invoked]: crate::program::invoke
+/// [invoked]: https://docs.rs/solana-cpi/latest/solana_cpi/fn.invoke.html
 ///
 /// Every transaction that relies on a durable transaction nonce must contain a
 /// [`SystemInstruction::AdvanceNonceAccount`] instruction as the first
@@ -1478,9 +1342,9 @@ pub fn create_nonce_account(
 /// For further description of durable transaction nonces see
 /// [`create_nonce_account`].
 ///
-/// [`Message`]: crate::message::Message
-/// [`Message::new_with_nonce`]: crate::message::Message::new_with_nonce
-/// [`recent_blockhash`]: crate::message::Message::recent_blockhash
+/// [`Message`]: https://docs.rs/solana-program/latest/solana_program/message/legacy/struct.Message.html
+/// [`Message::new_with_nonce`]: https://docs.rs/solana-program/latest/solana_program/message/legacy/struct.Message.html#method.new_with_nonce
+/// [`recent_blockhash`]: https://docs.rs/solana-program/latest/solana_program/message/legacy/struct.Message.html#structfield.recent_blockhash
 /// [dfa]: https://docs.rs/solana-rpc-client-nonce-utils/latest/solana_rpc_client_nonce_utils/fn.data_from_account.html
 ///
 /// # Required signers
@@ -1496,17 +1360,15 @@ pub fn create_nonce_account(
 /// # use solana_program::example_mocks::solana_rpc_client;
 /// # use solana_program::example_mocks::solana_rpc_client_nonce_utils;
 /// use solana_rpc_client::rpc_client::RpcClient;
+/// use solana_pubkey::Pubkey;
 /// use solana_sdk::{
 ///     message::Message,
-///     pubkey::Pubkey,
 ///     signature::{Keypair, Signer},
-///     system_instruction,
 ///     transaction::Transaction,
 /// };
-/// # use solana_sdk::account::Account;
+/// use solana_system_interface::instruction;
 /// use std::path::Path;
 /// use anyhow::Result;
-/// # use anyhow::anyhow;
 ///
 /// fn create_transfer_tx_with_nonce(
 ///     client: &RpcClient,
@@ -1517,14 +1379,14 @@ pub fn create_nonce_account(
 ///     tx_path: &Path,
 /// ) -> Result<()> {
 ///
-///     let instr_transfer = system_instruction::transfer(
+///     let instr_transfer = instruction::transfer(
 ///         &payer.pubkey(),
 ///         receiver,
 ///         amount,
 ///     );
 ///
 ///     // In this example, `payer` is `nonce_account_pubkey`'s authority
-///     let instr_advance_nonce_account = system_instruction::advance_nonce_account(
+///     let instr_advance_nonce_account = instruction::advance_nonce_account(
 ///         nonce_account_pubkey,
 ///         &payer.pubkey(),
 ///     );
@@ -1578,14 +1440,10 @@ pub fn advance_nonce_account(nonce_pubkey: &Pubkey, authorized_pubkey: &Pubkey) 
     let account_metas = vec![
         AccountMeta::new(*nonce_pubkey, false),
         #[allow(deprecated)]
-        AccountMeta::new_readonly(recent_blockhashes::id(), false),
+        AccountMeta::new_readonly(RECENT_BLOCKHASHES_ID, false),
         AccountMeta::new_readonly(*authorized_pubkey, true),
     ];
-    Instruction::new_with_bincode(
-        system_program::id(),
-        &SystemInstruction::AdvanceNonceAccount,
-        account_metas,
-    )
+    Instruction::new_with_bincode(ID, &SystemInstruction::AdvanceNonceAccount, account_metas)
 }
 
 /// Withdraw lamports from a durable transaction nonce account.
@@ -1595,7 +1453,7 @@ pub fn advance_nonce_account(nonce_pubkey: &Pubkey, authorized_pubkey: &Pubkey) 
 /// [`SystemInstruction::WithdrawNonceAccount`].
 ///
 /// [`Transaction`]: https://docs.rs/solana-sdk/latest/solana_sdk/transaction/struct.Transaction.html
-/// [invoked]: crate::program::invoke
+/// [invoked]: https://docs.rs/solana-cpi/latest/solana_cpi/fn.invoke.html
 ///
 /// Withdrawing the entire balance of a nonce account will cause the runtime to
 /// destroy it upon successful completion of the transaction.
@@ -1620,12 +1478,12 @@ pub fn advance_nonce_account(nonce_pubkey: &Pubkey, authorized_pubkey: &Pubkey) 
 /// # use solana_program::example_mocks::solana_sdk;
 /// # use solana_program::example_mocks::solana_rpc_client;
 /// use solana_rpc_client::rpc_client::RpcClient;
+/// use solana_pubkey::Pubkey;
 /// use solana_sdk::{
-///     pubkey::Pubkey,
 ///     signature::{Keypair, Signer},
-///     system_instruction,
 ///     transaction::Transaction,
 /// };
+/// use solana_system_interface::instruction;
 /// use anyhow::Result;
 ///
 /// fn submit_withdraw_nonce_account_tx(
@@ -1636,8 +1494,8 @@ pub fn advance_nonce_account(nonce_pubkey: &Pubkey, authorized_pubkey: &Pubkey) 
 ///
 ///     let nonce_balance = client.get_balance(nonce_account_pubkey)?;
 ///
-///     let instr = system_instruction::withdraw_nonce_account(
-///         &nonce_account_pubkey,
+///     let instr = instruction::withdraw_nonce_account(
+///         nonce_account_pubkey,
 ///         &authorized_account.pubkey(),
 ///         &authorized_account.pubkey(),
 ///         nonce_balance,
@@ -1670,12 +1528,12 @@ pub fn withdraw_nonce_account(
         AccountMeta::new(*nonce_pubkey, false),
         AccountMeta::new(*to_pubkey, false),
         #[allow(deprecated)]
-        AccountMeta::new_readonly(recent_blockhashes::id(), false),
-        AccountMeta::new_readonly(rent::id(), false),
+        AccountMeta::new_readonly(RECENT_BLOCKHASHES_ID, false),
+        AccountMeta::new_readonly(RENT_ID, false),
         AccountMeta::new_readonly(*authorized_pubkey, true),
     ];
     Instruction::new_with_bincode(
-        system_program::id(),
+        ID,
         &SystemInstruction::WithdrawNonceAccount(lamports),
         account_metas,
     )
@@ -1688,7 +1546,7 @@ pub fn withdraw_nonce_account(
 /// [`SystemInstruction::AuthorizeNonceAccount`].
 ///
 /// [`Transaction`]: https://docs.rs/solana-sdk/latest/solana_sdk/transaction/struct.Transaction.html
-/// [invoked]: crate::program::invoke
+/// [invoked]: https://docs.rs/solana-cpi/latest/solana_cpi/fn.invoke.html
 ///
 /// This constructor creates a [`SystemInstruction::AuthorizeNonceAccount`]
 /// instruction.
@@ -1703,12 +1561,12 @@ pub fn withdraw_nonce_account(
 /// # use solana_program::example_mocks::solana_sdk;
 /// # use solana_program::example_mocks::solana_rpc_client;
 /// use solana_rpc_client::rpc_client::RpcClient;
+/// use solana_pubkey::Pubkey;
 /// use solana_sdk::{
-///     pubkey::Pubkey,
 ///     signature::{Keypair, Signer},
-///     system_instruction,
 ///     transaction::Transaction,
 /// };
+/// use solana_system_interface::instruction;
 /// use anyhow::Result;
 ///
 /// fn authorize_nonce_account_tx(
@@ -1719,9 +1577,9 @@ pub fn withdraw_nonce_account(
 /// ) -> Result<()> {
 ///
 ///     let instr = system_instruction::authorize_nonce_account(
-///         &nonce_account_pubkey,
+///         nonce_account_pubkey,
 ///         &authorized_account.pubkey(),
-///         &new_authority_pubkey,
+///         new_authority_pubkey,
 ///     );
 ///
 ///     let mut tx = Transaction::new_with_payer(&[instr], Some(&authorized_account.pubkey()));
@@ -1752,7 +1610,7 @@ pub fn authorize_nonce_account(
         AccountMeta::new_readonly(*authorized_pubkey, true),
     ];
     Instruction::new_with_bincode(
-        system_program::id(),
+        ID,
         &SystemInstruction::AuthorizeNonceAccount(*new_authority),
         account_metas,
     )
@@ -1762,16 +1620,12 @@ pub fn authorize_nonce_account(
 /// them out of chain blockhash domain.
 pub fn upgrade_nonce_account(nonce_pubkey: Pubkey) -> Instruction {
     let account_metas = vec![AccountMeta::new(nonce_pubkey, /*is_signer:*/ false)];
-    Instruction::new_with_bincode(
-        system_program::id(),
-        &SystemInstruction::UpgradeNonceAccount,
-        account_metas,
-    )
+    Instruction::new_with_bincode(ID, &SystemInstruction::UpgradeNonceAccount, account_metas)
 }
 
 #[cfg(test)]
 mod tests {
-    use {super::*, crate::instruction::Instruction};
+    use super::*;
 
     fn get_keys(instruction: &Instruction) -> Vec<Pubkey> {
         instruction.accounts.iter().map(|x| x.pubkey).collect()
@@ -1798,7 +1652,7 @@ mod tests {
         let ixs = create_nonce_account(&from_pubkey, &nonce_pubkey, &authorized, 42);
         assert_eq!(ixs.len(), 2);
         let ix = &ixs[0];
-        assert_eq!(ix.program_id, system_program::id());
+        assert_eq!(ix.program_id, ID);
         let pubkeys: Vec<_> = ix.accounts.iter().map(|am| am.pubkey).collect();
         assert!(pubkeys.contains(&from_pubkey));
         assert!(pubkeys.contains(&nonce_pubkey));

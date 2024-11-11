@@ -1,0 +1,42 @@
+[package]
+name = "solana-system-interface"
+version = "0.0.1"
+description = "Instructions and constructors for the System program"
+repository = "https://github.com/solana-program/system"
+edition = "2021"
+readme = "README.md"
+license-file = "../LICENSE"
+
+[package.metadata.docs.rs]
+targets = ["x86_64-unknown-linux-gnu", "wasm32-unknown-unknown"]
+all-features = true
+rustdoc-args = ["--cfg=docsrs"]
+
+[dependencies]
+num-traits = "0.2"
+serde = "1.0.210"
+serde_derive = "1.0.210"
+solana-decode-error = "^2.1"
+solana-frozen-abi = { version = "^2.1", features = ["frozen-abi"], optional = true }
+solana-frozen-abi-macro = { version = "^2.1", features = ["frozen-abi"], optional = true }
+solana-instruction = { version = "^2.1", features = ["bincode", "std"] }
+solana-pubkey = { version = "^2.1", default-features = false, features = ["serde"] }
+
+[target.'cfg(target_arch = "wasm32")'.dependencies]
+js-sys = "0.3.72"
+wasm-bindgen = "0.2"
+
+[dev-dependencies]
+anyhow = "1.0.89"
+borsh = { version = "1.5.1", features = ["derive", "unstable__schema"] }
+solana-nonce = "^0.0.2"
+solana-program = { version = "^2.1", default-features = false }
+static_assertions = "1.1.0"
+strum = "0.24"
+strum_macros = "0.24"
+
+[features]
+frozen-abi = [
+    "dep:solana-frozen-abi",
+    "dep:solana-frozen-abi-macro"
+]
