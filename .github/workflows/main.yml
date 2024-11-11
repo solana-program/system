@@ -41,7 +41,7 @@ jobs:
         run: pnpm clients:rust:lint
 
       - name: Check Client Rust Features
-        run: pnpm clients:rust:check-features
+        run: pnpm clients:rust:features
 
       - name: Check Client Rust 'rustdoc'
         run: pnpm clients:rust:rustdoc
@@ -65,7 +65,7 @@ jobs:
         run: pnpm interface:lint
 
       - name: Check Interface Features
-        run: pnpm interface:check-features
+        run: pnpm interface:features
 
       - name: Check Interface 'rustdoc'
         run: pnpm interface:rustdoc
