@@ -48,3 +48,22 @@ pub mod program {
 
     declare_id!("11111111111111111111111111111111");
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use solana_program::sysvar::SysvarId;
+
+    #[allow(deprecated)]
+    #[test]
+    fn test_constants() {
+        // Ensure that the constants are in sync with the solana program.
+        assert_eq!(
+            RECENT_BLOCKHASHES_ID,
+            solana_program::sysvar::recent_blockhashes::RecentBlockhashes::id(),
+        );
+
+        // Ensure that the constants are in sync with the solana rent.
+        assert_eq!(RENT_ID, solana_program::sysvar::rent::Rent::id());
+    }
+}
