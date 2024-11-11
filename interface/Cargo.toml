@@ -20,6 +20,7 @@ solana-decode-error = "^2.1"
 solana-frozen-abi = { version = "^2.1", features = ["frozen-abi"], optional = true }
 solana-frozen-abi-macro = { version = "^2.1", features = ["frozen-abi"], optional = true }
 solana-instruction = { version = "^2.1", features = ["bincode", "std"] }
+solana-logger = { version = "^2.1", optional = true }
 solana-pubkey = { version = "^2.1", default-features = false, features = ["serde"] }
 
 [target.'cfg(target_arch = "wasm32")'.dependencies]
@@ -42,5 +43,6 @@ strum_macros = "0.24"
 [features]
 frozen-abi = [
     "dep:solana-frozen-abi",
-    "dep:solana-frozen-abi-macro"
+    "dep:solana-frozen-abi-macro",
+    "dep:solana-logger"
 ]
