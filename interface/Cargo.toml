@@ -47,3 +47,4 @@ frozen-abi = [
     "dep:solana-logger",
     "solana-pubkey/frozen-abi"
 ]
+test = ["solana-pubkey/std"]
