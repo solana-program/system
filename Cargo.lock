@@ -1613,6 +1613,8 @@ dependencies = [
  "solana-atomic-u64",
  "solana-decode-error",
  "solana-define-syscall",
+ "solana-frozen-abi",
+ "solana-frozen-abi-macro",
  "solana-sanitize",
  "solana-sha256-hasher",
  "wasm-bindgen",

@@ -44,5 +44,6 @@ strum_macros = "0.24"
 frozen-abi = [
     "dep:solana-frozen-abi",
     "dep:solana-frozen-abi-macro",
-    "dep:solana-logger"
+    "dep:solana-logger",
+    "solana-pubkey/frozen-abi"
 ]
