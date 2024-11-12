@@ -11,4 +11,4 @@ const manifestPath = path.join(
 );
 
 // Check feature powerset.
-await $`cargo hack check --manifest-path ${manifestPath} --feature-powerset --no-dev-deps ${args}`;
+await $`cargo hack check --manifest-path ${manifestPath} --feature-powerset --all-targets ${args}`;
