@@ -58,16 +58,16 @@ jobs:
         with:
           toolchain: format, lint, test
 
-      - name: Lint Interface / Format
+      - name: Format
         run: pnpm zx ./scripts/interface/lint-format.mjs
 
-      - name: Lint Interface / Clippy
+      - name: Clippy
         run: pnpm zx ./scripts/interface/lint-clippy.mjs
 
-      - name: Lint Interface / Features
+      - name: Features
         run: pnpm zx ./scripts/interface/lint-features.mjs
 
-      - name: Lint Interface / Docs
+      - name: Docs
         run: pnpm zx ./scripts/interface/lint-docs.mjs
 
   test_interface:
