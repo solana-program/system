@@ -32,7 +32,7 @@ jobs:
       - name: Setup Environment
         uses: ./.github/actions/setup
         with:
-          toolchain: format, lint
+          toolchain: format, lint, test
 
       - name: Format Client Rust
         run: pnpm clients:rust:format
@@ -56,7 +56,7 @@ jobs:
       - name: Setup Environment
         uses: ./.github/actions/setup
         with:
-          toolchain: format, lint
+          toolchain: format, lint, test
 
       - name: Format Interface
         run: pnpm interface:format

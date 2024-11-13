@@ -71,6 +71,7 @@ runs:
         cache: true
 
     - name: Install 'cargo-hack'
+      if: ${{ contains(inputs.toolchain, 'test') }}
       shell: bash
       run: cargo install cargo-hack
 

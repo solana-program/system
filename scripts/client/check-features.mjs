@@ -3,6 +3,7 @@ import 'zx/globals';
 import { cliArguments, workingDirectory } from '../utils.mjs';
 
 const args = cliArguments();
+const toolchain = getToolchainArgument('test');
 const manifestPath = path.join(
   workingDirectory,
   'clients',
@@ -11,4 +12,4 @@ const manifestPath = path.join(
 );
 
 // Check feature powerset.
-await $`cargo hack check --manifest-path ${manifestPath} --feature-powerset --all-targets ${args}`;
+await $`cargo ${toolchain} hack check --manifest-path ${manifestPath} --feature-powerset --all-targets ${args}`;
