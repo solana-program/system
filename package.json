@@ -19,11 +19,7 @@
     "clients:rust:publish": "zx ./scripts/client/publish-rust.mjs",
     "clients:rust:rustdoc": "zx ./scripts/client/rustdoc.mjs",
     "clients:rust:test": "zx ./scripts/client/test-rust.mjs",
-    "interface:check": "pnpm interface:format && pnpm interface:lint && pnpm interface:features && pnpm interface:rustdoc",
-    "interface:format": "zx ./scripts/interface/format.mjs",
     "interface:lint": "zx ./scripts/interface/lint.mjs",
-    "interface:features": "zx ./scripts/interface/check-features.mjs",
-    "interface:rustdoc": "zx ./scripts/interface/rustdoc.mjs",
     "interface:test": "zx ./scripts/interface/test.mjs",
     "template:upgrade": "zx ./scripts/upgrade-template.mjs"
   },

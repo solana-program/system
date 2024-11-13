@@ -47,7 +47,7 @@ jobs:
         run: pnpm clients:rust:rustdoc
 
   format_and_lint_interface:
-    name: Format & Lint Interface
+    name: Lint Interface
     runs-on: ubuntu-latest
     steps:
       - name: Git Checkout
@@ -58,17 +58,17 @@ jobs:
         with:
           toolchain: format, lint, test
 
-      - name: Format Interface
-        run: pnpm interface:format
+      - name: Lint Interface / Format
+        run: "zx ./scripts/interface/lint-format.mjs"
 
-      - name: Lint Interface
-        run: pnpm interface:lint
+      - name: Lint Interface / Clippy
+        run: "zx ./scripts/interface/lint-clippy.mjs"
 
-      - name: Check Interface Features
-        run: pnpm interface:features
+      - name: Lint Interface / Features
+        run: "zx ./scripts/interface/lint-features.mjs"
 
-      - name: Check Interface 'rustdoc'
-        run: pnpm interface:rustdoc
+      - name: Lint Interface / Docs
+        run: "zx ./scripts/interface/lint-docs.mjs"
 
   test_interface:
     name: Test Interface
