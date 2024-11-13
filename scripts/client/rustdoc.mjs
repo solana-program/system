@@ -1,8 +1,13 @@
 #!/usr/bin/env zx
 import 'zx/globals';
-import { cliArguments, workingDirectory } from '../utils.mjs';
+import {
+  cliArguments,
+  getToolchainArgument,
+  workingDirectory,
+} from '../utils.mjs';
 
 const args = cliArguments();
+const toolchain = getToolchainArgument('lint');
 const manifestPath = path.join(
   workingDirectory,
   'clients',
@@ -10,4 +15,4 @@ const manifestPath = path.join(
   'Cargo.toml'
 );
 
-await $`RUSTDOCFLAGS="--cfg docsrs -D warnings" cargo doc --manifest-path ${manifestPath} --all-features --no-deps ${args}`;
+await $`RUSTDOCFLAGS="--cfg docsrs -D warnings" cargo ${toolchain} doc --manifest-path ${manifestPath} --all-features --no-deps ${args}`;

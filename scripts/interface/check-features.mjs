@@ -7,7 +7,7 @@ import {
 } from '../utils.mjs';
 
 const args = ['--exclude-features', 'frozen-abi', ...cliArguments()];
-const toolchain = getToolchainArgument('test');
+const toolchain = getToolchainArgument('lint');
 const manifestPath = path.join(workingDirectory, 'interface', 'Cargo.toml');
 
 // Check feature powerset.
