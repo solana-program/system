@@ -34,20 +34,20 @@ jobs:
         with:
           toolchain: format, lint, test
 
-      - name: Format Client Rust
+      - name: Format
         run: pnpm clients:rust:format
 
-      - name: Lint Client Rust
-        run: pnpm clients:rust:lint
+      - name: Lint / Clippy
+        run: pnpm zx ./scripts/client/lint-rust-clippy.mjs
 
-      - name: Check Client Rust Features
-        run: pnpm clients:rust:features
+      - name: Lint / Features
+        run: pnpm zx ./scripts/client/lint-rust-features.mjs
 
-      - name: Check Client Rust 'rustdoc'
-        run: pnpm clients:rust:rustdoc
+      - name: Lint / Docs
+        run: pnpm zx ./scripts/client/lint-rust-docs.mjs
 
   format_and_lint_interface:
-    name: Lint Interface
+    name: Format & Lint Interface
     runs-on: ubuntu-latest
     steps:
       - name: Git Checkout
@@ -59,15 +59,15 @@ jobs:
           toolchain: format, lint, test
 
       - name: Format
-        run: pnpm zx ./scripts/interface/lint-format.mjs
+        run: pnpm interface:format
 
-      - name: Clippy
+      - name: Lint / Clippy
         run: pnpm zx ./scripts/interface/lint-clippy.mjs
 
-      - name: Features
+      - name: Lint / Features
         run: pnpm zx ./scripts/interface/lint-features.mjs
 
-      - name: Docs
+      - name: Lint / Docs
         run: pnpm zx ./scripts/interface/lint-docs.mjs
 
   test_interface:
