@@ -4,15 +4,13 @@
 // - lint-clippy.mjs
 // - lint-features.mjs
 // - lint-docs.mjs
-//
-// Command line arguments are only passed to clippy.
 
-import { cliArguments, popArgument, workingDirectory } from '../utils.mjs';
+import { workingDirectory } from '../utils.mjs';
 
 const scripts = path.join(workingDirectory, 'scripts', 'interface');
 
 // clippy
-await $`zx ${path.join(scripts, 'lint-clippy.mjs')} ${cliArguments()}`;
+await $`zx ${path.join(scripts, 'lint-clippy.mjs')}`;
 // features
 await $`zx ${path.join(scripts, 'lint-features.mjs')}`;
 // rustdoc

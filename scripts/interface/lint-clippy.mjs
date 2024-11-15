@@ -32,8 +32,4 @@ const toolchain = getToolchainArgument('lint');
 const manifestPath = path.join(workingDirectory, 'interface', 'Cargo.toml');
 
 // Lint the interface.
-if (fix) {
-  await $`cargo ${toolchain} clippy --manifest-path ${manifestPath} --fix ${lintArgs}`;
-} else {
-  await $`cargo ${toolchain} clippy --manifest-path ${manifestPath} ${lintArgs}`;
-}
+await $`cargo ${toolchain} clippy --manifest-path ${manifestPath} ${fix ? '--fix' : ''} ${lintArgs}`;
