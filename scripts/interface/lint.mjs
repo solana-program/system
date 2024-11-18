@@ -1,39 +1,17 @@
-#!/usr/bin/env zx
-import 'zx/globals';
-import {
-  cliArguments,
-  getToolchainArgument,
-  popArgument,
-  workingDirectory,
-} from '../utils.mjs';
+// Script to lint the interface crate.
+//
+// This script runs the following sub-scripts:
+// - lint-clippy.mjs
+// - lint-features.mjs
+// - lint-docs.mjs
 
-// Configure additional arguments here, e.g.:
-// ['--arg1', '--arg2', ...cliArguments()]
-const lintArgs = ['--all-targets', '--all-features', ...cliArguments()];
-// Check whether a '--' was already used.
-if (lintArgs.indexOf('--') === -1) {
-  lintArgs.push('--');
-}
-// Add additional arguments.
-lintArgs.push(
-  '--deny=warnings',
-  '--deny=clippy::default_trait_access',
-  '--deny=clippy::arithmetic_side_effects',
-  '--deny=clippy::manual_let_else',
-  '--deny=clippy::used_underscore_binding'
-);
+import { workingDirectory } from '../utils.mjs';
 
-const fix = popArgument(lintArgs, '--fix');
-// Note: need to use nightly clippy as frozen-abi proc-macro generates
-// a lot of code (frozen-abi is enabled only under nightly due to the
-// use of unstable rust feature). Likewise, frozen-abi(-macro) crates'
-// unit tests are only compiled under nightly.
-const toolchain = getToolchainArgument('lint');
-const manifestPath = path.join(workingDirectory, 'interface', 'Cargo.toml');
+const scripts = path.join(workingDirectory, 'scripts', 'interface');
 
-// Lint the interface.
-if (fix) {
-  await $`cargo ${toolchain} clippy --manifest-path ${manifestPath} --fix ${lintArgs}`;
-} else {
-  await $`cargo ${toolchain} clippy --manifest-path ${manifestPath} ${lintArgs}`;
-}
+// clippy
+await $`zx ${path.join(scripts, 'lint-clippy.mjs')}`;
+// features
+await $`zx ${path.join(scripts, 'lint-features.mjs')}`;
+// rustdoc
+await $`zx ${path.join(scripts, 'lint-docs.mjs')}`;

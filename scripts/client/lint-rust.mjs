@@ -1,28 +1,17 @@
-#!/usr/bin/env zx
-import 'zx/globals';
-import {
-  cliArguments,
-  getToolchainArgument,
-  popArgument,
-  workingDirectory,
-} from '../utils.mjs';
+// Script to lint the Rust client crate.
+//
+// This script runs the following sub-scripts:
+// - lint-rust-clippy.mjs
+// - lint-rust-features.mjs
+// - lint-rust-docs.mjs
 
-// Configure additional arguments here, e.g.:
-// ['--arg1', '--arg2', ...cliArguments()]
-const lintArgs = cliArguments();
+import { cliArguments, workingDirectory } from '../utils.mjs';
 
-const fix = popArgument(lintArgs, '--fix');
-const toolchain = getToolchainArgument('lint');
-const manifestPath = path.join(
-  workingDirectory,
-  'clients',
-  'rust',
-  'Cargo.toml'
-);
+const scripts = path.join(workingDirectory, 'scripts', 'client');
 
-// Check the client using Clippy.
-if (fix) {
-  await $`cargo ${toolchain} clippy --manifest-path ${manifestPath} --fix ${lintArgs}`;
-} else {
-  await $`cargo ${toolchain} clippy --manifest-path ${manifestPath} ${lintArgs}`;
-}
+// clippy
+await $`zx ${path.join(scripts, 'lint-rust-clippy.mjs')}`;
+// features
+await $`zx ${path.join(scripts, 'lint-rust-features.mjs')}`;
+// rustdoc
+await $`zx ${path.join(scripts, 'lint-rust-docs.mjs')}`;

@@ -34,11 +34,17 @@ jobs:
         with:
           toolchain: format, lint
 
-      - name: Format Client Rust
+      - name: Format
         run: pnpm clients:rust:format
 
-      - name: Lint Client Rust
-        run: pnpm clients:rust:lint
+      - name: Lint / Clippy
+        run: pnpm zx ./scripts/client/lint-rust-clippy.mjs
+
+      - name: Lint / Features
+        run: pnpm zx ./scripts/client/lint-rust-features.mjs
+
+      - name: Lint / Docs
+        run: pnpm zx ./scripts/client/lint-rust-docs.mjs
 
   format_and_lint_interface:
     name: Format & Lint Interface
@@ -52,11 +58,17 @@ jobs:
         with:
           toolchain: format, lint
 
-      - name: Format Interface
+      - name: Format
         run: pnpm interface:format
 
-      - name: Lint Interface
-        run: pnpm interface:lint
+      - name: Lint / Clippy
+        run: pnpm zx ./scripts/interface/lint-clippy.mjs
+
+      - name: Lint / Features
+        run: pnpm zx ./scripts/interface/lint-features.mjs
+
+      - name: Lint / Docs
+        run: pnpm zx ./scripts/interface/lint-docs.mjs
 
   test_interface:
     name: Test Interface
