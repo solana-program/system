@@ -21,8 +21,4 @@ const manifestPath = path.join(
 );
 
 // Check the client using Clippy.
-if (fix) {
-  await $`cargo ${toolchain} clippy --manifest-path ${manifestPath} --fix ${lintArgs}`;
-} else {
-  await $`cargo ${toolchain} clippy --manifest-path ${manifestPath} ${lintArgs}`;
-}
+await $`cargo ${toolchain} clippy --manifest-path ${manifestPath} ${fix ? '--fix' : ''} ${lintArgs}`;
