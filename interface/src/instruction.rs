@@ -40,9 +40,28 @@
 use solana_pubkey::Pubkey;
 #[cfg(feature = "bincode")]
 use {
-    crate::{program::ID, NONCE_STATE_SIZE, RECENT_BLOCKHASHES_ID, RENT_ID},
+    crate::program::ID,
     solana_instruction::{AccountMeta, Instruction},
 };
+
+// Inline some constants to avoid dependencies.
+//
+// Note: replace these inline IDs with the corresponding value from
+// `solana_sdk_ids` once the version is updated to 2.2.0.
+
+#[cfg(feature = "bincode")]
+const RECENT_BLOCKHASHES_ID: Pubkey =
+    Pubkey::from_str_const("SysvarRecentB1ockHashes11111111111111111111");
+
+#[cfg(feature = "bincode")]
+const RENT_ID: Pubkey = Pubkey::from_str_const("SysvarRent111111111111111111111111111111111");
+
+#[cfg(feature = "bincode")]
+#[cfg(test)]
+static_assertions::const_assert_eq!(solana_nonce::state::State::size(), NONCE_STATE_SIZE);
+/// The serialized size of the nonce state.
+#[cfg(feature = "bincode")]
+const NONCE_STATE_SIZE: usize = 80;
 
 /// An instruction to the system program.
 #[cfg_attr(
@@ -1650,9 +1669,23 @@ pub fn upgrade_nonce_account(nonce_pubkey: Pubkey) -> Instruction {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use solana_program::sysvar::SysvarId;
 
     fn get_keys(instruction: &Instruction) -> Vec<Pubkey> {
         instruction.accounts.iter().map(|x| x.pubkey).collect()
+    }
+
+    #[allow(deprecated)]
+    #[test]
+    fn test_constants() {
+        // Ensure that the constants are in sync with the solana program.
+        assert_eq!(
+            RECENT_BLOCKHASHES_ID,
+            solana_program::sysvar::recent_blockhashes::RecentBlockhashes::id(),
+        );
+
+        // Ensure that the constants are in sync with the solana rent.
+        assert_eq!(RENT_ID, solana_program::sysvar::rent::Rent::id());
     }
 
     #[test]
