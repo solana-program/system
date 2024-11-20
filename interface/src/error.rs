@@ -1,11 +1,14 @@
 use num_traits::{FromPrimitive, ToPrimitive};
-use serde_derive::{Deserialize, Serialize};
 use solana_decode_error::DecodeError;
 
 // Use strum when testing to ensure our FromPrimitive
 // impl is exhaustive
 #[cfg_attr(test, derive(strum_macros::FromRepr, strum_macros::EnumIter))]
-#[derive(Clone, Debug, Deserialize, PartialEq, Eq, Serialize)]
+#[cfg_attr(
+    feature = "serde",
+    derive(serde_derive::Deserialize, serde_derive::Serialize)
+)]
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub enum SystemError {
     /// An account with the same address already exists.
     AccountAlreadyInUse,

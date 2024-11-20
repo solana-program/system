@@ -14,14 +14,14 @@ rustdoc-args = ["--cfg=docsrs"]
 
 [dependencies]
 num-traits = "0.2"
-serde = "1.0.210"
-serde_derive = "1.0.210"
+serde = { version = "1.0.210", optional = true }
+serde_derive = { version = "1.0.210", optional = true }
 solana-decode-error = "^2.1"
 solana-frozen-abi = { version = "^2.1", features = ["frozen-abi"], optional = true }
 solana-frozen-abi-macro = { version = "^2.1", features = ["frozen-abi"], optional = true }
-solana-instruction = { version = "^2.1", features = ["bincode", "std"] }
+solana-instruction = { version = "^2.1", features = ["bincode", "std"], optional = true }
 solana-logger = { version = "^2.1", optional = true }
-solana-pubkey = { version = "^2.1", default-features = false, features = ["serde"] }
+solana-pubkey = { version = "^2.1", default-features = false }
 
 [target.'cfg(target_arch = "wasm32")'.dependencies]
 js-sys = "0.3.72"
@@ -42,6 +42,7 @@ strum = "0.24"
 strum_macros = "0.24"
 
 [features]
+bincode = ["dep:solana-instruction", "serde"]
 frozen-abi = [
     "dep:solana-frozen-abi",
     "dep:solana-frozen-abi-macro",
@@ -49,3 +50,4 @@ frozen-abi = [
     "solana-pubkey/frozen-abi",
     "solana-pubkey/std"
 ]
+serde = ["dep:serde", "dep:serde_derive", "solana-pubkey/serde"]

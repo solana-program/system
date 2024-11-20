@@ -8,6 +8,7 @@ pub mod instruction;
 #[cfg(target_arch = "wasm32")]
 mod wasm;
 
+#[cfg(feature = "bincode")]
 use solana_pubkey::Pubkey;
 
 // Inline some constants to avoid dependencies.
@@ -15,14 +16,18 @@ use solana_pubkey::Pubkey;
 // Note: replace these inline IDs with the corresponding value from
 // `solana_sdk_ids` once the version is updated to 2.2.0.
 
+#[cfg(feature = "bincode")]
 const RECENT_BLOCKHASHES_ID: Pubkey =
     Pubkey::from_str_const("SysvarRecentB1ockHashes11111111111111111111");
 
+#[cfg(feature = "bincode")]
 const RENT_ID: Pubkey = Pubkey::from_str_const("SysvarRent111111111111111111111111111111111");
 
+#[cfg(feature = "bincode")]
 #[cfg(test)]
 static_assertions::const_assert_eq!(solana_nonce::state::State::size(), NONCE_STATE_SIZE);
 /// The serialized size of the nonce state.
+#[cfg(feature = "bincode")]
 const NONCE_STATE_SIZE: usize = 80;
 
 #[cfg(test)]
@@ -49,6 +54,7 @@ pub mod program {
     declare_id!("11111111111111111111111111111111");
 }
 
+#[cfg(feature = "bincode")]
 #[cfg(test)]
 mod tests {
     use super::*;
