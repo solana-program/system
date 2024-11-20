@@ -1768,6 +1768,7 @@ dependencies = [
  "solana-program-entrypoint",
  "solana-program-error",
  "solana-pubkey",
+ "solana-system-interface",
  "static_assertions",
  "strum",
  "strum_macros",

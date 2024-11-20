@@ -37,6 +37,7 @@ solana-program = { version = "^2.1", default-features = false }
 solana-program-entrypoint = "^2.1"
 solana-program-error = { version = "^2.1", features = ["borsh"] }
 solana-pubkey = { version = "^2.1", features = ["std"] }
+solana-system-interface = { path = ".", features = ["bincode"] }
 static_assertions = "1.1.0"
 strum = "0.24"
 strum_macros = "0.24"
