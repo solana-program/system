@@ -2,10 +2,12 @@
 name = "solana-system-interface"
 version = "0.0.1"
 description = "Instructions and constructors for the System program"
+authors = ["Anza Maintainers <maintainers@anza.xyz>"]
 repository = "https://github.com/solana-program/system"
+homepage = "https://anza.xyz/"
+license = "Apache-2.0"
 edition = "2021"
 readme = "README.md"
-license-file = "../LICENSE"
 
 [package.metadata.docs.rs]
 targets = ["x86_64-unknown-linux-gnu", "wasm32-unknown-unknown"]
