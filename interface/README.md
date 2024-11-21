@@ -30,7 +30,7 @@ use solana_sdk::{
     signature::{Keypair, Signer},
     transaction::Transaction,
 };
-use solana_system_interface::{instruction};
+use solana_system_interface::instruction;
 use anyhow::Result;
 
 fn create_account(
