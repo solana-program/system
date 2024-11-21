@@ -1,10 +1,10 @@
 <p align="center">
   <a href="https://solana.com">
-    <img alt="Solana" src="https://i.imgur.com/IKyzQ6T.png" width="250" />
+    <img alt="Solana" src="https://github.com/user-attachments/assets/534af75d-6347-48dc-8943-129423b2ba63" height="80" />
   </a>
 </p>
 
-# `solana-system-interface`
+# Solana System Interface
 
 This crate contains instructions and constructors for interacting with the [System program](https://docs.solanalabs.com/runtime/programs#system-program).
 
