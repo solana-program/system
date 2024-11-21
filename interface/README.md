@@ -63,7 +63,7 @@ fn create_account(
 }
 ```
 
-Transfer lamports betweem accounts:
+Transfer lamports between accounts:
 
 ```rust
 use solana_rpc_client::rpc_client::RpcClient;
