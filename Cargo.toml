@@ -2,6 +2,13 @@
 resolver = "2"
 members = ["clients/rust", "interface"]
 
+[workspace.package]
+authors = ["Anza Maintainers <maintainers@anza.xyz>"]
+repository = "https://github.com/solana-program/system"
+homepage = "https://anza.xyz/"
+license = "Apache-2.0"
+edition = "2021"
+
 [workspace.metadata.cli]
 solana = "2.1.0"
 
