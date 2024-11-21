@@ -78,19 +78,19 @@ use anyhow::Result;
 fn transfer(
     client: &RpcClient,
     from: &Keypair,
-    recipient: &Keypair,
+    recipient: &Pubkey,
     lamports: u64,
 ) -> Result<()> {
     let instr = instruction::transfer(
         &from.pubkey(),
-        &recipient.pubkey(),
+        recipient,
         lamports,
     );
 
     let blockhash = client.get_latest_blockhash()?;
     let tx = Transaction::new_signed_with_payer(
         &[instr],
-        Some(&payer.pubkey()),
+        Some(&from.pubkey()),
         &[from],
         blockhash,
     );
