@@ -1,6 +1,6 @@
 [package]
 name = "solana-system-interface"
-version = "0.0.1"
+version = "1.0.0"
 description = "Instructions and constructors for the System program"
 authors = ["Anza Maintainers <maintainers@anza.xyz>"]
 repository = "https://github.com/solana-program/system"
