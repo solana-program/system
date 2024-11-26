@@ -66,7 +66,7 @@ export function getProgramFolders() {
 
 export function getAllProgramFolders() {
   return getCargo().workspace.members.filter((member) =>
-    (getCargo(member).lib?.['crate-type'] ?? []).includes('cdylib')
+    getCargo(member).package?.metadata?.solana?.['program-id']
   );
 }
 
