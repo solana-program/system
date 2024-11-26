@@ -70,6 +70,28 @@ jobs:
       - name: Lint / Docs
         run: pnpm zx ./scripts/interface/lint-docs.mjs
 
+  wasm_interface:
+    name: Build Interface in WASM
+    runs-on: ubuntu-latest
+    needs: format_and_lint_interface
+    steps:
+      - name: Git Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Environment
+        uses: ./.github/actions/setup
+        with:
+          cargo-cache-key: cargo-wasm-interface
+          solana: true
+
+      - name: Install wasm-pack
+        uses: taiki-e/install-action@v2
+        with:
+          tool: wasm-pack
+
+      - name: Build Interface with wasm-pack
+        run: pnpm interface:wasm
+
   test_interface:
     name: Test Interface
     runs-on: ubuntu-latest

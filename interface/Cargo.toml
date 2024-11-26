@@ -54,3 +54,6 @@ frozen-abi = [
     "solana-pubkey/std"
 ]
 serde = ["dep:serde", "dep:serde_derive", "solana-pubkey/serde"]
+
+[lib]
+crate-type = ["cdylib", "rlib"]
