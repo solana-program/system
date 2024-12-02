@@ -5,7 +5,7 @@
 // - lint-rust-features.mjs
 // - lint-rust-docs.mjs
 
-import { cliArguments, workingDirectory } from '../utils.mjs';
+import { cliArguments, workingDirectory } from '../utils';
 
 const scripts = path.join(workingDirectory, 'scripts', 'client');
 

@@ -1,6 +1,6 @@
 #!/usr/bin/env zx
 import 'zx/globals';
-import { cliArguments, getCargo, workingDirectory } from '../utils.mjs';
+import { cliArguments, getCargo, workingDirectory } from '../utils';
 
 const dryRun = argv['dry-run'] ?? false;
 const [level] = cliArguments();

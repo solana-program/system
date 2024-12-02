@@ -1,6 +1,6 @@
 #!/usr/bin/env zx
 import 'zx/globals';
-import { cliArguments, workingDirectory } from '../utils.mjs';
+import { cliArguments, workingDirectory } from '../utils';
 
 // Configure additional arguments here, e.g.:
 // ['--arg1', '--arg2', ...cliArguments()]

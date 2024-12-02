@@ -4,7 +4,7 @@ import {
   cliArguments,
   getToolchainArgument,
   workingDirectory,
-} from '../utils.mjs';
+} from '../helpers/utils.mts';
 
 // Configure additional arguments here, e.g.:
 // ['--arg1', '--arg2', ...cliArguments()]

@@ -3,23 +3,27 @@ import 'zx/globals';
 import { createFromRoot } from 'codama';
 import { renderVisitor as renderJavaScriptVisitor } from '@codama/renderers-js';
 import { renderVisitor as renderRustVisitor } from '@codama/renderers-rust';
-import { workingDirectory } from './utils.mjs';
+import { workingDirectory } from './utils.mts';
 
 // Instanciate Codama.
-const codama = createFromRoot(
-  require(path.join(workingDirectory, 'program', 'idl.json'))
+const idl = JSON.parse(
+  fs.readFileSync(path.join(workingDirectory, 'program', 'idl.json'), 'utf-8')
 );
+const codama = createFromRoot(idl);
 
 // Render JavaScript.
-const jsClient = path.join(__dirname, '..', 'clients', 'js');
+const jsClient = path.join(__dirname, '..', '..', 'clients', 'js');
+const prettierOptions = JSON.parse(
+  fs.readFileSync(path.join(jsClient, '.prettierrc.json'), 'utf-8')
+);
 codama.accept(
   renderJavaScriptVisitor(path.join(jsClient, 'src', 'generated'), {
-    prettier: require(path.join(jsClient, '.prettierrc.json')),
+    prettierOptions,
   })
 );
 
 // Render Rust.
-const rustClient = path.join(__dirname, '..', 'clients', 'rust');
+const rustClient = path.join(__dirname, '..', '..', 'clients', 'rust');
 codama.accept(
   renderRustVisitor(path.join(rustClient, 'src', 'generated'), {
     formatCode: true,

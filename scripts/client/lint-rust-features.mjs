@@ -1,10 +1,6 @@
 #!/usr/bin/env zx
 import 'zx/globals';
-import {
-  cliArguments,
-  getToolchainArgument,
-  workingDirectory,
-} from '../utils.mjs';
+import { cliArguments, getToolchainArgument, workingDirectory } from '../utils';
 
 const args = cliArguments();
 const toolchain = getToolchainArgument('lint');

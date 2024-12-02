@@ -1,4 +1,4 @@
-import { cliArguments, workingDirectory } from './helpers/utils.mjs';
+import { cliArguments, workingDirectory } from '../helpers/utils.mjs';
 
 export const manifestPath = path.join(
   workingDirectory,
@@ -27,5 +27,4 @@ export function getLintDocsArguments() {
   return cliArguments();
 }
 
-export function getLintFeaturesArguments() {
-}
+export function getLintFeaturesArguments() {}

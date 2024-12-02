@@ -1,6 +1,6 @@
 #!/usr/bin/env zx
 import 'zx/globals';
-import { getInstalledSolanaVersion, getSolanaVersion } from './utils.mjs';
+import { getInstalledSolanaVersion, getSolanaVersion } from './utils.mts';
 
 const expectedVersion = getSolanaVersion();
 const installedVersion = await getInstalledSolanaVersion();

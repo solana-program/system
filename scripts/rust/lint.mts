@@ -5,7 +5,7 @@
 // - lint-features.mjs
 // - lint-docs.mjs
 
-import { workingDirectory } from '../utils.mjs';
+import { workingDirectory } from '../helpers/utils.mts';
 
 const scripts = path.join(workingDirectory, 'scripts', 'interface');
 

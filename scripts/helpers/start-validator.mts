@@ -8,7 +8,7 @@ import {
   getExternalProgramAddresses,
   getExternalProgramOutputDir,
   getProgramFolders,
-} from './utils.mjs';
+} from './utils.mts';
 
 // Check Solana version.
 await $`pnpm solana:check`;
@@ -60,7 +60,7 @@ accounts.forEach(({ account, deployPath }) => {
 
 // Start the validator in detached mode.
 const cliLogs = path.join(os.tmpdir(), 'validator-cli.log');
-fs.writeFileSync(cliLogs, '', () => {});
+fs.writeFileSync(cliLogs, '');
 const out = fs.openSync(cliLogs, 'a');
 const err = fs.openSync(cliLogs, 'a');
 const validator = spawn('solana-test-validator', args, {
@@ -79,7 +79,7 @@ const waitForValidator = spinner(
         if (validator.exitCode !== null) {
           reject(logs);
         } else if (logs.includes('Confirmed Slot: 1')) {
-          resolve();
+          resolve(void 0);
         }
       }, 1000);
     })
@@ -100,9 +100,9 @@ function getPrograms() {
   const binaryDir = path.join(__dirname, '..', 'target', 'deploy');
   return getProgramFolders().map((folder) => {
     const cargo = getCargo(folder);
-    const name = cargo.package.name.replace(/-/g, '_');
+    const name = cargo.package['name'].replace(/-/g, '_');
     return {
-      programId: cargo.package.metadata.solana['program-id'],
+      programId: cargo.package['metadata'].solana['program-id'],
       deployPath: path.join(binaryDir, `${name}.so`),
     };
   });

@@ -5,7 +5,7 @@ import {
   getToolchainArgument,
   popArgument,
   workingDirectory,
-} from '../utils.mjs';
+} from '../utils';
 
 // Configure additional arguments here, e.g.:
 // ['--arg1', '--arg2', ...cliArguments()]

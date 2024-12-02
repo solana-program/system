@@ -4,11 +4,10 @@ import {
   cliArguments,
   getToolchainArgument,
   workingDirectory,
-} from '../utils.mjs';
+} from '../helpers/utils.mts';
 
-const args = ['--exclude-features', 'frozen-abi', ...cliArguments()];
+const args = cliArguments();
 const toolchain = getToolchainArgument('lint');
 const manifestPath = path.join(workingDirectory, 'interface', 'Cargo.toml');
 
-// Check feature powerset.
-await $`cargo ${toolchain} hack check --manifest-path ${manifestPath} --feature-powerset --all-targets ${args}`;
+await $`RUSTDOCFLAGS="--cfg docsrs -D warnings" cargo ${toolchain} doc --manifest-path ${manifestPath} --all-features --no-deps ${args}`;
