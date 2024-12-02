@@ -8,6 +8,7 @@ import {
   getExternalProgramAddresses,
   getExternalProgramOutputDir,
   getProgramFolders,
+  workingDirectory,
 } from './utils.mts';
 
 // Check Solana version.
@@ -97,7 +98,7 @@ try {
 }
 
 function getPrograms() {
-  const binaryDir = path.join(__dirname, '..', 'target', 'deploy');
+  const binaryDir = path.join(workingDirectory, 'target', 'deploy');
   return getProgramFolders().map((folder) => {
     const cargo = getCargo(folder);
     const name = cargo.package['name'].replace(/-/g, '_');

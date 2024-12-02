@@ -12,7 +12,7 @@ const idl = JSON.parse(
 const codama = createFromRoot(idl);
 
 // Render JavaScript.
-const jsClient = path.join(__dirname, '..', '..', 'clients', 'js');
+const jsClient = path.join(workingDirectory, 'clients', 'js');
 const prettierOptions = JSON.parse(
   fs.readFileSync(path.join(jsClient, '.prettierrc.json'), 'utf-8')
 );
@@ -23,7 +23,7 @@ codama.accept(
 );
 
 // Render Rust.
-const rustClient = path.join(__dirname, '..', '..', 'clients', 'rust');
+const rustClient = path.join(workingDirectory, 'clients', 'rust');
 codama.accept(
   renderRustVisitor(path.join(rustClient, 'src', 'generated'), {
     formatCode: true,
