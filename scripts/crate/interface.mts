@@ -1,8 +1,9 @@
-import { cliArguments, workingDirectory } from '../helpers/utils.mjs';
-import type { CrateEnvironment } from './index.mts';
+import { workingDirectory } from '../helpers/utils.mjs';
+import { getDefaultCrateEnvironment, type CrateEnvironment } from './index.mts';
 
 export function getInterfaceCrateEnvironment(): CrateEnvironment {
   return {
+    ...getDefaultCrateEnvironment(),
     manifestPath: path.join(workingDirectory, 'interface', 'Cargo.toml'),
     getLintClippyArguments,
     getLintDocsArguments,

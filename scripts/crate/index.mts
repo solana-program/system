@@ -29,3 +29,7 @@ export function getCrateEnvironment(crate: Crate): CrateEnvironment {
       throw new Error(`Unknown crate: ${crate}`);
   }
 }
+
+export function getDefaultCrateEnvironment(): CrateEnvironment {
+  return {} as CrateEnvironment; // TODO
+}

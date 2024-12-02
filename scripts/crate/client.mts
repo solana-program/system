@@ -1,4 +1,4 @@
-import { cliArguments, workingDirectory } from '../helpers/utils.mjs';
+import { workingDirectory } from '../helpers/utils.mjs';
 import type { CrateEnvironment } from './index.mts';
 
 export function getClientCrateEnvironment(): CrateEnvironment {
