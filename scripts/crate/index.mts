@@ -4,9 +4,14 @@ import { getInterfaceCrateEnvironment } from './interface.mts';
 import { getProgramCrateEnvironment } from './program.mts';
 
 export type CrateEnvironment = {
+  getFormatArguments: (cliArguments: string[]) => string[];
   getLintClippyArguments: (cliArguments: string[]) => string[];
   getLintDocsArguments: (cliArguments: string[]) => string[];
   getLintFeaturesArguments: (cliArguments: string[]) => string[];
+  getPublishArguments: (cliArguments: string[]) => string[];
+  getTestArguments: (cliArguments: string[]) => string[];
+  getWasmArguments: (cliArguments: string[]) => string[];
+  cratePath: string;
   manifestPath: string;
 };
 
@@ -30,6 +35,20 @@ export function getCrateEnvironment(crate: Crate): CrateEnvironment {
   }
 }
 
+const getCliArguments = (args: string[]): string[] => {
+  return args;
+};
+
 export function getDefaultCrateEnvironment(): CrateEnvironment {
-  return {} as CrateEnvironment; // TODO
+  return {
+    getFormatArguments: getCliArguments,
+    getLintClippyArguments: getCliArguments,
+    getLintDocsArguments: getCliArguments,
+    getLintFeaturesArguments: getCliArguments,
+    getPublishArguments: getCliArguments,
+    getTestArguments: getCliArguments,
+    getWasmArguments: getCliArguments,
+    cratePath: '',
+    manifestPath: '',
+  } as CrateEnvironment;
 }

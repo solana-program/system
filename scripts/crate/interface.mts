@@ -4,6 +4,7 @@ import { getDefaultCrateEnvironment, type CrateEnvironment } from './index.mts';
 export function getInterfaceCrateEnvironment(): CrateEnvironment {
   return {
     ...getDefaultCrateEnvironment(),
+    cratePath: path.join(workingDirectory, 'interface'),
     manifestPath: path.join(workingDirectory, 'interface', 'Cargo.toml'),
     getLintClippyArguments,
     getLintDocsArguments,
@@ -33,5 +34,5 @@ function getLintDocsArguments(cliArguments: string[]): string[] {
 }
 
 function getLintFeaturesArguments(cliArguments: string[]): string[] {
-  return cliArguments; // TODO
+  return ['--exclude-features', 'frozen-abi', ...cliArguments];
 }
