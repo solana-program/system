@@ -16,6 +16,7 @@
     "rust:lint": "tsx ./scripts/helpers/rust/lint.mts",
     "rust:publish": "tsx ./scripts/helpers/rust/publish.mts",
     "rust:test": "tsx ./scripts/helpers/rust/test.mts",
+    "rust:wasm": "tsx ./scripts/helpers/rust/wasm.mts",
     "template:upgrade": "tsx ./scripts/helpers/upgrade-template.ts"
   },
   "devDependencies": {
