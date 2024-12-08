@@ -38,13 +38,13 @@ jobs:
         run: pnpm rust:format client
 
       - name: Lint / Clippy
-        run: pnpm zx ./scripts/helpers/rust/lint-clippy.mjs client
+        run: pnpm tsx ./scripts/helpers/rust/lint-clippy.mjs client
 
       - name: Lint / Docs
-        run: pnpm zx ./scripts/helpers/rust/lint-docs.mjs client
+        run: pnpm tsx ./scripts/helpers/rust/lint-docs.mjs client
 
       - name: Lint / Features
-        run: pnpm zx ./scripts/helpers/rust/lint-features.mjs client
+        run: pnpm tsx ./scripts/helpers/rust/lint-features.mjs client
 
   format_and_lint_interface:
     name: Format & Lint Interface
@@ -62,13 +62,13 @@ jobs:
         run: pnpm rust:format interface
 
       - name: Lint / Clippy
-        run: pnpm zx ./scripts/helpers/rust/lint-clippy.mjs interface
+        run: pnpm tsx ./scripts/helpers/rust/lint-clippy.mjs interface
 
       - name: Lint / Docs
-        run: pnpm zx ./scripts/helpers/rust/lint-docs.mjs interface
+        run: pnpm tsx ./scripts/helpers/rust/lint-docs.mjs interface
 
       - name: Lint / Features
-        run: pnpm zx ./scripts/helpers/rust/lint-features.mjs interface
+        run: pnpm tsx ./scripts/helpers/rust/lint-features.mjs interface
 
   wasm_interface:
     name: Build Interface in WASM
