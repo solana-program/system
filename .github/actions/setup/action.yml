@@ -35,7 +35,7 @@ runs:
 
     - name: Set Environment Variables
       shell: bash
-      run: pnpm zx ./scripts/ci/set-env.mjs
+      run: pnpm tsx ./scripts/ci/set-env.mts
 
     - name: Install Rust 'build' Toolchain
       if: ${{ contains(inputs.toolchain, 'build') }}

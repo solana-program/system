@@ -1,5 +1,5 @@
 #!/usr/bin/env zx
-import { getSolanaVersion, getToolchain } from '../utils.mjs';
+import { getSolanaVersion, getToolchain } from '../helpers/utils.mts';
 
 await $`echo "SOLANA_VERSION=${getSolanaVersion()}" >> $GITHUB_ENV`;
 await $`echo "TOOLCHAIN_BUILD=${getToolchain('build')}" >> $GITHUB_ENV`;
