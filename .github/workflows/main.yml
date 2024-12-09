@@ -108,7 +108,7 @@ jobs:
           solana: true
 
       - name: Test Interface
-        run: pnpm rusr:test interface
+        run: pnpm rust:test interface
 
   generate_clients:
     name: Check Client Generation
