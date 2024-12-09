@@ -20,7 +20,7 @@ jobs:
         run: pnpm js:format
 
       - name: Lint Client JS
-        run: js:lint
+        run: pnpm js:lint
 
   format_and_lint_client_rust:
     name: Format & Lint Client Rust
@@ -158,6 +158,7 @@ jobs:
         uses: ./.github/actions/setup
         with:
           cargo-cache-key: cargo-rust-client
+          toolchain: test
           solana: true
 
       - name: Test Client Rust
