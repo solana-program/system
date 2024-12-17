@@ -1,15 +1,23 @@
 #!/usr/bin/env zx
 import 'zx/globals';
-import { cliArguments, getCargo, workingDirectory } from '../utils';
+import {
+  cliArguments,
+  getCargo,
+  parseCliArguments,
+  workingDirectory,
+} from '../helpers/utils.mts';
+
+// Extract the crate directory from the command-line arguments.
+const { manifestPath, args } = parseCliArguments();
 
 const dryRun = argv['dry-run'] ?? false;
-const [level] = cliArguments();
+const [level] = args;
 if (!level) {
   throw new Error('A version level — e.g. "path" — must be provided.');
 }
 
 // Go to the client directory and install the dependencies.
-cd(path.join(workingDirectory, 'clients', 'rust'));
+cd(path.dirname(manifestPath));
 
 // Publish the new version.
 const releaseArgs = dryRun
@@ -23,7 +31,7 @@ if (dryRun) {
 }
 
 // Get the new version.
-const newVersion = getCargo(path.join('clients', 'rust')).package.version;
+const newVersion = getCargo(path.join('clients', 'rust')).package['version'];
 
 // Expose the new version to CI if needed.
 if (process.env.CI) {

@@ -35,16 +35,16 @@ jobs:
           toolchain: format, lint
 
       - name: Format
-        run: pnpm rust:format client
+        run: pnpm rust:format
 
       - name: Lint / Clippy
-        run: pnpm tsx ./scripts/helpers/rust/lint-clippy.mjs client
+        run: pnpm rust:lint:clippy
 
       - name: Lint / Docs
-        run: pnpm tsx ./scripts/helpers/rust/lint-docs.mjs client
+        run: pnpm rust:lint:docs
 
       - name: Lint / Features
-        run: pnpm tsx ./scripts/helpers/rust/lint-features.mjs client
+        run: pnpm rust:lint:features
 
   format_and_lint_interface:
     name: Format & Lint Interface
@@ -59,16 +59,16 @@ jobs:
           toolchain: format, lint
 
       - name: Format
-        run: pnpm rust:format interface
+        run: pnpm interface:format
 
       - name: Lint / Clippy
-        run: pnpm tsx ./scripts/helpers/rust/lint-clippy.mjs interface
+        run: pnpm interface:lint:clippy
 
       - name: Lint / Docs
-        run: pnpm tsx ./scripts/helpers/rust/lint-docs.mjs interface
+        run: pnpm interface:lint:docs
 
       - name: Lint / Features
-        run: pnpm tsx ./scripts/helpers/rust/lint-features.mjs interface
+        run: pnpm interface:lint:features
 
   wasm_interface:
     name: Build Interface in WASM
@@ -90,7 +90,7 @@ jobs:
           tool: wasm-pack
 
       - name: Build Interface with wasm-pack
-        run: pnpm rust:wasm interface
+        run: pnpm interface:wasm
 
   test_interface:
     name: Test Interface
@@ -108,7 +108,7 @@ jobs:
           solana: true
 
       - name: Test Interface
-        run: pnpm rust:test interface
+        run: pnpm interface:test
 
   generate_clients:
     name: Check Client Generation
@@ -162,4 +162,4 @@ jobs:
           solana: true
 
       - name: Test Client Rust
-        run: pnpm rust:test client
+        run: pnpm rust:test

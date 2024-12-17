@@ -49,13 +49,13 @@ jobs:
           solana: true
 
       - name: Format
-        run: pnpm rust:format client
+        run: pnpm rust:format
 
       - name: Lint
-        run: pnpm rust:lint client
+        run: pnpm rust:lint
 
       - name: Test
-        run: pnpm rust:test client
+        run: pnpm rust:test
 
   publish_rust:
     name: Publish Rust Client
@@ -109,7 +109,7 @@ jobs:
             OPTIONS=""
           fi
 
-          pnpm clients:rust:publish $LEVEL $OPTIONS
+          pnpm rust:publish $LEVEL $OPTIONS
 
       - name: Push Commit and Tag
         if: github.event.inputs.dry_run != 'true'

@@ -1,5 +1,5 @@
 import 'zx/globals';
-import { parse as parseToml } from '@iarna/toml';
+import { JsonMap, parse as parseToml } from '@iarna/toml';
 
 process.env.FORCE_COLOR = '3';
 process.env.CARGO_TERM_COLOR = 'always';
@@ -70,7 +70,7 @@ export function getAllProgramFolders(): string[] {
   );
 }
 
-export function getCargo(folder?: string) {
+export function getCargo(folder?: string): JsonMap {
   return parseToml(
     fs.readFileSync(
       path.join(workingDirectory, folder ? folder : '.', 'Cargo.toml'),
@@ -98,7 +98,7 @@ export function getToolchainArgument(operation): string {
 }
 
 export function cliArguments(): string[] {
-  return process.argv.slice(3);
+  return process.argv.slice(2);
 }
 
 export function popArgument(args: string[], arg: string) {
@@ -126,4 +126,21 @@ export async function getInstalledSolanaVersion(): Promise<string | undefined> {
   } catch (error) {
     return '';
   }
+}
+
+export function parseCliArguments(): { manifestPath: string; args: string[] } {
+  // Command-line arguments.
+  const args = cliArguments();
+  // Extract the relative crate directory from the command-line arguments. This
+  // is the only required argument.
+  const relativePath = args.shift();
+
+  if (!relativePath) {
+    throw new Error('Missing relative manifest path');
+  }
+
+  return {
+    manifestPath: path.join(workingDirectory, relativePath, 'Cargo.toml'),
+    args,
+  };
 }
