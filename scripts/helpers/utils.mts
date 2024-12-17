@@ -119,6 +119,22 @@ export function partitionArguments(
     : [args, []];
 }
 
+export function partitionArgumentsV2(
+  args: string[],
+  delimiter: string,
+  defaultArgs?: string[],
+): [string[], string[]] {
+  const [providedCargoArgs, providedCommandArgs] = partitionArguments(args, delimiter);
+  if (defaultArgs) {
+    const [defaultCargoArgs, defaultCommandArgs] = partitionArguments(defaultArgs, delimiter);
+    return [
+      [...defaultCargoArgs, ...providedCargoArgs],
+      [...defaultCommandArgs, ...providedCommandArgs],
+    ];
+  }
+  return [providedCargoArgs, providedCommandArgs];
+}
+
 export async function getInstalledSolanaVersion(): Promise<string | undefined> {
   try {
     const { stdout } = await $`solana --version`.quiet();
@@ -140,6 +156,25 @@ export function parseCliArguments(): { manifestPath: string; args: string[] } {
   }
 
   return {
+    manifestPath: path.join(workingDirectory, relativePath, 'Cargo.toml'),
+    args,
+  };
+}
+
+export function parseCliArgumentsV2(): { command: string, manifestPath: string; args: string[] } {
+  const command = process.argv[2];
+  const args = process.argv.slice(3);
+  
+  // Extract the relative crate directory from the command-line arguments. This
+  // is the only required argument.
+  const relativePath = args.shift();
+
+  if (!relativePath) {
+    throw new Error('Missing relative manifest path');
+  }
+
+  return {
+    command,
     manifestPath: path.join(workingDirectory, relativePath, 'Cargo.toml'),
     args,
   };
