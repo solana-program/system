@@ -7,7 +7,7 @@ import {
     getCargo,
     getToolchainArgument,
     parseCliArguments,
-    partitionArgumentsWithDefaultArgs,
+    partitionArguments,
     popArgument,
     workingDirectory,
 } from './helpers/utils.mts';
@@ -32,7 +32,7 @@ async function cargo(
     defaultArgs?: string[],
     variables?: [string, string][],
 ) {
-    const [cargoArgs, commandArgs] = partitionArgumentsWithDefaultArgs(args, '--', defaultArgs);
+    const [cargoArgs, commandArgs] = partitionArguments(args, '--', defaultArgs);
     variables?.forEach(([k, v]) => $.env[k] = v);
     await $`cargo ${toolchain} ${command} --manifest-path ${manifestPath} ${cargoArgs} -- ${commandArgs}`;
 }

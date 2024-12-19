@@ -111,22 +111,18 @@ export function popArgument(args: string[], arg: string) {
 
 export function partitionArguments(
   args: string[],
-  delimiter: string
+  delimiter: string,
+  defaultArgs?: string[]
 ): [string[], string[]] {
   const index = args.indexOf(delimiter);
-  return index >= 0
-    ? [args.slice(0, index), args.slice(index + 1)]
-    : [args, []];
-}
+  const [providedCargoArgs, providedCommandArgs] =
+    index >= 0 ? [args.slice(0, index), args.slice(index + 1)] : [args, []];
 
-export function partitionArgumentsWithDefaultArgs(
-  args: string[],
-  delimiter: string,
-  defaultArgs?: string[],
-): [string[], string[]] {
-  const [providedCargoArgs, providedCommandArgs] = partitionArguments(args, delimiter);
   if (defaultArgs) {
-    const [defaultCargoArgs, defaultCommandArgs] = partitionArguments(defaultArgs, delimiter);
+    const [defaultCargoArgs, defaultCommandArgs] = partitionArguments(
+      defaultArgs,
+      delimiter
+    );
     return [
       [...defaultCargoArgs, ...providedCargoArgs],
       [...defaultCommandArgs, ...providedCommandArgs],
@@ -144,10 +140,14 @@ export async function getInstalledSolanaVersion(): Promise<string | undefined> {
   }
 }
 
-export function parseCliArguments(): { command: string, libraryPath: string; args: string[] } {
+export function parseCliArguments(): {
+  command: string;
+  libraryPath: string;
+  args: string[];
+} {
   const command = process.argv[2];
   const args = process.argv.slice(3);
-  
+
   // Extract the relative crate directory from the command-line arguments. This
   // is the only required argument.
   const relativePath = args.shift();
