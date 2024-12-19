@@ -6,8 +6,8 @@ import 'zx/globals';
 import {
     getCargo,
     getToolchainArgument,
-    parseCliArgumentsV2,
-    partitionArgumentsV2,
+    parseCliArguments,
+    partitionArgumentsWithDefaultArgs,
     popArgument,
     workingDirectory,
 } from './helpers/utils.mts';
@@ -23,7 +23,7 @@ enum Command {
     Publish = 'publish',
 }
 
-const { command, libraryPath, args } = parseCliArgumentsV2();
+const { command, libraryPath, args } = parseCliArguments();
 const manifestPath = path.join(libraryPath, 'Cargo.toml');
 
 async function cargo(
@@ -32,7 +32,7 @@ async function cargo(
     defaultArgs?: string[],
     variables?: [string, string][],
 ) {
-    const [cargoArgs, commandArgs] = partitionArgumentsV2(args, '--', defaultArgs);
+    const [cargoArgs, commandArgs] = partitionArgumentsWithDefaultArgs(args, '--', defaultArgs);
     variables?.forEach(([k, v]) => $.env[k] = v);
     await $`cargo ${toolchain} ${command} --manifest-path ${manifestPath} ${cargoArgs} -- ${commandArgs}`;
 }
