@@ -5,7 +5,7 @@
 import 'zx/globals';
 import {
     parseCliArguments,
-    partitionArgumentsWithDefaultArgs,
+    partitionArguments,
 } from './helpers/utils.mts';
 
 enum Command {
@@ -21,7 +21,7 @@ async function pnpm(
     command: string,
     build = false,
 ) {
-    const [pnpmArgs, commandArgs] = partitionArgumentsWithDefaultArgs(args, '--');
+    const [pnpmArgs, commandArgs] = partitionArguments(args, '--');
     cd(libraryPath);
     await $`pnpm install`;
     if (build) {
