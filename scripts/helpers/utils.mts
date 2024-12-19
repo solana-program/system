@@ -161,7 +161,7 @@ export function parseCliArguments(): { manifestPath: string; args: string[] } {
   };
 }
 
-export function parseCliArgumentsV2(): { command: string, manifestPath: string; args: string[] } {
+export function parseCliArgumentsV2(): { command: string, libraryPath: string; args: string[] } {
   const command = process.argv[2];
   const args = process.argv.slice(3);
   
@@ -175,7 +175,7 @@ export function parseCliArgumentsV2(): { command: string, manifestPath: string; 
 
   return {
     command,
-    manifestPath: path.join(workingDirectory, relativePath, 'Cargo.toml'),
+    libraryPath: path.join(workingDirectory, relativePath),
     args,
   };
 }

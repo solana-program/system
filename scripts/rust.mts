@@ -23,7 +23,8 @@ enum Command {
     Publish = 'publish',
 }
 
-const { command, manifestPath, args } = parseCliArgumentsV2();
+const { command, libraryPath, args } = parseCliArgumentsV2();
+const manifestPath = path.join(libraryPath, 'Cargo.toml');
 
 async function cargo(
     toolchain: string,
