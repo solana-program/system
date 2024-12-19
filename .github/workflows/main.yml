@@ -17,10 +17,10 @@ jobs:
         uses: ./.github/actions/setup
 
       - name: Format Client JS
-        run: pnpm clients:js:format
+        run: pnpm js:format
 
       - name: Lint Client JS
-        run: pnpm clients:js:lint
+        run: pnpm js:lint
 
   format_and_lint_client_rust:
     name: Format & Lint Client Rust
@@ -35,16 +35,16 @@ jobs:
           toolchain: format, lint
 
       - name: Format
-        run: pnpm clients:rust:format
+        run: pnpm rust:format
 
       - name: Lint / Clippy
-        run: pnpm zx ./scripts/client/lint-rust-clippy.mjs
-
-      - name: Lint / Features
-        run: pnpm zx ./scripts/client/lint-rust-features.mjs
+        run: pnpm rust:lint:clippy
 
       - name: Lint / Docs
-        run: pnpm zx ./scripts/client/lint-rust-docs.mjs
+        run: pnpm rust:lint:docs
+
+      - name: Lint / Features
+        run: pnpm rust:lint:features
 
   format_and_lint_interface:
     name: Format & Lint Interface
@@ -62,13 +62,13 @@ jobs:
         run: pnpm interface:format
 
       - name: Lint / Clippy
-        run: pnpm zx ./scripts/interface/lint-clippy.mjs
-
-      - name: Lint / Features
-        run: pnpm zx ./scripts/interface/lint-features.mjs
+        run: pnpm interface:lint:clippy
 
       - name: Lint / Docs
-        run: pnpm zx ./scripts/interface/lint-docs.mjs
+        run: pnpm interface:lint:docs
+
+      - name: Lint / Features
+        run: pnpm interface:lint:features
 
   wasm_interface:
     name: Build Interface in WASM
@@ -144,7 +144,7 @@ jobs:
           solana: true
 
       - name: Test Client JS
-        run: pnpm clients:js:test
+        run: pnpm js:test
 
   test_client_rust:
     name: Test Client Rust
@@ -158,7 +158,8 @@ jobs:
         uses: ./.github/actions/setup
         with:
           cargo-cache-key: cargo-rust-client
+          toolchain: test
           solana: true
 
       - name: Test Client Rust
-        run: pnpm clients:rust:test
+        run: pnpm rust:test

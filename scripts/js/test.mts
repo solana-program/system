@@ -1,6 +1,6 @@
 #!/usr/bin/env zx
 import 'zx/globals';
-import { cliArguments, workingDirectory } from '../utils.mjs';
+import { cliArguments, workingDirectory } from '../helpers/utils.mts';
 
 // Start the local validator, or restart it if it is already running.
 await $`pnpm validator:restart`;

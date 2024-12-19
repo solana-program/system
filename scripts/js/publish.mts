@@ -1,6 +1,6 @@
 #!/usr/bin/env zx
 import 'zx/globals';
-import { cliArguments, workingDirectory } from '../utils.mjs';
+import { cliArguments, workingDirectory } from '../helpers/utils.mts';
 
 const [level, tag = 'latest'] = cliArguments();
 if (!level) {

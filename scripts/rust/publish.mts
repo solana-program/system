@@ -1,15 +1,18 @@
 #!/usr/bin/env zx
 import 'zx/globals';
-import { cliArguments, getCargo, workingDirectory } from '../utils.mjs';
+import { getCargo, parseCliArguments } from '../helpers/utils.mts';
+
+// Extract the crate directory from the command-line arguments.
+const { manifestPath, args } = parseCliArguments();
 
 const dryRun = argv['dry-run'] ?? false;
-const [level] = cliArguments();
+const [level] = args;
 if (!level) {
   throw new Error('A version level — e.g. "path" — must be provided.');
 }
 
 // Go to the client directory and install the dependencies.
-cd(path.join(workingDirectory, 'clients', 'rust'));
+cd(path.dirname(manifestPath));
 
 // Publish the new version.
 const releaseArgs = dryRun
@@ -22,8 +25,10 @@ if (dryRun) {
   process.exit(0);
 }
 
-// Get the new version.
-const newVersion = getCargo(path.join('clients', 'rust')).package.version;
+// Get the crate information.
+const toml = getCargo(path.dirname(manifestPath));
+const crateName = toml.package['name'];
+const newVersion = toml.package['version'];
 
 // Expose the new version to CI if needed.
 if (process.env.CI) {
@@ -34,7 +39,7 @@ if (process.env.CI) {
 await $`git reset --soft HEAD~1`;
 
 // Commit the new version.
-await $`git commit -am "Publish Rust client v${newVersion}"`;
+await $`git commit -am "Publish ${crateName} v${newVersion}"`;
 
 // Tag the new version.
-await $`git tag -a rust@v${newVersion} -m "Rust client v${newVersion}"`;
+await $`git tag -a ${crateName}@v${newVersion} -m "${crateName} v${newVersion}"`;
