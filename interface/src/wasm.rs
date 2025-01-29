@@ -1,5 +1,5 @@
 //! `SystemInstruction` Javascript interface
-#![cfg(target_arch = "wasm32")]
+#![cfg(feature = "js")]
 #![allow(non_snake_case)]
 use {
     crate::instruction::{
