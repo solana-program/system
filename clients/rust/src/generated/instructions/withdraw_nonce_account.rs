@@ -9,6 +9,7 @@ use borsh::BorshDeserialize;
 use borsh::BorshSerialize;
 
 /// Accounts.
+#[derive(Debug)]
 pub struct WithdrawNonceAccount {
     pub nonce_account: solana_program::pubkey::Pubkey,
 
@@ -70,7 +71,8 @@ impl WithdrawNonceAccount {
     }
 }
 
-#[derive(BorshDeserialize, BorshSerialize)]
+#[derive(BorshSerialize, BorshDeserialize, Clone, Debug, Eq, PartialEq)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct WithdrawNonceAccountInstructionData {
     discriminator: u32,
 }

@@ -11,6 +11,7 @@ use kaigan::types::U64PrefixString;
 use solana_program::pubkey::Pubkey;
 
 /// Accounts.
+#[derive(Debug)]
 pub struct TransferSolWithSeed {
     pub source: solana_program::pubkey::Pubkey,
 
@@ -60,7 +61,8 @@ impl TransferSolWithSeed {
     }
 }
 
-#[derive(BorshDeserialize, BorshSerialize)]
+#[derive(BorshSerialize, BorshDeserialize, Clone, Debug, Eq, PartialEq)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct TransferSolWithSeedInstructionData {
     discriminator: u32,
 }
