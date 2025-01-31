@@ -11,7 +11,7 @@
       "args": [
         "clients/rust/src/generated",
         {
-          "anchorTraits": true,
+          "anchorTraits": false,
           "crateFolder": "clients/rust",
           "formatCode": true
         }
