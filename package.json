@@ -30,10 +30,10 @@
     "template:upgrade": "tsx ./scripts/helpers/upgrade-template.ts"
   },
   "devDependencies": {
-    "@codama/renderers-js": "^1.2.1",
-    "@codama/renderers-rust": "^1.0.10",
+    "@codama/renderers-js": "^1.2.3",
+    "@codama/renderers-rust": "^1.0.12",
     "@iarna/toml": "^2.2.5",
-    "codama": "^1.2.2",
+    "codama": "^1.2.4",
     "tsx": "^4.19.2",
     "typescript": "^5.5.2",
     "zx": "^7.2.3"
