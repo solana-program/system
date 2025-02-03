@@ -8,6 +8,7 @@ readme = "README.md"
 license-file = "../../LICENSE"
 
 [features]
+fetch = []
 test-sbf = []
 serde = ["dep:serde", "dep:serde_with", "kaigan/serde"]
 
