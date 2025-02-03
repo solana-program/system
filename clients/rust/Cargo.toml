@@ -8,7 +8,7 @@ readme = "README.md"
 license-file = "../../LICENSE"
 
 [features]
-fetch = []
+fetch = ["dep:solana-client", "dep:solana-sdk"]
 test-sbf = []
 serde = ["dep:serde", "dep:serde_with", "kaigan/serde"]
 
@@ -19,5 +19,7 @@ num-derive = "^0.3"
 num-traits = "^0.2"
 serde = { version = "^1.0", features = ["derive"], optional = true }
 serde_with = { version = "^3.0", optional = true }
+solana-client = { version = "^2.1", optional = true }
+solana-sdk = { version = "^2.1", optional = true }
 solana-program = "^2.1"
 thiserror = "^1.0"
