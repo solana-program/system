@@ -4,7 +4,7 @@
     "solana:check": "tsx ./scripts/helpers/check-solana-version.mts",
     "solana:link": "tsx ./scripts/helpers/link-solana-version.mts",
     "generate": "pnpm generate:clients",
-    "generate:clients": "tsx ./scripts/helpers/generate-clients.mts",
+    "generate:clients": "codama run --all",
     "validator:start": "tsx ./scripts/helpers/start-validator.mts",
     "validator:restart": "pnpm validator:start --restart",
     "validator:stop": "tsx ./scripts/helpers/stop-validator.mts",
@@ -30,10 +30,10 @@
     "template:upgrade": "tsx ./scripts/helpers/upgrade-template.ts"
   },
   "devDependencies": {
-    "@codama/renderers-js": "^1.1.0",
-    "@codama/renderers-rust": "^1.0.4",
+    "@codama/renderers-js": "^1.2.3",
+    "@codama/renderers-rust": "^1.0.12",
     "@iarna/toml": "^2.2.5",
-    "codama": "^1.1.0",
+    "codama": "^1.2.4",
     "tsx": "^4.19.2",
     "typescript": "^5.5.2",
     "zx": "^7.2.3"

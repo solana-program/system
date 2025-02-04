@@ -9,6 +9,7 @@ use borsh::BorshDeserialize;
 use borsh::BorshSerialize;
 
 /// Accounts.
+#[derive(Debug)]
 pub struct Allocate {
     pub new_account: solana_program::pubkey::Pubkey,
 }
@@ -44,7 +45,8 @@ impl Allocate {
     }
 }
 
-#[derive(BorshDeserialize, BorshSerialize)]
+#[derive(BorshSerialize, BorshDeserialize, Clone, Debug, Eq, PartialEq)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct AllocateInstructionData {
     discriminator: u32,
 }

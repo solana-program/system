@@ -11,6 +11,7 @@ use kaigan::types::U64PrefixString;
 use solana_program::pubkey::Pubkey;
 
 /// Accounts.
+#[derive(Debug)]
 pub struct AllocateWithSeed {
     pub new_account: solana_program::pubkey::Pubkey,
 
@@ -52,7 +53,8 @@ impl AllocateWithSeed {
     }
 }
 
-#[derive(BorshDeserialize, BorshSerialize)]
+#[derive(BorshSerialize, BorshDeserialize, Clone, Debug, Eq, PartialEq)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct AllocateWithSeedInstructionData {
     discriminator: u32,
 }
