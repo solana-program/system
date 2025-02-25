@@ -226,6 +226,35 @@ fn process_create_account(
     )
 }
 
+fn process_create_account_with_seed(
+    accounts: &[AccountInfo],
+    base: Pubkey,
+    seed: String,
+    lamports: u64,
+    space: u64,
+    owner: Pubkey,
+) -> ProgramResult {
+    accounts!(
+        accounts,
+        signers,
+        0 => from_info,
+        1 => to_info,
+        2 => base_info,
+    );
+
+    let to_address = Address::create(to_info.key, Some((&base, &seed, &owner)))?;
+
+    create_account(
+        from_info,
+        to_info,
+        &to_address,
+        lamports,
+        space,
+        &owner,
+        &signers,
+    )
+}
+
 pub fn process(_program_id: &Pubkey, accounts: &[AccountInfo], input: &[u8]) -> ProgramResult {
     match solana_bincode::limited_deserialize::<SystemInstruction>(input, MAX_INPUT_LEN)
         .map_err(|_| ProgramError::InvalidInstructionData)?
@@ -237,6 +266,16 @@ pub fn process(_program_id: &Pubkey, accounts: &[AccountInfo], input: &[u8]) -> 
         } => {
             msg!("Instruction: CreateAccount");
             process_create_account(accounts, lamports, space, owner)
+        }
+        SystemInstruction::CreateAccountWithSeed {
+            base,
+            seed,
+            lamports,
+            space,
+            owner,
+        } => {
+            msg!("Instruction: CreateAccountWithSeed");
+            process_create_account_with_seed(accounts, base, seed, lamports, space, owner)
         }
         /* TODO: Remaining instruction implementations... */
         _ => Err(ProgramError::InvalidInstructionData),
