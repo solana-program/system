@@ -19,11 +19,13 @@ num-traits = "0.2"
 serde = { version = "1.0.210", optional = true }
 serde_derive = { version = "1.0.210", optional = true }
 solana-decode-error = "^2.1"
-solana-frozen-abi = { version = "^2.1", features = ["frozen-abi"], optional = true }
-solana-frozen-abi-macro = { version = "^2.1", features = ["frozen-abi"], optional = true }
-solana-instruction = { version = "^2.1", features = ["bincode", "std"], optional = true }
-solana-logger = { version = "^2.1", optional = true }
-solana-pubkey = { version = "^2.1", default-features = false }
+solana-frozen-abi = { workspace = true, features = ["frozen-abi"], optional = true }
+solana-frozen-abi-macro = { workspace = true, features = ["frozen-abi"], optional = true }
+solana-instruction = { workspace = true, features = ["bincode", "std"], optional = true }
+solana-logger = { workspace = true, optional = true }
+solana-msg = { workspace = true }
+solana-program-error = { workspace = true }
+solana-pubkey = { workspace = true, default-features = false }
 
 [target.'cfg(target_arch = "wasm32")'.dependencies]
 js-sys = "0.3.72"
@@ -35,10 +37,10 @@ borsh = { version = "1.5.1", features = ["derive", "unstable__schema"] }
 solana-account-info = "^2.1"
 solana-cpi = "^2.1"
 solana-nonce = "^0.0.2"
-solana-program = { version = "^2.1", default-features = false }
-solana-program-entrypoint = "^2.1"
-solana-program-error = { version = "^2.1", features = ["borsh"] }
-solana-pubkey = { version = "^2.1", features = ["std"] }
+solana-program = { workspace = true, default-features = false }
+solana-program-entrypoint = { workspace = true }
+solana-program-error = { workspace = true, features = ["borsh"] }
+solana-pubkey = { workspace = true, features = ["std"] }
 solana-system-interface = { path = ".", features = ["bincode"] }
 static_assertions = "1.1.0"
 strum = "0.24"
