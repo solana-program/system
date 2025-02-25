@@ -166,7 +166,6 @@ jobs:
         uses: ./.github/actions/setup
         with:
           cargo-cache-key: cargo-build-program
-          toolchain: build
           solana: true
 
       - name: Build
@@ -231,6 +230,7 @@ jobs:
         uses: ./.github/actions/setup
         with:
           cargo-cache-key: cargo-test-program
+          toolchain: test
           solana: true
 
       - name: Test
