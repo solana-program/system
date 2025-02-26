@@ -25,7 +25,7 @@ solana-system-interface = { path = "../interface" }
 [dev-dependencies]
 
 [lib]
-crate-type = ["cdylib", "lib"]
+crate-type = ["cdylib"]
 
 [lints.rust.unexpected_cfgs]
 level = "warn"
