@@ -113,6 +113,27 @@ fn allocate(
     Ok(())
 }
 
+fn assign(
+    info: &AccountInfo,
+    address: &Address,
+    owner: &Pubkey,
+    signers: &HashSet<Pubkey>,
+) -> Result<(), ProgramError> {
+    // No work to do, just return.
+    if info.owner == owner {
+        return Ok(());
+    }
+
+    if !address.is_signer(signers) {
+        msg!("Assign: account {:?} must sign", address);
+        Err(ProgramError::MissingRequiredSignature)?
+    }
+
+    info.assign(owner);
+
+    Ok(())
+}
+
 fn process_allocate(accounts: &[AccountInfo], space: u64) -> ProgramResult {
     accounts!(
         accounts,
@@ -125,6 +146,26 @@ fn process_allocate(accounts: &[AccountInfo], space: u64) -> ProgramResult {
     allocate(account_info, &address, space, &signers)
 }
 
+fn process_allocate_with_seed(
+    accounts: &[AccountInfo],
+    base: Pubkey,
+    seed: String,
+    space: u64,
+    owner: Pubkey,
+) -> ProgramResult {
+    accounts!(
+        accounts,
+        signers,
+        0 => account_info,
+        1 => base_info,
+    );
+
+    let address = Address::create(account_info.key, Some((&base, &seed, &owner)))?;
+
+    allocate(account_info, &address, space, &signers)?;
+    assign(account_info, &address, &owner, &signers)
+}
+
 pub fn process(_program_id: &Pubkey, accounts: &[AccountInfo], input: &[u8]) -> ProgramResult {
     match solana_bincode::limited_deserialize::<SystemInstruction>(input, MAX_INPUT_LEN)
         .map_err(|_| ProgramError::InvalidInstructionData)?
@@ -132,6 +173,15 @@ pub fn process(_program_id: &Pubkey, accounts: &[AccountInfo], input: &[u8]) -> 
         SystemInstruction::Allocate { space } => {
             msg!("Instruction: Allocate");
             process_allocate(accounts, space)
+        }
+        SystemInstruction::AllocateWithSeed {
+            base,
+            seed,
+            space,
+            owner,
+        } => {
+            msg!("Instruction: AllocateWithSeed");
+            process_allocate_with_seed(accounts, base, seed, space, owner)
         }
         /* TODO: Remaining instruction implementations... */
         _ => Err(ProgramError::InvalidInstructionData),
