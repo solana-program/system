@@ -178,6 +178,24 @@ fn process_assign(accounts: &[AccountInfo], owner: Pubkey) -> ProgramResult {
     assign(account_info, &address, &owner, &signers)
 }
 
+fn process_assign_with_seed(
+    accounts: &[AccountInfo],
+    base: Pubkey,
+    seed: String,
+    owner: Pubkey,
+) -> ProgramResult {
+    accounts!(
+        accounts,
+        signers,
+        0 => account_info,
+        1 => base_info,
+    );
+
+    let address = Address::create(account_info.key, Some((&base, &seed, &owner)))?;
+
+    assign(account_info, &address, &owner, &signers)
+}
+
 pub fn process(_program_id: &Pubkey, accounts: &[AccountInfo], input: &[u8]) -> ProgramResult {
     match solana_bincode::limited_deserialize::<SystemInstruction>(input, MAX_INPUT_LEN)
         .map_err(|_| ProgramError::InvalidInstructionData)?
@@ -198,6 +216,10 @@ pub fn process(_program_id: &Pubkey, accounts: &[AccountInfo], input: &[u8]) -> 
         SystemInstruction::Assign { owner } => {
             msg!("Instruction: Assign");
             process_assign(accounts, owner)
+        }
+        SystemInstruction::AssignWithSeed { base, seed, owner } => {
+            msg!("Instruction: AssignWithSeed");
+            process_assign_with_seed(accounts, base, seed, owner)
         }
         /* TODO: Remaining instruction implementations... */
         _ => Err(ProgramError::InvalidInstructionData),
