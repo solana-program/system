@@ -245,5 +245,11 @@ jobs:
           toolchain: test
           solana: true
 
+      - name: Restore Program Builds
+        uses: actions/cache/restore@v4
+        with:
+          path: ./**/*.so
+          key: ${{ runner.os }}-builds-${{ github.sha }}
+
       - name: Test
         run: pnpm program:test
