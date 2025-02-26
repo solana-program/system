@@ -27,6 +27,14 @@
     "interface:publish": "tsx ./scripts/rust.mts publish interface",
     "interface:test": "tsx ./scripts/rust.mts test interface",
     "interface:wasm": "tsx ./scripts/rust.mts wasm interface",
+    "program:format": "tsx ./scripts/rust.mts format program",
+    "program:lint": "tsx ./scripts/rust.mts lint program",
+    "program:lint:clippy": "tsx ./scripts/rust.mts lint-clippy program",
+    "program:lint:docs": "tsx ./scripts/rust.mts lint-docs program",
+    "program:lint:features": "tsx ./scripts/rust.mts lint-features program",
+    "program:publish": "tsx ./scripts/rust.mts publish program",
+    "program:build": "tsx ./scripts/rust.mts build-sbf program",
+    "program:test": "tsx ./scripts/rust.mts test program",
     "template:upgrade": "tsx ./scripts/helpers/upgrade-template.ts"
   },
   "devDependencies": {

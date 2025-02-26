@@ -1,5 +1,9 @@
-use num_traits::{FromPrimitive, ToPrimitive};
-use solana_decode_error::DecodeError;
+use {
+    num_traits::{FromPrimitive, ToPrimitive},
+    solana_decode_error::DecodeError,
+    solana_msg::msg,
+    solana_program_error::PrintProgramError,
+};
 
 // Use strum when testing to ensure our FromPrimitive
 // impl is exhaustive
@@ -115,6 +119,12 @@ impl core::fmt::Display for SystemError {
                 f.write_str("specified nonce does not match stored nonce")
             }
         }
+    }
+}
+
+impl PrintProgramError for SystemError {
+    fn print<E>(&self) {
+        msg!(&self.to_string());
     }
 }
 

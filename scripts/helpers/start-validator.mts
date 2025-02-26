@@ -28,7 +28,10 @@ if (!restart && isValidatorRunning) {
 const verb = isValidatorRunning ? 'Restarting' : 'Starting';
 
 // Get programs and accounts.
-const programs = [...getPrograms(), ...getExternalPrograms()];
+// TODO: JOE C:
+// Disabled adding the BPF program until BPF implementation is complete.
+// Tests expect a valid System program to live at the corresponding address.
+const programs = [...getExternalPrograms()];
 const programPluralized = programs.length === 1 ? 'program' : 'programs';
 const accounts = [...getExternalAccounts()];
 const accountsPluralized = accounts.length === 1 ? 'account' : 'accounts';
@@ -97,7 +100,10 @@ try {
   process.exit();
 }
 
-function getPrograms() {
+// TODO: JOE C:
+// Disabled adding the BPF program until BPF implementation is complete.
+// Tests expect a valid System program to live at the corresponding address.
+function _getPrograms() {
   const binaryDir = path.join(workingDirectory, 'target', 'deploy');
   return getProgramFolders().map((folder) => {
     const cargo = getCargo(folder);

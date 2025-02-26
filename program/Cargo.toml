@@ -1,0 +1,34 @@
+[package]
+name = "solana-system-program"
+version = "3.0.0"
+description = "Solana System Program"
+readme = "README.md"
+authors = { workspace = true }
+repository = { workspace = true }
+homepage = { workspace = true }
+license = { workspace = true }
+edition = { workspace = true }
+
+[package.metadata.solana]
+program-id = "11111111111111111111111111111111"
+
+[features]
+bpf-entrypoint = []
+
+[dependencies]
+solana-account-info = { workspace = true }
+solana-program-entrypoint = { workspace = true }
+solana-program-error = { workspace = true }
+solana-pubkey = { workspace = true }
+solana-system-interface = { path = "../interface" }
+
+[dev-dependencies]
+
+[lib]
+crate-type = ["cdylib"]
+
+[lints.rust.unexpected_cfgs]
+level = "warn"
+check-cfg = [
+    'cfg(target_os, values("solana"))',
+]

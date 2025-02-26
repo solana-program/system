@@ -4363,6 +4363,7 @@ dependencies = [
  "solana-frozen-abi-macro",
  "solana-instruction",
  "solana-logger",
+ "solana-msg",
  "solana-nonce",
  "solana-program",
  "solana-program-entrypoint",
@@ -4373,6 +4374,17 @@ dependencies = [
  "strum",
  "strum_macros",
  "wasm-bindgen",
+]
+
+[[package]]
+name = "solana-system-program"
+version = "3.0.0"
+dependencies = [
+ "solana-account-info",
+ "solana-program-entrypoint",
+ "solana-program-error",
+ "solana-pubkey",
+ "solana-system-interface",
 ]
 
 [[package]]
