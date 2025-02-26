@@ -16,6 +16,11 @@ use {
 const MAX_INPUT_LEN: u64 = 1232;
 
 macro_rules! accounts {
+    ( $infos:ident, $( $i:literal => $name:ident ),* $(,)? ) => {
+        $(
+            let $name = $infos.get($i).ok_or(ProgramError::NotEnoughAccountKeys)?;
+        )*
+    };
     ( $infos:ident, $signers:ident, $( $i:literal => $name:ident ),* $(,)? ) => {
         let mut $signers = HashSet::new();
         $(
@@ -134,6 +139,45 @@ fn assign(
     Ok(())
 }
 
+fn transfer(
+    from_info: &AccountInfo,
+    to_info: &AccountInfo,
+    lamports: u64,
+) -> Result<(), ProgramError> {
+    if !from_info.is_signer {
+        msg!("Transfer: `from` account {} must sign", from_info.key);
+        Err(ProgramError::MissingRequiredSignature)?
+    }
+
+    if !from_info.data_is_empty() {
+        msg!("Transfer: `from` must not carry data");
+        Err(ProgramError::InvalidArgument)?
+    }
+
+    if from_info.lamports() < lamports {
+        msg!(
+            "Transfer: insufficient lamports {}, need {}",
+            from_info.lamports(),
+            lamports
+        );
+        Err(SystemError::ResultWithNegativeLamports)?
+    }
+
+    let new_to_lamports = to_info
+        .lamports()
+        .checked_add(lamports)
+        .ok_or(ProgramError::ArithmeticOverflow)?;
+    let new_from_lamports = from_info
+        .lamports()
+        .checked_sub(lamports)
+        .ok_or(ProgramError::ArithmeticOverflow)?;
+
+    **to_info.try_borrow_mut_lamports()? = new_to_lamports;
+    **from_info.try_borrow_mut_lamports()? = new_from_lamports;
+
+    Ok(())
+}
+
 fn process_allocate(accounts: &[AccountInfo], space: u64) -> ProgramResult {
     accounts!(
         accounts,
@@ -196,6 +240,16 @@ fn process_assign_with_seed(
     assign(account_info, &address, &owner, &signers)
 }
 
+fn process_transfer(accounts: &[AccountInfo], lamports: u64) -> ProgramResult {
+    accounts!(
+        accounts,
+        0 => from_info,
+        1 => to_info,
+    );
+
+    transfer(from_info, to_info, lamports)
+}
+
 pub fn process(_program_id: &Pubkey, accounts: &[AccountInfo], input: &[u8]) -> ProgramResult {
     match solana_bincode::limited_deserialize::<SystemInstruction>(input, MAX_INPUT_LEN)
         .map_err(|_| ProgramError::InvalidInstructionData)?
@@ -220,6 +274,10 @@ pub fn process(_program_id: &Pubkey, accounts: &[AccountInfo], input: &[u8]) -> 
         SystemInstruction::AssignWithSeed { base, seed, owner } => {
             msg!("Instruction: AssignWithSeed");
             process_assign_with_seed(accounts, base, seed, owner)
+        }
+        SystemInstruction::Transfer { lamports } => {
+            msg!("Instruction: Transfer");
+            process_transfer(accounts, lamports)
         }
         /* TODO: Remaining instruction implementations... */
         _ => Err(ProgramError::InvalidInstructionData),
