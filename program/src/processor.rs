@@ -170,6 +170,17 @@ fn process_allocate_with_seed(
     assign(account_info, &address, &owner)
 }
 
+fn process_assign(accounts: &[AccountInfo], owner: Pubkey) -> ProgramResult {
+    accounts!(
+        accounts,
+        0 => account_info,
+    );
+
+    let address = AddressInfo::create(account_info, None)?;
+
+    assign(account_info, &address, &owner)
+}
+
 pub fn process(_program_id: &Pubkey, accounts: &[AccountInfo], input: &[u8]) -> ProgramResult {
     match solana_bincode::limited_deserialize::<SystemInstruction>(input, MAX_INPUT_LEN)
         .map_err(|_| ProgramError::InvalidInstructionData)?
@@ -186,6 +197,10 @@ pub fn process(_program_id: &Pubkey, accounts: &[AccountInfo], input: &[u8]) -> 
         } => {
             msg!("Instruction: AllocateWithSeed");
             process_allocate_with_seed(accounts, base, seed, space, owner)
+        }
+        SystemInstruction::Assign { owner } => {
+            msg!("Instruction: Assign");
+            process_assign(accounts, owner)
         }
         /* TODO: Remaining instruction implementations... */
         _ => Err(ProgramError::InvalidInstructionData),
