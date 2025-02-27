@@ -139,16 +139,11 @@ fn assign(
     Ok(())
 }
 
-fn transfer(
+fn transfer_verified(
     from_info: &AccountInfo,
     to_info: &AccountInfo,
     lamports: u64,
 ) -> Result<(), ProgramError> {
-    if !from_info.is_signer {
-        msg!("Transfer: `from` account {} must sign", from_info.key);
-        Err(ProgramError::MissingRequiredSignature)?
-    }
-
     if !from_info.data_is_empty() {
         msg!("Transfer: `from` must not carry data");
         Err(ProgramError::InvalidArgument)?
@@ -176,6 +171,19 @@ fn transfer(
     **from_info.try_borrow_mut_lamports()? = new_from_lamports;
 
     Ok(())
+}
+
+fn transfer(
+    from_info: &AccountInfo,
+    to_info: &AccountInfo,
+    lamports: u64,
+) -> Result<(), ProgramError> {
+    if !from_info.is_signer {
+        msg!("Transfer: `from` account {} must sign", from_info.key);
+        Err(ProgramError::MissingRequiredSignature)?
+    }
+
+    transfer_verified(from_info, to_info, lamports)
 }
 
 fn process_allocate(accounts: &[AccountInfo], space: u64) -> ProgramResult {
@@ -250,6 +258,41 @@ fn process_transfer(accounts: &[AccountInfo], lamports: u64) -> ProgramResult {
     transfer(from_info, to_info, lamports)
 }
 
+fn process_transfer_with_seed(
+    accounts: &[AccountInfo],
+    from_seed: String,
+    from_owner: Pubkey,
+    lamports: u64,
+) -> ProgramResult {
+    accounts!(
+        accounts,
+        0 => from_info,
+        1 => from_base_info,
+        2 => to_info,
+    );
+
+    if !from_base_info.is_signer {
+        msg!(
+            "Transfer: 'from_base' account {:?} must sign",
+            from_base_info.key,
+        );
+        Err(ProgramError::MissingRequiredSignature)?
+    }
+
+    let address_from_seed = Pubkey::create_with_seed(from_base_info.key, &from_seed, &from_owner)?;
+
+    if *from_info.key != address_from_seed {
+        msg!(
+            "Transfer: 'from' address {} does not match derived address {}",
+            from_info.key,
+            address_from_seed
+        );
+        Err(SystemError::AddressWithSeedMismatch)?
+    }
+
+    transfer_verified(from_info, to_info, lamports)
+}
+
 pub fn process(_program_id: &Pubkey, accounts: &[AccountInfo], input: &[u8]) -> ProgramResult {
     match solana_bincode::limited_deserialize::<SystemInstruction>(input, MAX_INPUT_LEN)
         .map_err(|_| ProgramError::InvalidInstructionData)?
@@ -278,6 +321,14 @@ pub fn process(_program_id: &Pubkey, accounts: &[AccountInfo], input: &[u8]) -> 
         SystemInstruction::Transfer { lamports } => {
             msg!("Instruction: Transfer");
             process_transfer(accounts, lamports)
+        }
+        SystemInstruction::TransferWithSeed {
+            lamports,
+            from_seed,
+            from_owner,
+        } => {
+            msg!("Instruction: TransferWithSeed");
+            process_transfer_with_seed(accounts, from_seed, from_owner, lamports)
         }
         /* TODO: Remaining instruction implementations... */
         _ => Err(ProgramError::InvalidInstructionData),
