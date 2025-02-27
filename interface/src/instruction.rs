@@ -58,7 +58,7 @@ const RENT_ID: Pubkey = Pubkey::from_str_const("SysvarRent1111111111111111111111
 
 #[cfg(feature = "bincode")]
 #[cfg(test)]
-static_assertions::const_assert_eq!(solana_nonce::state::State::size(), NONCE_STATE_SIZE);
+static_assertions::const_assert_eq!(solana_program::nonce::state::State::size(), NONCE_STATE_SIZE);
 /// The serialized size of the nonce state.
 #[cfg(feature = "bincode")]
 const NONCE_STATE_SIZE: usize = 80;

@@ -14,21 +14,26 @@ license = "Apache-2.0"
 edition = "2021"
 
 [workspace.dependencies]
-solana-account = "2.1"
-solana-account-info = "2.1"
-solana-bincode = "2.1"
-solana-cpi = "2.1"
-solana-decode-error = "2.1"
-solana-frozen-abi = "2.1"
-solana-frozen-abi-macro = "2.1"
-solana-instruction = "2.1"
-solana-logger = "2.1"
-solana-nonce = "0.0.2"
-solana-msg = "2.1"
-solana-program = { version = "2.1", default-features = false }
-solana-program-entrypoint = "2.1"
-solana-program-error = "2.1"
-solana-pubkey = { version = "2.1", default-features = false }
+solana-account = { path = "../../agave/sdk/account" }
+solana-account-info = { path = "../../agave/sdk/account-info" }
+solana-bincode = { path = "../../agave/sdk/bincode" }
+solana-cpi = { path = "../../agave/sdk/cpi" }
+solana-decode-error = { path = "../../agave/sdk/decode-error" }
+solana-frozen-abi = { path = "../../agave/frozen-abi" }
+solana-frozen-abi-macro = { path = "../../agave/frozen-abi/macro" }
+solana-instruction = { path = "../../agave/sdk/instruction" }
+solana-logger = { path = "../../agave/logger" }
+solana-msg = { path = "../../agave/sdk/msg" }
+solana-program = { path = "../../agave/sdk/program", default-features = false }
+solana-program-entrypoint = { path = "../../agave/sdk/program-entrypoint" }
+solana-program-error = { path = "../../agave/sdk/program-error" }
+solana-pubkey = { path = "../../agave/sdk/pubkey", default-features = false }
+
+[patch.crates-io]
+solana-program = { path = "../../agave/sdk/program" }
+solana-sdk = { path = "../../agave/sdk" }
+solana-zk-sdk = { path = "../../agave/zk-sdk" }
+solana-zk-token-sdk = { path = "../../agave/zk-token-sdk" }
 
 [workspace.metadata.cli]
 solana = "2.1.0"

@@ -19,6 +19,7 @@ bpf-entrypoint = []
 solana-account-info = { workspace = true }
 solana-bincode = { workspace = true }
 solana-msg = { workspace = true }
+solana-program = { workspace = true }
 solana-program-entrypoint = { workspace = true }
 solana-program-error = { workspace = true }
 solana-pubkey = { workspace = true, features = ["sha2"] }

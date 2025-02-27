@@ -97,18 +97,9 @@ fn allocate(
     }
 
     /*
-    [TODO: CORE_BPF]:
-
-    This is going to behave differently than the builtin program right now,
-    since reallocations are limited to `MAX_PERMITTED_DATA_INCREASE``, which is
-    smaller than `MAX_PERMITTED_DATA_LENGTH`.
-
-    * `MAX_PERMITTED_DATA_LENGTH`   : 1_024 * 10 * 1_024
-    * `MAX_PERMITTED_DATA_INCREASE` : 1_024 * 10
-
-    https://github.com/solana-program/system/issues/30
+    [CORE_BPF]: Testing privileged syscall...
      */
-    info.realloc(space as usize, true)?;
+    solana_program::privileged_syscall::alloc_large(info, space as usize)?;
 
     Ok(())
 }
