@@ -186,6 +186,28 @@ fn transfer(
     transfer_verified(from_info, to_info, lamports)
 }
 
+fn create_account(
+    from_info: &AccountInfo,
+    to_info: &AccountInfo,
+    to_address: &Address,
+    lamports: u64,
+    space: u64,
+    owner: &Pubkey,
+    signers: &HashSet<Pubkey>,
+) -> Result<(), ProgramError> {
+    // If it looks like the `to` account is already in use, bail.
+    if to_info.lamports() > 0 {
+        msg!("Create Account: account {:?} already in use", to_info.key);
+        Err(SystemError::AccountAlreadyInUse)?
+    }
+
+    allocate(to_info, to_address, space, signers)?;
+    assign(to_info, to_address, owner, signers)?;
+    transfer(from_info, to_info, lamports)?;
+
+    Ok(())
+}
+
 fn process_allocate(accounts: &[AccountInfo], space: u64) -> ProgramResult {
     accounts!(
         accounts,
@@ -293,6 +315,32 @@ fn process_transfer_with_seed(
     transfer_verified(from_info, to_info, lamports)
 }
 
+fn process_create_account(
+    accounts: &[AccountInfo],
+    lamports: u64,
+    space: u64,
+    owner: Pubkey,
+) -> ProgramResult {
+    accounts!(
+        accounts,
+        signers,
+        0 => from_info,
+        1 => to_info,
+    );
+
+    let to_address = Address::create(to_info.key, None)?;
+
+    create_account(
+        from_info,
+        to_info,
+        &to_address,
+        lamports,
+        space,
+        &owner,
+        &signers,
+    )
+}
+
 pub fn process(_program_id: &Pubkey, accounts: &[AccountInfo], input: &[u8]) -> ProgramResult {
     match solana_bincode::limited_deserialize::<SystemInstruction>(input, MAX_INPUT_LEN)
         .map_err(|_| ProgramError::InvalidInstructionData)?
@@ -329,6 +377,14 @@ pub fn process(_program_id: &Pubkey, accounts: &[AccountInfo], input: &[u8]) -> 
         } => {
             msg!("Instruction: TransferWithSeed");
             process_transfer_with_seed(accounts, from_seed, from_owner, lamports)
+        }
+        SystemInstruction::CreateAccount {
+            lamports,
+            space,
+            owner,
+        } => {
+            msg!("Instruction: CreateAccount");
+            process_create_account(accounts, lamports, space, owner)
         }
         /* TODO: Remaining instruction implementations... */
         _ => Err(ProgramError::InvalidInstructionData),
