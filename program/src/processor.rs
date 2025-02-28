@@ -108,9 +108,7 @@ fn allocate(
 
     https://github.com/solana-program/system/issues/30
      */
-    info.realloc(space as usize, true)?;
-
-    Ok(())
+    info.realloc(space as usize, true)
 }
 
 fn process_allocate(accounts: &[AccountInfo], space: u64) -> ProgramResult {
