@@ -8,7 +8,6 @@ use {
     solana_system_interface::{
         error::SystemError, instruction::SystemInstruction, MAX_PERMITTED_DATA_LENGTH,
     },
-    std::collections::HashSet,
 };
 
 // Maximum input buffer length that can be deserialized.
@@ -16,67 +15,63 @@ use {
 const MAX_INPUT_LEN: u64 = 1232;
 
 macro_rules! accounts {
-    ( $infos:ident, $signers:ident, $( $i:literal => $name:ident ),* $(,)? ) => {
-        let mut $signers = HashSet::new();
+    ( $infos:ident, $( $i:literal => $name:ident ),* $(,)? ) => {
         $(
             let $name = $infos.get($i).ok_or(ProgramError::NotEnoughAccountKeys)?;
-            if $name.is_signer {
-                $signers.insert(*$name.key);
-            }
         )*
     };
 }
 
 // Represents an address that may or may not have been generated from a seed.
-#[derive(Debug)]
-struct Address {
-    address: Pubkey,
-    base: Option<Pubkey>,
+struct AddressInfo<'a, 'b> {
+    info: &'a AccountInfo<'b>,
+    base: Option<&'a AccountInfo<'b>>,
 }
 
-impl Address {
-    fn is_signer(&self, signers: &HashSet<Pubkey>) -> bool {
+impl std::fmt::Debug for AddressInfo<'_, '_> {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.debug_struct("AddressInfo")
+            .field("address", &self.info.key)
+            .field("base", &self.base.map(|info| info.key))
+            .finish()
+    }
+}
+
+impl<'a, 'b> AddressInfo<'a, 'b> {
+    fn is_signer(&self) -> bool {
         if let Some(base) = self.base {
-            signers.contains(&base)
+            base.is_signer
         } else {
-            signers.contains(&self.address)
+            self.info.is_signer
         }
     }
 
     fn create(
-        address: &Pubkey,
-        with_seed: Option<(&Pubkey, &str, &Pubkey)>,
+        info: &'a AccountInfo<'b>,
+        with_seed: Option<(&'a AccountInfo<'b>, &str, &Pubkey)>,
     ) -> Result<Self, ProgramError> {
         let base = if let Some((base, seed, owner)) = with_seed {
             // Re-derive the address. It must match the supplied address.
-            let address_with_seed = Pubkey::create_with_seed(base, seed, owner)?;
-            if *address != address_with_seed {
+            let address_with_seed = Pubkey::create_with_seed(base.key, seed, owner)?;
+            if *info.key != address_with_seed {
                 msg!(
                     "Create: address {} does not match derived address {}",
-                    address,
+                    info.key,
                     address_with_seed
                 );
                 Err(SystemError::AddressWithSeedMismatch)?
             }
-            Some(*base)
+            Some(base)
         } else {
             None
         };
 
-        Ok(Self {
-            address: *address,
-            base,
-        })
+        Ok(Self { info, base })
     }
 }
 
-fn allocate(
-    info: &AccountInfo,
-    address: &Address,
-    space: u64,
-    signers: &HashSet<Pubkey>,
-) -> Result<(), ProgramError> {
-    if !address.is_signer(signers) {
+fn allocate(info: &AccountInfo, address: &AddressInfo, space: u64) -> Result<(), ProgramError> {
+    if !address.is_signer() {
         msg!("Allocate: 'to' account {:?} must sign", address);
         Err(ProgramError::MissingRequiredSignature)?
     }
@@ -114,13 +109,13 @@ fn allocate(
 fn process_allocate(accounts: &[AccountInfo], space: u64) -> ProgramResult {
     accounts!(
         accounts,
-        signers,
         0 => account_info,
     );
-
-    let address = Address::create(account_info.key, None)?;
-
-    allocate(account_info, &address, space, &signers)
+    allocate(
+        account_info,
+        &AddressInfo::create(account_info, None)?,
+        space,
+    )
 }
 
 pub fn process(_program_id: &Pubkey, accounts: &[AccountInfo], input: &[u8]) -> ProgramResult {
