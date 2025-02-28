@@ -3,7 +3,7 @@ import {
   fetchEncodedAccount,
   generateKeyPairSigner,
   pipe,
-} from '@solana/web3.js';
+} from '@solana/kit';
 import test from 'ava';
 import { SYSTEM_PROGRAM_ADDRESS, getCreateAccountInstruction } from '../src';
 import {
@@ -49,5 +49,6 @@ test('it creates a new empty account', async (t) => {
     address: newAccount.address,
     data: new Uint8Array(Array.from({ length: 42 }, () => 0)),
     exists: true,
+    space: 42n,
   });
 });

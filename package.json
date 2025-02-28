@@ -38,8 +38,8 @@
     "template:upgrade": "tsx ./scripts/helpers/upgrade-template.ts"
   },
   "devDependencies": {
-    "@codama/renderers-js": "^1.2.3",
-    "@codama/renderers-rust": "^1.0.12",
+    "@codama/renderers-js": "^1.2.6",
+    "@codama/renderers-rust": "^1.0.15",
     "@iarna/toml": "^2.2.5",
     "codama": "^1.2.4",
     "tsx": "^4.19.2",
