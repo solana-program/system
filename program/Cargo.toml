@@ -17,12 +17,17 @@ bpf-entrypoint = []
 
 [dependencies]
 solana-account-info = { workspace = true }
+solana-bincode = { workspace = true }
+solana-msg = { workspace = true }
 solana-program-entrypoint = { workspace = true }
 solana-program-error = { workspace = true }
-solana-pubkey = { workspace = true }
-solana-system-interface = { path = "../interface" }
+solana-pubkey = { workspace = true, features = ["sha2"] }
+solana-system-interface = { path = "../interface", features = ["serde"] }
 
 [dev-dependencies]
+mollusk-svm = "0.0.15"
+solana-account = { workspace = true }
+solana-system-interface = { path = "../interface", features = ["bincode"] }
 
 [lib]
 crate-type = ["cdylib"]
