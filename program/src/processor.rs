@@ -25,22 +25,37 @@ macro_rules! accounts {
 // Represents an address that may or may not have been generated from a seed.
 struct AddressInfo<'a, 'b> {
     info: &'a AccountInfo<'b>,
-    base: Option<&'a AccountInfo<'b>>,
+    base: Option<(&'a Pubkey, &'a AccountInfo<'b>)>,
 }
 
 impl std::fmt::Debug for AddressInfo<'_, '_> {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         f.debug_struct("AddressInfo")
             .field("address", &self.info.key)
-            .field("base", &self.base.map(|info| info.key))
+            .field("base", &self.base.map(|(key, _)| key))
             .finish()
     }
 }
 
 impl<'a, 'b> AddressInfo<'a, 'b> {
     fn is_signer(&self) -> bool {
-        if let Some(base) = self.base {
-            base.is_signer
+        /*
+        [CORE_BPF]:
+        This is pretty ugly, but...
+
+        For some reason, the program asks for the base address _and_ the
+        base account, which are supposed to be the same account.
+
+        In the original builtin, the key is validated against the
+        account when this method is called, since it would search the
+        `signers` hash map for the keyed account matching the provided base
+        address.
+
+        To preserve identical functionality, including the timing at which
+        errors are thrown, we inject the check here.
+         */
+        if let Some((base_key, base_info)) = self.base {
+            base_key == base_info.key && base_info.is_signer
         } else {
             self.info.is_signer
         }
@@ -48,11 +63,11 @@ impl<'a, 'b> AddressInfo<'a, 'b> {
 
     fn create(
         info: &'a AccountInfo<'b>,
-        with_seed: Option<(&'a AccountInfo<'b>, &str, &Pubkey)>,
+        with_seed: Option<(&'a Pubkey, &'a AccountInfo<'b>, &str, &Pubkey)>,
     ) -> Result<Self, ProgramError> {
-        let base = if let Some((base, seed, owner)) = with_seed {
+        let base = if let Some((base_key, base_info, seed, owner)) = with_seed {
             // Re-derive the address. It must match the supplied address.
-            let address_with_seed = Pubkey::create_with_seed(base.key, seed, owner)?;
+            let address_with_seed = Pubkey::create_with_seed(base_key, seed, owner)?;
             if *info.key != address_with_seed {
                 msg!(
                     "Create: address {} does not match derived address {}",
@@ -61,7 +76,7 @@ impl<'a, 'b> AddressInfo<'a, 'b> {
                 );
                 Err(SystemError::AddressWithSeedMismatch)?
             }
-            Some(base)
+            Some((base_key, base_info))
         } else {
             None
         };
@@ -106,6 +121,22 @@ fn allocate(info: &AccountInfo, address: &AddressInfo, space: u64) -> Result<(),
     info.realloc(space as usize, true)
 }
 
+fn assign(info: &AccountInfo, address: &AddressInfo, owner: &Pubkey) -> Result<(), ProgramError> {
+    // No work to do, just return.
+    if info.owner == owner {
+        return Ok(());
+    }
+
+    if !address.is_signer() {
+        msg!("Assign: account {:?} must sign", address);
+        Err(ProgramError::MissingRequiredSignature)?
+    }
+
+    info.assign(owner);
+
+    Ok(())
+}
+
 fn process_allocate(accounts: &[AccountInfo], space: u64) -> ProgramResult {
     accounts!(
         accounts,
@@ -118,6 +149,25 @@ fn process_allocate(accounts: &[AccountInfo], space: u64) -> ProgramResult {
     )
 }
 
+fn process_allocate_with_seed(
+    accounts: &[AccountInfo],
+    base: Pubkey,
+    seed: String,
+    space: u64,
+    owner: Pubkey,
+) -> ProgramResult {
+    accounts!(
+        accounts,
+        0 => account_info,
+        1 => base_info,
+    );
+
+    let address = AddressInfo::create(account_info, Some((&base, base_info, &seed, &owner)))?;
+
+    allocate(account_info, &address, space)?;
+    assign(account_info, &address, &owner)
+}
+
 pub fn process(_program_id: &Pubkey, accounts: &[AccountInfo], input: &[u8]) -> ProgramResult {
     match solana_bincode::limited_deserialize::<SystemInstruction>(input, MAX_INPUT_LEN)
         .map_err(|_| ProgramError::InvalidInstructionData)?
@@ -125,6 +175,15 @@ pub fn process(_program_id: &Pubkey, accounts: &[AccountInfo], input: &[u8]) -> 
         SystemInstruction::Allocate { space } => {
             msg!("Instruction: Allocate");
             process_allocate(accounts, space)
+        }
+        SystemInstruction::AllocateWithSeed {
+            base,
+            seed,
+            space,
+            owner,
+        } => {
+            msg!("Instruction: AllocateWithSeed");
+            process_allocate_with_seed(accounts, base, seed, space, owner)
         }
         /* TODO: Remaining instruction implementations... */
         _ => Err(ProgramError::InvalidInstructionData),
