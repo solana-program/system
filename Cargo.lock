@@ -2000,6 +2000,18 @@ dependencies = [
 ]
 
 [[package]]
+name = "light-poseidon"
+version = "0.2.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "3c9a85a9752c549ceb7578064b4ed891179d20acd85f27318573b64d2d7ee7ee"
+dependencies = [
+ "ark-bn254",
+ "ark-ff",
+ "num-bigint 0.4.6",
+ "thiserror 1.0.69",
+]
+
+[[package]]
 name = "litemap"
 version = "0.7.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2097,6 +2109,45 @@ dependencies = [
  "libc",
  "wasi 0.11.0+wasi-snapshot-preview1",
  "windows-sys 0.52.0",
+]
+
+[[package]]
+name = "mollusk-svm"
+version = "0.0.15"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "95e7c0b51a00d234774b61bf829aa75316eb3a5ebf30bd622010bd046daa287a"
+dependencies = [
+ "bincode",
+ "mollusk-svm-error",
+ "mollusk-svm-keys",
+ "solana-bpf-loader-program",
+ "solana-compute-budget",
+ "solana-log-collector",
+ "solana-logger",
+ "solana-program-runtime",
+ "solana-sdk",
+ "solana-system-program 2.1.12",
+ "solana-timings",
+]
+
+[[package]]
+name = "mollusk-svm-error"
+version = "0.0.15"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "92d7892725c98a376b55e03ccbea44a0d2111c8f7bab0432b42ea689f3f612e7"
+dependencies = [
+ "solana-sdk",
+ "thiserror 1.0.69",
+]
+
+[[package]]
+name = "mollusk-svm-keys"
+version = "0.0.15"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "dd18816096707d148467889844ae57384ab4cbbe50ed24fd03139e6e34d61301"
+dependencies = [
+ "mollusk-svm-error",
+ "solana-sdk",
 ]
 
 [[package]]
@@ -3353,6 +3404,33 @@ dependencies = [
 ]
 
 [[package]]
+name = "solana-bpf-loader-program"
+version = "2.1.12"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "a72f4ec4df7ac88310560ec9e03358017176d38d6947f0de118925b31bfcc57c"
+dependencies = [
+ "bincode",
+ "byteorder",
+ "libsecp256k1",
+ "log",
+ "scopeguard",
+ "solana-bn254",
+ "solana-compute-budget",
+ "solana-curve25519",
+ "solana-feature-set",
+ "solana-log-collector",
+ "solana-measure",
+ "solana-poseidon",
+ "solana-program-memory",
+ "solana-program-runtime",
+ "solana-sdk",
+ "solana-timings",
+ "solana-type-overrides",
+ "solana_rbpf",
+ "thiserror 1.0.69",
+]
+
+[[package]]
 name = "solana-client"
 version = "2.1.12"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -3757,6 +3835,18 @@ dependencies = [
  "solana-sdk",
  "solana-short-vec",
  "solana-vote-program",
+]
+
+[[package]]
+name = "solana-poseidon"
+version = "2.1.12"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "9cb8f71202f04231fbc0869c94da00e7198abc9117100c62e4efb3cdf533f39d"
+dependencies = [
+ "ark-bn254",
+ "light-poseidon",
+ "solana-define-syscall",
+ "thiserror 1.0.69",
 ]
 
 [[package]]
@@ -4378,9 +4468,29 @@ dependencies = [
 
 [[package]]
 name = "solana-system-program"
+version = "2.1.12"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "58e1e57bab6f597a95790ce6a1133a8984dd5e4939bffe87ac08b7b0fa1f545f"
+dependencies = [
+ "bincode",
+ "log",
+ "serde",
+ "serde_derive",
+ "solana-log-collector",
+ "solana-program-runtime",
+ "solana-sdk",
+ "solana-type-overrides",
+]
+
+[[package]]
+name = "solana-system-program"
 version = "3.0.0"
 dependencies = [
+ "mollusk-svm",
+ "solana-account",
  "solana-account-info",
+ "solana-bincode",
+ "solana-msg",
  "solana-program-entrypoint",
  "solana-program-error",
  "solana-pubkey",
