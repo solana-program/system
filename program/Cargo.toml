@@ -25,7 +25,7 @@ solana-pubkey = { workspace = true, features = ["sha2"] }
 solana-system-interface = { path = "../interface", features = ["serde"] }
 
 [dev-dependencies]
-mollusk-svm = "0.0.15"
+mollusk-svm = "0.1.0"
 solana-account = { workspace = true }
 solana-system-interface = { path = "../interface", features = ["bincode"] }
 

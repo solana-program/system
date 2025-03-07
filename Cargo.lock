@@ -2024,41 +2024,62 @@ dependencies = [
 
 [[package]]
 name = "mollusk-svm"
-version = "0.0.15"
+version = "0.1.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "95e7c0b51a00d234774b61bf829aa75316eb3a5ebf30bd622010bd046daa287a"
+checksum = "e07877773d8734efadaa9b44a8c817d048033003c467243fb747efe2e641da71"
 dependencies = [
  "bincode",
  "mollusk-svm-error",
  "mollusk-svm-keys",
+ "solana-account",
  "solana-bpf-loader-program",
+ "solana-clock",
  "solana-compute-budget",
+ "solana-epoch-rewards",
+ "solana-epoch-schedule",
+ "solana-feature-set",
+ "solana-fee-structure",
+ "solana-hash",
+ "solana-instruction",
+ "solana-loader-v3-interface",
  "solana-log-collector",
  "solana-logger",
+ "solana-precompiles",
+ "solana-program-error",
  "solana-program-runtime",
- "solana-sdk",
+ "solana-pubkey",
+ "solana-rent",
+ "solana-sdk-ids",
+ "solana-slot-hashes",
+ "solana-stake-interface",
  "solana-system-program 2.2.1",
+ "solana-sysvar",
+ "solana-sysvar-id",
  "solana-timings",
+ "solana-transaction-context",
 ]
 
 [[package]]
 name = "mollusk-svm-error"
-version = "0.0.15"
+version = "0.1.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "92d7892725c98a376b55e03ccbea44a0d2111c8f7bab0432b42ea689f3f612e7"
+checksum = "e5062f87053bf1daf07e578155a850d01d2bb8c9327d5e31924edc7c17b7903f"
 dependencies = [
- "solana-sdk",
+ "solana-pubkey",
  "thiserror 1.0.69",
 ]
 
 [[package]]
 name = "mollusk-svm-keys"
-version = "0.0.15"
+version = "0.1.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "dd18816096707d148467889844ae57384ab4cbbe50ed24fd03139e6e34d61301"
+checksum = "41f95fd45db898fde342eeb6c55c4d32033fccdc4cb703f213af848c96d3a82b"
 dependencies = [
  "mollusk-svm-error",
- "solana-sdk",
+ "solana-account",
+ "solana-instruction",
+ "solana-pubkey",
+ "solana-transaction-context",
 ]
 
 [[package]]
@@ -5037,6 +5058,7 @@ dependencies = [
  "solana-account-info",
  "solana-cpi",
  "solana-decode-error",
+ "solana-example-mocks",
  "solana-frozen-abi",
  "solana-frozen-abi-macro",
  "solana-instruction",

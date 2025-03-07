@@ -36,6 +36,7 @@ anyhow = "1.0.89"
 borsh = { version = "1.5.1", features = ["derive", "unstable__schema"] }
 solana-account-info = { workspace = true }
 solana-cpi = { workspace = true }
+solana-example-mocks = { workspace = true }
 solana-nonce = { workspace = true }
 solana-program = { workspace = true, default-features = false }
 solana-program-entrypoint = { workspace = true }
