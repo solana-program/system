@@ -164,6 +164,8 @@ fn process_allocate_with_seed(
 
     let address = AddressInfo::create(account_info, Some((&base, base_info, &seed, &owner)))?;
 
+    // [CORE_BPF]: The original builtin also does both `allocate` & `assign` here.
+    // See https://github.com/anza-xyz/agave/blob/b31e5f47f9b9190a3c566f6d13c3f37422961071/programs/system/src/system_processor.rs#L518.
     allocate(account_info, &address, space)?;
     assign(account_info, &address, &owner)
 }
