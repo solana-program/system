@@ -1282,15 +1282,16 @@ pub fn create_nonce_account_with_seed(
 /// Create a nonce account from an off-chain client:
 ///
 /// ```
-/// # use solana_program::example_mocks::solana_sdk;
-/// # use solana_program::example_mocks::solana_rpc_client;
+/// # use solana_example_mocks::solana_keypair;
+/// # use solana_example_mocks::solana_signer;
+/// # use solana_example_mocks::solana_rpc_client;
+/// # use solana_example_mocks::solana_transaction;
+/// use solana_keypair::Keypair;
+/// use solana_nonce::state::State;
 /// use solana_rpc_client::rpc_client::RpcClient;
-/// use solana_sdk::{
-///     signature::{Keypair, Signer},
-///     transaction::Transaction,
-///     nonce::State,
-/// };
+/// use solana_signer::Signer;
 /// use solana_system_interface::instruction;
+/// use solana_transaction::Transaction;
 /// use anyhow::Result;
 ///
 /// fn submit_create_nonce_account_tx(

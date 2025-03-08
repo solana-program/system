@@ -14,26 +14,27 @@ license = "Apache-2.0"
 edition = "2021"
 
 [workspace.dependencies]
-solana-account = "2.1"
-solana-account-info = "2.1"
-solana-bincode = "2.1"
-solana-cpi = "2.1"
-solana-decode-error = "2.1"
-solana-frozen-abi = "2.1"
-solana-frozen-abi-macro = "2.1"
-solana-instruction = "2.1"
-solana-logger = "2.1"
-solana-nonce = "0.0.2"
-solana-msg = "2.1"
-solana-program = { version = "2.1", default-features = false }
-solana-program-entrypoint = "2.1"
-solana-program-error = "2.1"
-solana-pubkey = { version = "2.1", default-features = false }
+solana-account = "2.2.1"
+solana-account-info = "2.2.1"
+solana-bincode = "2.2.1"
+solana-cpi = "2.2.1"
+solana-decode-error = "2.2.1"
+solana-example-mocks = "2.2.1"
+solana-frozen-abi = "2.2.1"
+solana-frozen-abi-macro = "2.2.1"
+solana-instruction = "2.2.1"
+solana-logger = "2.2.1"
+solana-nonce = "2.2.1"
+solana-msg = "2.2.1"
+solana-program = { version = "2.2.1", default-features = false }
+solana-program-entrypoint = "2.2.1"
+solana-program-error = "2.2.1"
+solana-pubkey = { version = "2.2.1", default-features = false }
 
 [workspace.metadata.cli]
-solana = "2.1.0"
+solana = "2.2.0"
 
 [workspace.metadata.toolchains]
-format = "nightly-2024-08-08"
-lint = "nightly-2024-08-08"
-test = "nightly-2024-08-08"
+format = "nightly-2024-11-22"
+lint = "nightly-2024-11-22"
+test = "nightly-2024-11-22"
