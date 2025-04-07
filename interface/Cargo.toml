@@ -28,8 +28,8 @@ solana-program-error = { workspace = true }
 solana-pubkey = { workspace = true, default-features = false }
 
 [target.'cfg(target_arch = "wasm32")'.dependencies]
-js-sys = "0.3.72"
-wasm-bindgen = "0.2"
+js-sys = { version = "0.3.72", optional = true }
+wasm-bindgen = { version = "0.2", optional = true }
 
 [dev-dependencies]
 anyhow = "1.0.89"
@@ -56,6 +56,7 @@ frozen-abi = [
     "solana-pubkey/frozen-abi",
     "solana-pubkey/std"
 ]
+js = ["dep:js-sys", "dep:wasm-bindgen"]
 serde = ["dep:serde", "dep:serde_derive", "solana-pubkey/serde"]
 
 [lib]
