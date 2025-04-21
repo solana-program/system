@@ -1,0 +1,71 @@
+env_files = ["./dev.env"]
+
+[config]
+default_to_workspace = false
+skip_core_tasks = true
+
+
+# JavaScript Tasks
+
+[tasks.js-install]
+command = "pnpm"
+cwd = "${MANIFEST_DIR}"
+args = ["install"]
+
+[tasks.js-base]
+command = "pnpm"
+cwd = "${MANIFEST_DIR}"
+
+[tasks.js-format]
+extend = "js-base"
+dependencies = ["js-install"]
+args = ["format"]
+
+[tasks.js-lint]
+extend = "js-base"
+dependencies = ["js-install"]
+args = ["lint"]
+
+
+# Rust Tasks
+
+[tasks.rust-base]
+command = "cargo"
+cwd = "${MANIFEST_DIR}"
+toolchain = "${RUST_TOOLCHAIN_NIGHTLY}"
+
+[tasks.rust-format]
+extend = "rust-base"
+args = ["fmt", "--", "--check"]
+
+[tasks.rust-format-fix]
+extend = "rust-base"
+args = ["fmt"]
+
+[tasks.rust-lint-clippy]
+extend = "rust-base"
+args = ["clippy"]
+
+[tasks.rust-lint-clippy-fix]
+extend = "rust-base"
+args = ["clippy", "--allow-dirty", "--fix"]
+
+[tasks.rust-lint-docs]
+extend = "rust-base"
+env = { "RUSTDOCFLAGS" = "--cfg docsrs -D warnings" }
+args = ["doc", "--all-features", "--no-deps"]
+
+[tasks.rust-lint-features]
+extend = "rust-base"
+args = ["hack", "check", "--feature-powerset", "--all-targets"]
+
+[tasks.rust-lint]
+dependencies = ["rust-lint-clippy", "rust-lint-docs", "rust-lint-features"]
+
+[tasks.rust-test]
+extend = "rust-base"
+args = ["test", "--all-features"]
+
+[tasks.rust-build-wasm]
+command = "wasm-pack"
+args = ["build", "--target", "nodejs", "--dev", "${MANIFEST_DIR}", "--features", "bincode"]

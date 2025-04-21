@@ -13,75 +13,11 @@ import {
 } from './helpers/utils.mts';
 
 enum Command {
-    Format = 'format',
-    LintClippy = 'lint-clippy',
-    LintDocs = 'lint-docs',
-    LintFeatures = 'lint-features',
-    Lint = 'lint',
-    Test = 'test',
-    Wasm = 'wasm',
     Publish = 'publish',
 }
 
 const { command, libraryPath, args } = parseCliArguments();
 const manifestPath = path.join(libraryPath, 'Cargo.toml');
-
-async function cargo(
-    toolchain: string,
-    command: string | string[],
-    defaultArgs?: string[],
-    variables?: [string, string][],
-) {
-    const [cargoArgs, commandArgs] = partitionArguments(args, '--', defaultArgs);
-    variables?.forEach(([k, v]) => $.env[k] = v);
-    await $`cargo ${toolchain} ${command} --manifest-path ${manifestPath} ${cargoArgs} -- ${commandArgs}`;
-}
-
-async function format() {
-    return cargo(
-        getToolchainArgument('format'),
-        'fmt',
-        popArgument(args, '--fix') ? [] : ['--', '--check'],
-    );
-}
-
-async function lintClippy() {
-    return cargo(
-        getToolchainArgument('lint'),
-        'clippy',
-        popArgument(args, '--fix') ? ['--fix'] : [],
-    );
-}
-
-async function lintDocs() {
-    return cargo(
-        getToolchainArgument('lint'),
-        'doc',
-        ['--all-features', '--no-deps'],
-        [['RUSTDOCFLAGS', '--cfg docsrs -D warnings']],
-    );
-}
-
-async function lintFeatures() {
-    return cargo(
-        getToolchainArgument('lint'),
-        ['hack', 'check'],
-        ['--feature-powerset', '--all-targets'],
-    );
-}
-
-async function test() {
-    return cargo(
-        getToolchainArgument('test'),
-        'test',
-        ['--all-features'],
-        [['SBF_OUT_DIR', path.join(workingDirectory, 'target', 'deploy')]]
-    );
-}
-
-async function wasm() {
-    await $`wasm-pack build --target nodejs --dev ${path.dirname(manifestPath)} --features bincode ${args}`;
-}
 
 async function publish() {
     const dryRun = argv['dry-run'] ?? false;
@@ -126,27 +62,6 @@ async function publish() {
 
 
 switch (command) {
-    case Command.Format:
-        await format();
-        break;
-    case Command.LintClippy:
-        await lintClippy();
-        break;
-    case Command.LintDocs:
-        await lintDocs();
-        break;
-    case Command.LintFeatures:
-        await lintFeatures();
-        break;
-    case Command.Lint:
-        await Promise.all([lintClippy(), lintDocs(), lintFeatures()]);
-        break;
-    case Command.Test:
-        await test();
-        break;
-    case Command.Wasm:
-        await wasm();
-        break;
     case Command.Publish:
         await publish();
         break;

@@ -9,8 +9,6 @@ import {
 } from './helpers/utils.mts';
 
 enum Command {
-    Format = 'format',
-    Lint = 'lint',
     Test = 'test',
     Publish = 'publish',
 }
@@ -28,14 +26,6 @@ async function pnpm(
         await $`pnpm build`;
     }
     await $`pnpm ${command} ${pnpmArgs} -- ${commandArgs}`;
-}
-
-async function format() {
-    return pnpm('format');
-}
-
-async function lint() {
-    return pnpm('lint');
 }
 
 async function test() {
@@ -82,12 +72,6 @@ async function publish() {
 
 
 switch (command) {
-    case Command.Format:
-        await format();
-        break;
-    case Command.Lint:
-        await lint();
-        break;
     case Command.Test:
         await test();
         break;

@@ -35,39 +35,62 @@ runs:
 
     - name: Set Environment Variables
       shell: bash
-      run: pnpm tsx ./scripts/ci/set-env.mts
+      run: |
+        source ./dev.env
+        echo "RUST_TOOLCHAIN_NIGHTLY=$RUST_TOOLCHAIN_NIGHTLY" >> "$GITHUB_ENV"
+        echo "SOLANA_TOOLCHAIN=$SOLANA_TOOLCHAIN" >> "$GITHUB_ENV"
+    
+    - name: Cache Cargo Install for Cargo-Make
+      uses: actions/cache@v4
+      with:
+        path: |
+          ~/.cargo/bin/cargo-make
+          ~/.cargo/registry
+          ~/.cargo/git
+          ~/.cargo/.crates.toml
+          ~/.cargo/.crates2.json
+        key: ${{ runner.os }}-cargo-install-cargo-make
+        restore-keys: |
+          ${{ runner.os }}-cargo-install-cargo-make
+
+    - name: Install Cargo-Make
+      shell: bash
+      run: |
+        if ! command -v cargo-make &> /dev/null; then
+          cargo install cargo-make
+        fi
 
     - name: Install Rust 'build' Toolchain
       if: ${{ contains(inputs.toolchain, 'build') }}
       uses: dtolnay/rust-toolchain@master
       with:
-        toolchain: ${{ env.TOOLCHAIN_BUILD }}
+        toolchain: ${{ env.RUST_TOOLCHAIN_NIGHTLY }}
 
     - name: Install Rust 'format' Toolchain
       if: ${{ contains(inputs.toolchain, 'format') }}
       uses: dtolnay/rust-toolchain@master
       with:
-        toolchain: ${{ env.TOOLCHAIN_FORMAT }}
+        toolchain: ${{ env.RUST_TOOLCHAIN_NIGHTLY }}
         components: rustfmt
 
     - name: Install Rust 'lint' Toolchain
       if: ${{ contains(inputs.toolchain, 'lint') }}
       uses: dtolnay/rust-toolchain@master
       with:
-        toolchain: ${{ env.TOOLCHAIN_LINT }}
+        toolchain: ${{ env.RUST_TOOLCHAIN_NIGHTLY }}
         components: clippy
 
     - name: Install Rust 'test' Toolchain
       if: ${{ contains(inputs.toolchain, 'test') }}
       uses: dtolnay/rust-toolchain@master
       with:
-        toolchain: ${{ env.TOOLCHAIN_TEST }}
+        toolchain: ${{ env.RUST_TOOLCHAIN_NIGHTLY }}
 
     - name: Install Solana
       if: ${{ inputs.solana == 'true' }}
       uses: solana-program/actions/install-solana@v1
       with:
-        version: ${{ env.SOLANA_VERSION }}
+        version: ${{ env.SOLANA_TOOLCHAIN }}
         cache: true
 
     - name: Install 'cargo-hack'
