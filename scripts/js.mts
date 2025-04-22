@@ -9,32 +9,10 @@ import {
 } from './helpers/utils.mts';
 
 enum Command {
-    Test = 'test',
     Publish = 'publish',
 }
 
 const { command, libraryPath, args } = parseCliArguments();
-
-async function pnpm(
-    command: string,
-    build = false,
-) {
-    const [pnpmArgs, commandArgs] = partitionArguments(args, '--');
-    cd(libraryPath);
-    await $`pnpm install`;
-    if (build) {
-        await $`pnpm build`;
-    }
-    await $`pnpm ${command} ${pnpmArgs} -- ${commandArgs}`;
-}
-
-async function test() {
-    // Start the local validator, or restart it if it is already running.
-    await $`pnpm validator:restart`;
-
-    // Build the client and run the tests.
-    return pnpm('test', true);
-}
 
 async function publish() {
     const [level, tag = 'latest'] = args;
@@ -72,9 +50,6 @@ async function publish() {
 
 
 switch (command) {
-    case Command.Test:
-        await test();
-        break;
     case Command.Publish:
         await publish();
         break;

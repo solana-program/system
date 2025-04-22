@@ -26,6 +26,17 @@ extend = "js-base"
 dependencies = ["js-install"]
 args = ["lint"]
 
+[tasks.js-test]
+script = [
+    "./scripts/start-test-validator.sh",
+    "cd ${MANIFEST_DIR}",
+    "pnpm install",
+    "pnpm build",
+    "pnpm test",
+    "cd ${CARGO_MAKE_WORKSPACE_WORKING_DIRECTORY}",
+    "./scripts/stop-test-validator.sh",
+]
+
 
 # Rust Tasks
 
