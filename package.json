@@ -1,8 +1,6 @@
 {
   "private": true,
   "scripts": {
-    "solana:check": "tsx ./scripts/helpers/check-solana-version.mts",
-    "solana:link": "tsx ./scripts/helpers/link-solana-version.mts",
     "generate": "pnpm generate:clients",
     "generate:clients": "codama run --all",
     "js:format": "cargo make --env MANIFEST_DIR=./clients/js js-format ",
@@ -23,17 +21,12 @@
     "interface:lint:features": "cargo make --env MANIFEST_DIR=interface rust-lint-features",
     "interface:publish": "./scripts/publish-rust.sh interface",
     "interface:test": "cargo make --env MANIFEST_DIR=interface rust-test",
-    "interface:wasm": "cargo make --env MANIFEST_DIR=interface rust-build-wasm",
-    "template:upgrade": "tsx ./scripts/helpers/upgrade-template.ts"
+    "interface:wasm": "cargo make --env MANIFEST_DIR=interface rust-build-wasm"
   },
   "devDependencies": {
     "@codama/renderers-js": "^1.2.7",
     "@codama/renderers-rust": "^1.0.16",
-    "@iarna/toml": "^2.2.5",
-    "codama": "^1.2.8",
-    "tsx": "^4.19.2",
-    "typescript": "^5.5.2",
-    "zx": "^7.2.3"
+    "codama": "^1.2.8"
   },
   "engines": {
     "node": ">=v20.0.0"
