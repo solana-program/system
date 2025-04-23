@@ -3,7 +3,6 @@ resolver = "2"
 members = [
     "clients/rust",
     "interface",
-    "program",
 ]
 
 [workspace.package]
@@ -14,9 +13,7 @@ license = "Apache-2.0"
 edition = "2021"
 
 [workspace.dependencies]
-solana-account = "2.2.1"
 solana-account-info = "2.2.1"
-solana-bincode = "2.2.1"
 solana-cpi = "2.2.1"
 solana-decode-error = "2.2.1"
 solana-example-mocks = "2.2.1"
