@@ -13,7 +13,6 @@ import {
 } from './helpers/utils.mts';
 
 enum Command {
-    BuildSbf = 'build-sbf',
     Format = 'format',
     LintClippy = 'lint-clippy',
     LintDocs = 'lint-docs',
@@ -36,13 +35,6 @@ async function cargo(
     const [cargoArgs, commandArgs] = partitionArguments(args, '--', defaultArgs);
     variables?.forEach(([k, v]) => $.env[k] = v);
     await $`cargo ${toolchain} ${command} --manifest-path ${manifestPath} ${cargoArgs} -- ${commandArgs}`;
-}
-
-async function buildSbf() {
-    return cargo(
-        'build-sbf',
-        ['--features', 'bpf-entrypoint'],
-    );
 }
 
 async function format() {
@@ -134,9 +126,6 @@ async function publish() {
 
 
 switch (command) {
-    case Command.BuildSbf:
-        await buildSbf();
-        break;
     case Command.Format:
         await format();
         break;
