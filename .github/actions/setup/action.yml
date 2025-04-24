@@ -10,29 +10,19 @@ inputs:
   cargo-cache-local-key:
     description: The key to cache local cargo dependencies. Skips local cargo caching if not provided.
     required: false
-  toolchain:
-    description: Rust toolchain to install. Comma-separated string of [`build`, `format`, `lint`, `test`].
+  pnpm:
+    description: Install pnpm if `true`. Defaults to `false`.
     required: false
   solana:
     description: Install Solana if `true`. Defaults to `false`.
+    required: false
+  toolchain:
+    description: Rust toolchain to install. Comma-separated string of [`build`, `format`, `lint`, `test`].
     required: false
 
 runs:
   using: 'composite'
   steps:
-    - name: Setup pnpm
-      uses: pnpm/action-setup@v3
-
-    - name: Setup Node.js
-      uses: actions/setup-node@v4
-      with:
-        node-version: 20
-        cache: 'pnpm'
-
-    - name: Install Dependencies
-      run: pnpm install --frozen-lockfile
-      shell: bash
-
     - name: Set Environment Variables
       shell: bash
       run: |
@@ -59,6 +49,22 @@ runs:
         if ! command -v cargo-make &> /dev/null; then
           cargo install cargo-make
         fi
+    
+    - name: Setup pnpm
+      if: ${{ inputs.pnpm == 'true' }}
+      uses: pnpm/action-setup@v3
+
+    - name: Setup Node.js
+      if: ${{ inputs.pnpm == 'true' }}
+      uses: actions/setup-node@v4
+      with:
+        node-version: 20
+        cache: 'pnpm'
+
+    - name: Install Dependencies
+      if: ${{ inputs.pnpm == 'true' }}
+      run: pnpm install --frozen-lockfile
+      shell: bash
 
     - name: Install Rust 'build' Toolchain
       if: ${{ contains(inputs.toolchain, 'build') }}
