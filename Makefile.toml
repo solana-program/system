@@ -5,31 +5,26 @@ default_to_workspace = false
 skip_core_tasks = true
 
 
-# JavaScript Tasks
-
-[tasks.js-install]
-command = "pnpm"
-cwd = "${MANIFEST_DIR}"
-args = ["install"]
-
-[tasks.js-base]
-command = "pnpm"
-cwd = "${MANIFEST_DIR}"
+# JavaScript Client Tasks
 
 [tasks.js-format]
-extend = "js-base"
-dependencies = ["js-install"]
-args = ["format"]
+script = [
+  "cd ./clients/js",
+  "pnpm install",
+  "pnpm format",
+]
 
 [tasks.js-lint]
-extend = "js-base"
-dependencies = ["js-install"]
-args = ["lint"]
+script = [
+  "cd ./clients/js",
+  "pnpm install",
+  "pnpm lint",
+]
 
 [tasks.js-test]
 script = [
     "./scripts/start-test-validator.sh",
-    "cd ${MANIFEST_DIR}",
+    "cd ./clients/js",
     "pnpm install",
     "pnpm build",
     "pnpm test",
@@ -37,46 +32,124 @@ script = [
     "./scripts/stop-test-validator.sh",
 ]
 
+[tasks.js-publish]
+script = "./scripts/publish-js.sh ./clients/js"
 
-# Rust Tasks
 
-[tasks.rust-base]
+# Rust Base Tasks
+
+[tasks.cargo-base]
 command = "cargo"
-cwd = "${MANIFEST_DIR}"
 toolchain = "${RUST_TOOLCHAIN_NIGHTLY}"
 
-[tasks.rust-format]
-extend = "rust-base"
+[tasks.cargo-format]
+extend = "cargo-base"
 args = ["fmt", "--", "--check"]
 
-[tasks.rust-format-fix]
-extend = "rust-base"
+[tasks.cargo-format-fix]
+extend = "cargo-base"
 args = ["fmt"]
 
-[tasks.rust-lint-clippy]
-extend = "rust-base"
+[tasks.cargo-lint-clippy]
+extend = "cargo-base"
 args = ["clippy"]
 
-[tasks.rust-lint-clippy-fix]
-extend = "rust-base"
+[tasks.cargo-lint-clippy-fix]
+extend = "cargo-base"
 args = ["clippy", "--allow-dirty", "--fix"]
 
-[tasks.rust-lint-docs]
-extend = "rust-base"
+[tasks.cargo-lint-docs]
+extend = "cargo-base"
 env = { "RUSTDOCFLAGS" = "--cfg docsrs -D warnings" }
 args = ["doc", "--all-features", "--no-deps"]
 
-[tasks.rust-lint-features]
-extend = "rust-base"
+[tasks.cargo-lint-features]
+extend = "cargo-base"
 args = ["hack", "check", "--feature-powerset", "--all-targets"]
 
-[tasks.rust-lint]
-dependencies = ["rust-lint-clippy", "rust-lint-docs", "rust-lint-features"]
+[tasks.cargo-lint]
+dependencies = ["cargo-lint-clippy", "cargo-lint-docs", "cargo-lint-features"]
 
-[tasks.rust-test]
-extend = "rust-base"
+[tasks.cargo-test]
+extend = "cargo-base"
 args = ["test", "--all-features"]
 
-[tasks.rust-build-wasm]
+
+# Rust Client Tasks
+
+[tasks.rust-format]
+cwd = "./clients/rust"
+extend = "cargo-format"
+
+[tasks.rust-format-fix]
+cwd = "./clients/rust"
+extend = "cargo-format-fix"
+
+[tasks.rust-lint-clippy]
+cwd = "./clients/rust"
+extend = "cargo-lint-clippy"
+
+[tasks.rust-lint-clippy-fix]
+cwd = "./clients/rust"
+extend = "cargo-lint-clippy-fix"
+
+[tasks.rust-lint-docs]
+cwd = "./clients/rust"
+extend = "cargo-lint-docs"
+
+[tasks.rust-lint-features]
+cwd = "./clients/rust"
+extend = "cargo-lint-features"
+
+[tasks.rust-lint]
+cwd = "./clients/rust"
+extend = "cargo-lint"
+
+[tasks.rust-test]
+cwd = "./clients/rust"
+extend = "cargo-test"
+
+[tasks.rust-publish]
+script = "./scripts/publish-rust.sh ./clients/rust"
+
+
+# Rust Interface Tasks
+
+[tasks.interface-format]
+cwd = "./clients/rust"
+extend = "cargo-format"
+
+[tasks.interface-format-fix]
+cwd = "./clients/rust"
+extend = "cargo-format-fix"
+
+[tasks.interface-lint-clippy]
+cwd = "./clients/rust"
+extend = "cargo-lint-clippy"
+
+[tasks.interface-lint-clippy-fix]
+cwd = "./clients/rust"
+extend = "cargo-lint-clippy-fix"
+
+[tasks.interface-lint-docs]
+cwd = "./clients/rust"
+extend = "cargo-lint-docs"
+
+[tasks.interface-lint-features]
+cwd = "./clients/rust"
+extend = "cargo-lint-features"
+
+[tasks.interface-lint]
+cwd = "./clients/rust"
+extend = "cargo-lint"
+
+[tasks.interface-test]
+cwd = "./clients/rust"
+extend = "cargo-test"
+
+[tasks.interface-publish]
+script = "./scripts/publish-rust.sh ./interface"
+
+[tasks.interface-build-wasm]
 command = "wasm-pack"
-args = ["build", "--target", "nodejs", "--dev", "${MANIFEST_DIR}", "--features", "bincode"]
+args = ["build", "--target", "nodejs", "--dev", "./interface", "--features", "bincode"]

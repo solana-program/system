@@ -17,10 +17,10 @@ jobs:
         uses: ./.github/actions/setup
 
       - name: Format Client JS
-        run: pnpm js:format
+        run: cargo make js-format
 
       - name: Lint Client JS
-        run: pnpm js:lint
+        run: cargo make js-lint
 
   format_and_lint_client_rust:
     name: Format & Lint Client Rust
@@ -35,16 +35,16 @@ jobs:
           toolchain: format, lint
 
       - name: Format
-        run: pnpm rust:format
+        run: cargo make rust-format
 
       - name: Lint / Clippy
-        run: pnpm rust:lint:clippy
+        run: cargo make rust-lint-clippy
 
       - name: Lint / Docs
-        run: pnpm rust:lint:docs
+        run: cargo make rust-lint-docs
 
       - name: Lint / Features
-        run: pnpm rust:lint:features
+        run: cargo make rust-lint-features
 
   format_and_lint_interface:
     name: Format & Lint Interface
@@ -59,16 +59,16 @@ jobs:
           toolchain: format, lint
 
       - name: Format
-        run: pnpm interface:format
+        run: cargo make interface-format
 
       - name: Lint / Clippy
-        run: pnpm interface:lint:clippy
+        run: cargo make interface-lint-clippy
 
       - name: Lint / Docs
-        run: pnpm interface:lint:docs
+        run: cargo make interface-lint-docs
 
       - name: Lint / Features
-        run: pnpm interface:lint:features
+        run: cargo make interface-lint-features
 
   wasm_interface:
     name: Build Interface in WASM
@@ -90,7 +90,7 @@ jobs:
           tool: wasm-pack
 
       - name: Build Interface with wasm-pack
-        run: pnpm interface:wasm
+        run: cargo make interface-build-wasm
 
   test_interface:
     name: Test Interface
@@ -108,7 +108,7 @@ jobs:
           solana: true
 
       - name: Test Interface
-        run: pnpm interface:test
+        run: cargo make interface-test
 
   generate_clients:
     name: Check Client Generation
@@ -144,7 +144,7 @@ jobs:
           solana: true
 
       - name: Test Client JS
-        run: pnpm js:test
+        run: cargo make js-test
 
   test_client_rust:
     name: Test Client Rust
@@ -162,4 +162,4 @@ jobs:
           solana: true
 
       - name: Test Client Rust
-        run: pnpm rust:test
+        run: cargo make rust-test
