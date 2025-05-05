@@ -1,4 +1,6 @@
-nightly = +nightly-2024-11-22
+include vars.env
+
+nightly = +$(subst ",,${RUST_TOOLCHAIN_NIGHTLY})
 
 clippy-%:
 	cargo $(nightly) clippy --manifest-path $(subst -,/,$*)/Cargo.toml

@@ -26,7 +26,7 @@ runs:
     - name: Set Environment Variables
       shell: bash
       run: |
-        source ./dev.env
+        source ./vars.env
         echo "RUST_TOOLCHAIN_NIGHTLY=$RUST_TOOLCHAIN_NIGHTLY" >> "$GITHUB_ENV"
         echo "SOLANA_TOOLCHAIN=$SOLANA_TOOLCHAIN" >> "$GITHUB_ENV"
 
