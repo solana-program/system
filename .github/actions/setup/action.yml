@@ -29,27 +29,7 @@ runs:
         source ./dev.env
         echo "RUST_TOOLCHAIN_NIGHTLY=$RUST_TOOLCHAIN_NIGHTLY" >> "$GITHUB_ENV"
         echo "SOLANA_TOOLCHAIN=$SOLANA_TOOLCHAIN" >> "$GITHUB_ENV"
-    
-    - name: Cache Cargo Install for Cargo-Make
-      uses: actions/cache@v4
-      with:
-        path: |
-          ~/.cargo/bin/cargo-make
-          ~/.cargo/registry
-          ~/.cargo/git
-          ~/.cargo/.crates.toml
-          ~/.cargo/.crates2.json
-        key: ${{ runner.os }}-cargo-install-cargo-make
-        restore-keys: |
-          ${{ runner.os }}-cargo-install-cargo-make
 
-    - name: Install Cargo-Make
-      shell: bash
-      run: |
-        if ! command -v cargo-make &> /dev/null; then
-          cargo install cargo-make
-        fi
-    
     - name: Setup pnpm
       if: ${{ inputs.pnpm == 'true' }}
       uses: pnpm/action-setup@v3

@@ -19,10 +19,10 @@ jobs:
           pnpm: true
 
       - name: Format Client JS
-        run: cargo make js-format
+        run: make format-js
 
       - name: Lint Client JS
-        run: cargo make js-lint
+        run: make lint-js
 
   format_and_lint_client_rust:
     name: Format & Lint Client Rust
@@ -37,16 +37,16 @@ jobs:
           toolchain: format, lint
 
       - name: Format
-        run: cargo make rust-format
+        run: make format-clients-rust
 
       - name: Lint / Clippy
-        run: cargo make rust-lint-clippy
+        run: make clippy-clients-rust
 
       - name: Lint / Docs
-        run: cargo make rust-lint-docs
+        run: make lint-docs-clients-rust
 
       - name: Lint / Features
-        run: cargo make rust-lint-features
+        run: make lint-features-clients-rust
 
   format_and_lint_interface:
     name: Format & Lint Interface
@@ -61,16 +61,16 @@ jobs:
           toolchain: format, lint
 
       - name: Format
-        run: cargo make interface-format
+        run: make format-interface
 
       - name: Lint / Clippy
-        run: cargo make interface-lint-clippy
+        run: make clippy-interface
 
       - name: Lint / Docs
-        run: cargo make interface-lint-docs
+        run: make lint-docs-interface
 
       - name: Lint / Features
-        run: cargo make interface-lint-features
+        run: make lint-features-interface
 
   wasm_interface:
     name: Build Interface in WASM
@@ -92,7 +92,7 @@ jobs:
           tool: wasm-pack
 
       - name: Build Interface with wasm-pack
-        run: cargo make interface-build-wasm
+        run: make build-wasm-interface
 
   test_interface:
     name: Test Interface
@@ -110,7 +110,7 @@ jobs:
           solana: true
 
       - name: Test Interface
-        run: cargo make interface-test
+        run: make test-interface
 
   generate_clients:
     name: Check Client Generation
@@ -148,7 +148,7 @@ jobs:
           solana: true
 
       - name: Test Client JS
-        run: cargo make js-test
+        run: make test-js
 
   test_client_rust:
     name: Test Client Rust
@@ -166,4 +166,4 @@ jobs:
           solana: true
 
       - name: Test Client Rust
-        run: cargo make rust-test
+        run: make test-clients-rust
