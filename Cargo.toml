@@ -27,11 +27,3 @@ solana-program = { version = "2.2.1", default-features = false }
 solana-program-entrypoint = "2.2.1"
 solana-program-error = "2.2.1"
 solana-pubkey = { version = "2.2.1", default-features = false }
-
-[workspace.metadata.cli]
-solana = "2.2.0"
-
-[workspace.metadata.toolchains]
-format = "nightly-2024-11-22"
-lint = "nightly-2024-11-22"
-test = "nightly-2024-11-22"

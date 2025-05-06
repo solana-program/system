@@ -10,64 +10,73 @@ inputs:
   cargo-cache-local-key:
     description: The key to cache local cargo dependencies. Skips local cargo caching if not provided.
     required: false
-  toolchain:
-    description: Rust toolchain to install. Comma-separated string of [`build`, `format`, `lint`, `test`].
+  pnpm:
+    description: Install pnpm if `true`. Defaults to `false`.
     required: false
   solana:
     description: Install Solana if `true`. Defaults to `false`.
+    required: false
+  toolchain:
+    description: Rust toolchain to install. Comma-separated string of [`build`, `format`, `lint`, `test`].
     required: false
 
 runs:
   using: 'composite'
   steps:
+    - name: Set Environment Variables
+      shell: bash
+      run: |
+        source ./vars.env
+        echo "RUST_TOOLCHAIN_NIGHTLY=$RUST_TOOLCHAIN_NIGHTLY" >> "$GITHUB_ENV"
+        echo "SOLANA_CLI_VERSION=$SOLANA_CLI_VERSION" >> "$GITHUB_ENV"
+
     - name: Setup pnpm
+      if: ${{ inputs.pnpm == 'true' }}
       uses: pnpm/action-setup@v3
 
     - name: Setup Node.js
+      if: ${{ inputs.pnpm == 'true' }}
       uses: actions/setup-node@v4
       with:
         node-version: 20
         cache: 'pnpm'
 
     - name: Install Dependencies
+      if: ${{ inputs.pnpm == 'true' }}
       run: pnpm install --frozen-lockfile
       shell: bash
-
-    - name: Set Environment Variables
-      shell: bash
-      run: pnpm tsx ./scripts/ci/set-env.mts
 
     - name: Install Rust 'build' Toolchain
       if: ${{ contains(inputs.toolchain, 'build') }}
       uses: dtolnay/rust-toolchain@master
       with:
-        toolchain: ${{ env.TOOLCHAIN_BUILD }}
+        toolchain: ${{ env.RUST_TOOLCHAIN_NIGHTLY }}
 
     - name: Install Rust 'format' Toolchain
       if: ${{ contains(inputs.toolchain, 'format') }}
       uses: dtolnay/rust-toolchain@master
       with:
-        toolchain: ${{ env.TOOLCHAIN_FORMAT }}
+        toolchain: ${{ env.RUST_TOOLCHAIN_NIGHTLY }}
         components: rustfmt
 
     - name: Install Rust 'lint' Toolchain
       if: ${{ contains(inputs.toolchain, 'lint') }}
       uses: dtolnay/rust-toolchain@master
       with:
-        toolchain: ${{ env.TOOLCHAIN_LINT }}
+        toolchain: ${{ env.RUST_TOOLCHAIN_NIGHTLY }}
         components: clippy
 
     - name: Install Rust 'test' Toolchain
       if: ${{ contains(inputs.toolchain, 'test') }}
       uses: dtolnay/rust-toolchain@master
       with:
-        toolchain: ${{ env.TOOLCHAIN_TEST }}
+        toolchain: ${{ env.RUST_TOOLCHAIN_NIGHTLY }}
 
     - name: Install Solana
       if: ${{ inputs.solana == 'true' }}
       uses: solana-program/actions/install-solana@v1
       with:
-        version: ${{ env.SOLANA_VERSION }}
+        version: ${{ env.SOLANA_CLI_VERSION }}
         cache: true
 
     - name: Install 'cargo-hack'

@@ -1,42 +1,13 @@
 {
   "private": true,
   "scripts": {
-    "solana:check": "tsx ./scripts/helpers/check-solana-version.mts",
-    "solana:link": "tsx ./scripts/helpers/link-solana-version.mts",
     "generate": "pnpm generate:clients",
-    "generate:clients": "codama run --all",
-    "validator:start": "tsx ./scripts/helpers/start-validator.mts",
-    "validator:restart": "pnpm validator:start --restart",
-    "validator:stop": "tsx ./scripts/helpers/stop-validator.mts",
-    "js:format": "tsx ./scripts/js.mts format clients/js",
-    "js:lint": "tsx ./scripts/js.mts lint clients/js",
-    "js:publish": "tsx ./scripts/js.mts publish clients/js",
-    "js:test": "tsx ./scripts/js.mts test clients/js",
-    "rust:format": "tsx ./scripts/rust.mts format clients/rust",
-    "rust:lint": "tsx ./scripts/rust.mts lint clients/rust",
-    "rust:lint:clippy": "tsx ./scripts/rust.mts lint-clippy clients/rust",
-    "rust:lint:docs": "tsx ./scripts/rust.mts lint-docs clients/rust",
-    "rust:lint:features": "tsx ./scripts/rust.mts lint-features clients/rust",
-    "rust:publish": "tsx ./scripts/rust.mts publish clients/rust",
-    "rust:test": "tsx ./scripts/rust.mts test clients/rust",
-    "interface:format": "tsx ./scripts/rust.mts format interface",
-    "interface:lint": "tsx ./scripts/rust.mts lint interface",
-    "interface:lint:clippy": "tsx ./scripts/rust.mts lint-clippy interface",
-    "interface:lint:docs": "tsx ./scripts/rust.mts lint-docs interface",
-    "interface:lint:features": "tsx ./scripts/rust.mts lint-features interface",
-    "interface:publish": "tsx ./scripts/rust.mts publish interface",
-    "interface:test": "tsx ./scripts/rust.mts test interface",
-    "interface:wasm": "tsx ./scripts/rust.mts wasm interface",
-    "template:upgrade": "tsx ./scripts/helpers/upgrade-template.ts"
+    "generate:clients": "codama run --all"
   },
   "devDependencies": {
     "@codama/renderers-js": "^1.2.7",
     "@codama/renderers-rust": "^1.0.16",
-    "@iarna/toml": "^2.2.5",
-    "codama": "^1.2.8",
-    "tsx": "^4.19.2",
-    "typescript": "^5.5.2",
-    "zx": "^7.2.3"
+    "codama": "^1.2.8"
   },
   "engines": {
     "node": ">=v20.0.0"
