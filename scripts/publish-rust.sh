@@ -18,7 +18,7 @@ cd "$library_path"
 if [[ "$dry_run" != "true" ]]; then
     cargo release "$level" --no-push --no-tag --no-confirm --execute
 else
-    cargo release "$level" --dry-run
+    cargo release "$level"
     exit 0
 fi
 
