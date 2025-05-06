@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 PORT=8899
 LOG_FILE="./test-ledger/validator.log"

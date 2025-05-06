@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 if lsof -t -i:8899 > /dev/null; then
   echo "Stopping test validator..."
