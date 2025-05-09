@@ -5,7 +5,7 @@
 
 pub mod error;
 pub mod instruction;
-#[cfg(target_arch = "wasm32")]
+#[cfg(feature = "js")]
 mod wasm;
 
 #[cfg(test)]
