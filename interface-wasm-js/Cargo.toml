@@ -1,0 +1,26 @@
+[package]
+name = "solana-system-interface-wasm-js"
+version = "1.0.0"
+description = "Instructions and constructors for the System program"
+readme = "README.md"
+authors = { workspace = true }
+repository = { workspace = true }
+homepage = { workspace = true }
+license = { workspace = true }
+edition = { workspace = true }
+
+[package.metadata.docs.rs]
+targets = ["x86_64-unknown-linux-gnu", "wasm32-unknown-unknown"]
+all-features = true
+rustdoc-args = ["--cfg=docsrs"]
+
+[dependencies]
+solana-instruction = { workspace = true, features = ["bincode", "std"], optional = true }
+solana-pubkey = { workspace = true, default-features = false }
+
+[target.'cfg(target_arch = "wasm32")'.dependencies]
+js-sys = { version = "0.3.72", optional = true }
+wasm-bindgen = { version = "0.2", optional = true }
+
+[lib]
+crate-type = ["cdylib"]

@@ -5,8 +5,6 @@
 
 pub mod error;
 pub mod instruction;
-#[cfg(feature = "js")]
-mod wasm;
 
 #[cfg(test)]
 static_assertions::const_assert!(MAX_PERMITTED_DATA_LENGTH <= u32::MAX as u64);

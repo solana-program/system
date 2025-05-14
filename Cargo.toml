@@ -3,6 +3,7 @@ resolver = "2"
 members = [
     "clients/rust",
     "interface",
+    "interface-wasm-js",
     "program",
 ]
 
