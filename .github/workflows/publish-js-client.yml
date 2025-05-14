@@ -41,13 +41,13 @@ jobs:
           solana: true
 
       - name: Format
-        run: pnpm js:format
+        run: make format-js
 
       - name: Lint
-        run: pnpm js:lint
+        run: make lint-js
 
       - name: Test
-        run: pnpm js:test
+        run: make test-js
 
   publish_js:
     name: Publish JS client
@@ -83,7 +83,7 @@ jobs:
 
       - name: Publish JS Client
         id: publish
-        run: pnpm js:publish ${{ inputs.level }} ${{ inputs.tag }}
+        run: ./scripts/publish-js.sh clients/js ${{ inputs.level }} ${{ inputs.tag }}
 
       - name: Push Commit and Tag
         run: git push origin --follow-tags
