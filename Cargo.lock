@@ -4760,7 +4760,6 @@ version = "1.0.0"
 dependencies = [
  "anyhow",
  "borsh 1.5.5",
- "js-sys",
  "num-traits",
  "serde",
  "serde_derive",
@@ -4782,7 +4781,6 @@ dependencies = [
  "static_assertions",
  "strum",
  "strum_macros",
- "wasm-bindgen",
 ]
 
 [[package]]
@@ -4798,6 +4796,17 @@ dependencies = [
  "solana-decode-error",
  "solana-instruction",
  "solana-pubkey",
+ "wasm-bindgen",
+]
+
+[[package]]
+name = "solana-system-interface-wasm-js"
+version = "1.0.0"
+dependencies = [
+ "js-sys",
+ "solana-instruction",
+ "solana-pubkey",
+ "solana-system-interface 1.0.0",
  "wasm-bindgen",
 ]
 
