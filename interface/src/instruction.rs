@@ -279,7 +279,7 @@ pub enum SystemInstruction {
 /// The `payer` and `new_account` are signers.
 ///
 /// ```
-/// # use solana_program::example_mocks::{solana_sdk, solana_rpc_client};
+/// # use solana_example_mocks::{solana_sdk, solana_rpc_client};
 /// use solana_rpc_client::rpc_client::RpcClient;
 /// use solana_sdk::{
 ///     signature::{Keypair, Signer},
@@ -338,11 +338,11 @@ pub enum SystemInstruction {
 /// use borsh::{BorshDeserialize, BorshSerialize};
 /// use solana_account_info::{next_account_info, AccountInfo};
 /// use solana_cpi::invoke_signed;
-/// use solana_program::sysvar::{rent::Rent, Sysvar};
 /// use solana_program_entrypoint::entrypoint;
 /// use solana_program_error::ProgramResult;
 /// use solana_pubkey::Pubkey;
 /// use solana_system_interface::{instruction, program};
+/// use solana_sysvar::{rent::Rent, Sysvar};
 ///
 /// #[derive(BorshSerialize, BorshDeserialize, Debug)]
 /// pub struct CreateAccountInstruction {
@@ -481,7 +481,7 @@ pub fn create_account_with_seed(
 /// The `payer` and `new_account` are signers.
 ///
 /// ```
-/// # use solana_program::example_mocks::{solana_sdk, solana_rpc_client};
+/// # use solana_example_mocks::{solana_sdk, solana_rpc_client};
 /// use solana_rpc_client::rpc_client::RpcClient;
 /// use solana_pubkey::Pubkey;
 /// use solana_sdk::{
@@ -553,11 +553,11 @@ pub fn create_account_with_seed(
 /// use borsh::{BorshDeserialize, BorshSerialize};
 /// use solana_account_info::{next_account_info, AccountInfo};
 /// use solana_cpi::invoke_signed;
-/// use solana_program::sysvar::{rent::Rent, Sysvar};
 /// use solana_program_entrypoint::entrypoint;
 /// use solana_program_error::ProgramResult;
 /// use solana_pubkey::Pubkey;
 /// use solana_system_interface::{instruction, program};
+/// use solana_sysvar::{rent::Rent, Sysvar};
 ///
 /// #[derive(BorshSerialize, BorshDeserialize, Debug)]
 /// pub struct CreateAccountInstruction {
@@ -674,7 +674,7 @@ pub fn assign_with_seed(
 /// The `payer` and `new_account` are signers.
 ///
 /// ```
-/// # use solana_program::example_mocks::{solana_sdk, solana_rpc_client};
+/// # use solana_example_mocks::{solana_sdk, solana_rpc_client};
 /// use solana_rpc_client::rpc_client::RpcClient;
 /// use solana_pubkey::Pubkey;
 /// use solana_sdk::{
@@ -746,11 +746,11 @@ pub fn assign_with_seed(
 /// # use borsh::{BorshDeserialize, BorshSerialize};
 /// use solana_account_info::{next_account_info, AccountInfo};
 /// use solana_cpi::invoke_signed;
-/// use solana_program::sysvar::{rent::Rent, Sysvar};
 /// use solana_program_entrypoint::entrypoint;
 /// use solana_program_error::ProgramResult;
 /// use solana_pubkey::Pubkey;
 /// use solana_system_interface::{instruction, program};
+/// use solana_sysvar::{rent::Rent, Sysvar};
 ///
 /// #[derive(BorshSerialize, BorshDeserialize, Debug)]
 /// # #[borsh(crate = "borsh")]
@@ -873,7 +873,7 @@ pub fn transfer_with_seed(
 /// The `payer` and `new_account` are signers.
 ///
 /// ```
-/// # use solana_program::example_mocks::{solana_sdk, solana_rpc_client};
+/// # use solana_example_mocks::{solana_sdk, solana_rpc_client};
 /// use solana_rpc_client::rpc_client::RpcClient;
 /// use solana_pubkey::Pubkey;
 /// use solana_sdk::{
@@ -945,11 +945,11 @@ pub fn transfer_with_seed(
 /// use borsh::{BorshDeserialize, BorshSerialize};
 /// use solana_account_info::{next_account_info, AccountInfo};
 /// use solana_cpi::invoke_signed;
-/// use solana_program::sysvar::{rent::Rent, Sysvar};
 /// use solana_program_entrypoint::entrypoint;
 /// use solana_program_error::ProgramResult;
 /// use solana_pubkey::Pubkey;
 /// use solana_system_interface::{instruction, program};
+/// use solana_sysvar::{rent::Rent, Sysvar};
 ///
 /// #[derive(BorshSerialize, BorshDeserialize, Debug)]
 /// pub struct CreateAccountInstruction {
@@ -1059,7 +1059,7 @@ pub fn allocate_with_seed(
 /// This example performs multiple transfers in a single transaction.
 ///
 /// ```
-/// # use solana_program::example_mocks::{solana_sdk, solana_rpc_client};
+/// # use solana_example_mocks::{solana_sdk, solana_rpc_client};
 /// use solana_rpc_client::rpc_client::RpcClient;
 /// use solana_pubkey::Pubkey;
 /// use solana_sdk::{
@@ -1394,9 +1394,9 @@ pub fn create_nonce_account(
 /// Create and sign a transaction with a durable nonce:
 ///
 /// ```
-/// # use solana_program::example_mocks::solana_sdk;
-/// # use solana_program::example_mocks::solana_rpc_client;
-/// # use solana_program::example_mocks::solana_rpc_client_nonce_utils;
+/// # use solana_example_mocks::solana_sdk;
+/// # use solana_example_mocks::solana_rpc_client;
+/// # use solana_example_mocks::solana_rpc_client_nonce_utils;
 /// # use solana_sdk::account::Account;
 /// use solana_rpc_client::rpc_client::RpcClient;
 /// use solana_pubkey::Pubkey;
@@ -1515,8 +1515,8 @@ pub fn advance_nonce_account(nonce_pubkey: &Pubkey, authorized_pubkey: &Pubkey) 
 /// # Examples
 ///
 /// ```
-/// # use solana_program::example_mocks::solana_sdk;
-/// # use solana_program::example_mocks::solana_rpc_client;
+/// # use solana_example_mocks::solana_sdk;
+/// # use solana_example_mocks::solana_rpc_client;
 /// use solana_rpc_client::rpc_client::RpcClient;
 /// use solana_pubkey::Pubkey;
 /// use solana_sdk::{
@@ -1599,8 +1599,8 @@ pub fn withdraw_nonce_account(
 /// # Examples
 ///
 /// ```
-/// # use solana_program::example_mocks::solana_sdk;
-/// # use solana_program::example_mocks::solana_rpc_client;
+/// # use solana_example_mocks::solana_sdk;
+/// # use solana_example_mocks::solana_rpc_client;
 /// use solana_rpc_client::rpc_client::RpcClient;
 /// use solana_pubkey::Pubkey;
 /// use solana_sdk::{
@@ -1670,7 +1670,7 @@ pub fn upgrade_nonce_account(nonce_pubkey: Pubkey) -> Instruction {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use solana_program::sysvar::SysvarId;
+    use solana_sysvar_id::SysvarId;
 
     fn get_keys(instruction: &Instruction) -> Vec<Pubkey> {
         instruction.accounts.iter().map(|x| x.pubkey).collect()
@@ -1682,11 +1682,11 @@ mod tests {
         // Ensure that the constants are in sync with the solana program.
         assert_eq!(
             RECENT_BLOCKHASHES_ID,
-            solana_program::sysvar::recent_blockhashes::RecentBlockhashes::id(),
+            solana_sysvar::recent_blockhashes::RecentBlockhashes::id(),
         );
 
         // Ensure that the constants are in sync with the solana rent.
-        assert_eq!(RENT_ID, solana_program::sysvar::rent::Rent::id());
+        assert_eq!(RENT_ID, solana_sysvar::rent::Rent::id());
     }
 
     #[test]
