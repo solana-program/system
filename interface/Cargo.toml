@@ -38,11 +38,12 @@ solana-account-info = { workspace = true }
 solana-cpi = { workspace = true }
 solana-example-mocks = { workspace = true }
 solana-nonce = { workspace = true }
-solana-program = { workspace = true, default-features = false }
 solana-program-entrypoint = { workspace = true }
 solana-program-error = { workspace = true, features = ["borsh"] }
 solana-pubkey = { workspace = true, features = ["std"] }
 solana-system-interface = { path = ".", features = ["bincode"] }
+solana-sysvar = { workspace = true }
+solana-sysvar-id = { workspace = true }
 static_assertions = "1.1.0"
 strum = "0.24"
 strum_macros = "0.24"
