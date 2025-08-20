@@ -17,9 +17,6 @@ features-%:
 publish-%:
 	./scripts/publish-rust.sh $(subst -,/,$*)
 
-build-wasm-interface:
-	wasm-pack build --target nodejs --dev ./interface --features bincode
-
 lint-docs-%:
 	RUSTDOCFLAGS="--cfg docsrs -D warnings" cargo $(nightly) doc --all-features --no-deps --manifest-path $(subst -,/,$*)/Cargo.toml
 
