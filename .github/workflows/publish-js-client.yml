@@ -38,6 +38,7 @@ jobs:
       - name: Setup Environment
         uses: ./.github/actions/setup
         with:
+          pnpm: true
           solana: true
 
       - name: Format
@@ -61,6 +62,8 @@ jobs:
 
       - name: Setup Environment
         uses: ./.github/actions/setup
+        with:
+          pnpm: true
 
       - name: Ensure NPM_TOKEN variable is set
         env:
