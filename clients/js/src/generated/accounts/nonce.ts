@@ -21,12 +21,12 @@ import {
   getU64Encoder,
   type Account,
   type Address,
-  type Codec,
-  type Decoder,
   type EncodedAccount,
-  type Encoder,
   type FetchAccountConfig,
   type FetchAccountsConfig,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
   type MaybeAccount,
   type MaybeEncodedAccount,
 } from '@solana/kit';
@@ -57,7 +57,7 @@ export type NonceArgs = {
   lamportsPerSignature: number | bigint;
 };
 
-export function getNonceEncoder(): Encoder<NonceArgs> {
+export function getNonceEncoder(): FixedSizeEncoder<NonceArgs> {
   return getStructEncoder([
     ['version', getNonceVersionEncoder()],
     ['state', getNonceStateEncoder()],
@@ -67,7 +67,7 @@ export function getNonceEncoder(): Encoder<NonceArgs> {
   ]);
 }
 
-export function getNonceDecoder(): Decoder<Nonce> {
+export function getNonceDecoder(): FixedSizeDecoder<Nonce> {
   return getStructDecoder([
     ['version', getNonceVersionDecoder()],
     ['state', getNonceStateDecoder()],
@@ -77,7 +77,7 @@ export function getNonceDecoder(): Decoder<Nonce> {
   ]);
 }
 
-export function getNonceCodec(): Codec<NonceArgs, Nonce> {
+export function getNonceCodec(): FixedSizeCodec<NonceArgs, Nonce> {
   return combineCodec(getNonceEncoder(), getNonceDecoder());
 }
 
