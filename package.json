@@ -5,9 +5,9 @@
     "generate:clients": "codama run --all"
   },
   "devDependencies": {
-    "@codama/renderers-js": "^1.2.7",
-    "@codama/renderers-rust": "^1.0.16",
-    "codama": "^1.2.8"
+    "@codama/renderers-js": "^1.3",
+    "@codama/renderers-rust": "~1.0",
+    "codama": "^1.3"
   },
   "engines": {
     "node": ">=v20.0.0"
