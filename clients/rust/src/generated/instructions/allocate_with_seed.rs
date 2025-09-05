@@ -15,7 +15,7 @@ use solana_program::pubkey::Pubkey;
 pub struct AllocateWithSeed {
     pub new_account: solana_program::pubkey::Pubkey,
 
-    pub base_account: Option<solana_program::pubkey::Pubkey>,
+    pub base_account: solana_program::pubkey::Pubkey,
 }
 
 impl AllocateWithSeed {
@@ -37,12 +37,10 @@ impl AllocateWithSeed {
             self.new_account,
             false,
         ));
-        if let Some(base_account) = self.base_account {
-            accounts.push(solana_program::instruction::AccountMeta::new_readonly(
-                base_account,
-                true,
-            ));
-        }
+        accounts.push(solana_program::instruction::AccountMeta::new_readonly(
+            self.base_account,
+            true,
+        ));
         accounts.extend_from_slice(remaining_accounts);
         let mut data = borsh::to_vec(&AllocateWithSeedInstructionData::new()).unwrap();
         let mut args = borsh::to_vec(&args).unwrap();
@@ -88,7 +86,7 @@ pub struct AllocateWithSeedInstructionArgs {
 /// ### Accounts:
 ///
 ///   0. `[writable]` new_account
-///   1. `[signer, optional]` base_account
+///   1. `[signer]` base_account
 #[derive(Clone, Debug, Default)]
 pub struct AllocateWithSeedBuilder {
     new_account: Option<solana_program::pubkey::Pubkey>,
@@ -109,13 +107,9 @@ impl AllocateWithSeedBuilder {
         self.new_account = Some(new_account);
         self
     }
-    /// `[optional account]`
     #[inline(always)]
-    pub fn base_account(
-        &mut self,
-        base_account: Option<solana_program::pubkey::Pubkey>,
-    ) -> &mut Self {
-        self.base_account = base_account;
+    pub fn base_account(&mut self, base_account: solana_program::pubkey::Pubkey) -> &mut Self {
+        self.base_account = Some(base_account);
         self
     }
     #[inline(always)]
@@ -160,7 +154,7 @@ impl AllocateWithSeedBuilder {
     pub fn instruction(&self) -> solana_program::instruction::Instruction {
         let accounts = AllocateWithSeed {
             new_account: self.new_account.expect("new_account is not set"),
-            base_account: self.base_account,
+            base_account: self.base_account.expect("base_account is not set"),
         };
         let args = AllocateWithSeedInstructionArgs {
             base: self.base.clone().expect("base is not set"),
@@ -180,7 +174,7 @@ impl AllocateWithSeedBuilder {
 pub struct AllocateWithSeedCpiAccounts<'a, 'b> {
     pub new_account: &'b solana_program::account_info::AccountInfo<'a>,
 
-    pub base_account: Option<&'b solana_program::account_info::AccountInfo<'a>>,
+    pub base_account: &'b solana_program::account_info::AccountInfo<'a>,
 }
 
 /// `allocate_with_seed` CPI instruction.
@@ -190,7 +184,7 @@ pub struct AllocateWithSeedCpi<'a, 'b> {
 
     pub new_account: &'b solana_program::account_info::AccountInfo<'a>,
 
-    pub base_account: Option<&'b solana_program::account_info::AccountInfo<'a>>,
+    pub base_account: &'b solana_program::account_info::AccountInfo<'a>,
     /// The arguments for the instruction.
     pub __args: AllocateWithSeedInstructionArgs,
 }
@@ -247,12 +241,10 @@ impl<'a, 'b> AllocateWithSeedCpi<'a, 'b> {
             *self.new_account.key,
             false,
         ));
-        if let Some(base_account) = self.base_account {
-            accounts.push(solana_program::instruction::AccountMeta::new_readonly(
-                *base_account.key,
-                true,
-            ));
-        }
+        accounts.push(solana_program::instruction::AccountMeta::new_readonly(
+            *self.base_account.key,
+            true,
+        ));
         remaining_accounts.iter().for_each(|remaining_account| {
             accounts.push(solana_program::instruction::AccountMeta {
                 pubkey: *remaining_account.0.key,
@@ -272,9 +264,7 @@ impl<'a, 'b> AllocateWithSeedCpi<'a, 'b> {
         let mut account_infos = Vec::with_capacity(3 + remaining_accounts.len());
         account_infos.push(self.__program.clone());
         account_infos.push(self.new_account.clone());
-        if let Some(base_account) = self.base_account {
-            account_infos.push(base_account.clone());
-        }
+        account_infos.push(self.base_account.clone());
         remaining_accounts
             .iter()
             .for_each(|remaining_account| account_infos.push(remaining_account.0.clone()));
@@ -292,7 +282,7 @@ impl<'a, 'b> AllocateWithSeedCpi<'a, 'b> {
 /// ### Accounts:
 ///
 ///   0. `[writable]` new_account
-///   1. `[signer, optional]` base_account
+///   1. `[signer]` base_account
 #[derive(Clone, Debug)]
 pub struct AllocateWithSeedCpiBuilder<'a, 'b> {
     instruction: Box<AllocateWithSeedCpiBuilderInstruction<'a, 'b>>,
@@ -320,13 +310,12 @@ impl<'a, 'b> AllocateWithSeedCpiBuilder<'a, 'b> {
         self.instruction.new_account = Some(new_account);
         self
     }
-    /// `[optional account]`
     #[inline(always)]
     pub fn base_account(
         &mut self,
-        base_account: Option<&'b solana_program::account_info::AccountInfo<'a>>,
+        base_account: &'b solana_program::account_info::AccountInfo<'a>,
     ) -> &mut Self {
-        self.instruction.base_account = base_account;
+        self.instruction.base_account = Some(base_account);
         self
     }
     #[inline(always)]
@@ -408,7 +397,10 @@ impl<'a, 'b> AllocateWithSeedCpiBuilder<'a, 'b> {
                 .new_account
                 .expect("new_account is not set"),
 
-            base_account: self.instruction.base_account,
+            base_account: self
+                .instruction
+                .base_account
+                .expect("base_account is not set"),
             __args: args,
         };
         instruction.invoke_signed_with_remaining_accounts(

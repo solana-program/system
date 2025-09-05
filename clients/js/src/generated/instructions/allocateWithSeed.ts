@@ -47,10 +47,7 @@ export function getAllocateWithSeedDiscriminatorBytes() {
 export type AllocateWithSeedInstruction<
   TProgram extends string = typeof SYSTEM_PROGRAM_ADDRESS,
   TAccountNewAccount extends string | AccountMeta<string> = string,
-  TAccountBaseAccount extends
-    | string
-    | AccountMeta<string>
-    | undefined = undefined,
+  TAccountBaseAccount extends string | AccountMeta<string> = string,
   TRemainingAccounts extends readonly AccountMeta<string>[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
@@ -59,14 +56,10 @@ export type AllocateWithSeedInstruction<
       TAccountNewAccount extends string
         ? WritableAccount<TAccountNewAccount>
         : TAccountNewAccount,
-      ...(TAccountBaseAccount extends undefined
-        ? []
-        : [
-            TAccountBaseAccount extends string
-              ? ReadonlySignerAccount<TAccountBaseAccount> &
-                  AccountSignerMeta<TAccountBaseAccount>
-              : TAccountBaseAccount,
-          ]),
+      TAccountBaseAccount extends string
+        ? ReadonlySignerAccount<TAccountBaseAccount> &
+            AccountSignerMeta<TAccountBaseAccount>
+        : TAccountBaseAccount,
       ...TRemainingAccounts,
     ]
   >;
@@ -124,7 +117,7 @@ export type AllocateWithSeedInput<
   TAccountBaseAccount extends string = string,
 > = {
   newAccount: Address<TAccountNewAccount>;
-  baseAccount?: TransactionSigner<TAccountBaseAccount>;
+  baseAccount: TransactionSigner<TAccountBaseAccount>;
   base: AllocateWithSeedInstructionDataArgs['base'];
   seed: AllocateWithSeedInstructionDataArgs['seed'];
   space: AllocateWithSeedInstructionDataArgs['space'];
@@ -164,7 +157,7 @@ export function getAllocateWithSeedInstruction<
     accounts: [
       getAccountMeta(accounts.newAccount),
       getAccountMeta(accounts.baseAccount),
-    ].filter(<T,>(x: T | undefined): x is T => x !== undefined),
+    ],
     programAddress,
     data: getAllocateWithSeedInstructionDataEncoder().encode(
       args as AllocateWithSeedInstructionDataArgs
@@ -185,7 +178,7 @@ export type ParsedAllocateWithSeedInstruction<
   programAddress: Address<TProgram>;
   accounts: {
     newAccount: TAccountMetas[0];
-    baseAccount?: TAccountMetas[1] | undefined;
+    baseAccount: TAccountMetas[1];
   };
   data: AllocateWithSeedInstructionData;
 };
@@ -198,7 +191,7 @@ export function parseAllocateWithSeedInstruction<
     InstructionWithAccounts<TAccountMetas> &
     InstructionWithData<ReadonlyUint8Array>
 ): ParsedAllocateWithSeedInstruction<TProgram, TAccountMetas> {
-  if (instruction.accounts.length < 1) {
+  if (instruction.accounts.length < 2) {
     // TODO: Coded error.
     throw new Error('Not enough accounts');
   }
@@ -208,17 +201,11 @@ export function parseAllocateWithSeedInstruction<
     accountIndex += 1;
     return accountMeta;
   };
-  let optionalAccountsRemaining = instruction.accounts.length - 1;
-  const getNextOptionalAccount = () => {
-    if (optionalAccountsRemaining === 0) return undefined;
-    optionalAccountsRemaining -= 1;
-    return getNextAccount();
-  };
   return {
     programAddress: instruction.programAddress,
     accounts: {
       newAccount: getNextAccount(),
-      baseAccount: getNextOptionalAccount(),
+      baseAccount: getNextAccount(),
     },
     data: getAllocateWithSeedInstructionDataDecoder().decode(instruction.data),
   };
