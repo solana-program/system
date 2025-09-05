@@ -163,7 +163,7 @@ export function getTransferSolWithSeedInstruction<
   // Original args.
   const args = { ...input };
 
-  const getAccountMeta = getAccountMetaFactory(programAddress, 'programId');
+  const getAccountMeta = getAccountMetaFactory(programAddress, 'omitted');
   const instruction = {
     accounts: [
       getAccountMeta(accounts.source),

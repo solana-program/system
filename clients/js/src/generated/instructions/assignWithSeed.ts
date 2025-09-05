@@ -47,7 +47,10 @@ export function getAssignWithSeedDiscriminatorBytes() {
 export type AssignWithSeedInstruction<
   TProgram extends string = typeof SYSTEM_PROGRAM_ADDRESS,
   TAccountAccount extends string | AccountMeta<string> = string,
-  TAccountBaseAccount extends string | AccountMeta<string> = string,
+  TAccountBaseAccount extends
+    | string
+    | AccountMeta<string>
+    | undefined = undefined,
   TRemainingAccounts extends readonly AccountMeta<string>[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
@@ -56,10 +59,14 @@ export type AssignWithSeedInstruction<
       TAccountAccount extends string
         ? WritableAccount<TAccountAccount>
         : TAccountAccount,
-      TAccountBaseAccount extends string
-        ? ReadonlySignerAccount<TAccountBaseAccount> &
-            AccountSignerMeta<TAccountBaseAccount>
-        : TAccountBaseAccount,
+      ...(TAccountBaseAccount extends undefined
+        ? []
+        : [
+            TAccountBaseAccount extends string
+              ? ReadonlySignerAccount<TAccountBaseAccount> &
+                  AccountSignerMeta<TAccountBaseAccount>
+              : TAccountBaseAccount,
+          ]),
       ...TRemainingAccounts,
     ]
   >;
@@ -113,7 +120,7 @@ export type AssignWithSeedInput<
   TAccountBaseAccount extends string = string,
 > = {
   account: Address<TAccountAccount>;
-  baseAccount: TransactionSigner<TAccountBaseAccount>;
+  baseAccount?: TransactionSigner<TAccountBaseAccount>;
   base: AssignWithSeedInstructionDataArgs['base'];
   seed: AssignWithSeedInstructionDataArgs['seed'];
   programAddress: AssignWithSeedInstructionDataArgs['programAddress'];
@@ -147,12 +154,12 @@ export function getAssignWithSeedInstruction<
   // Original args.
   const args = { ...input };
 
-  const getAccountMeta = getAccountMetaFactory(programAddress, 'programId');
+  const getAccountMeta = getAccountMetaFactory(programAddress, 'omitted');
   const instruction = {
     accounts: [
       getAccountMeta(accounts.account),
       getAccountMeta(accounts.baseAccount),
-    ],
+    ].filter(<T,>(x: T | undefined): x is T => x !== undefined),
     programAddress,
     data: getAssignWithSeedInstructionDataEncoder().encode(
       args as AssignWithSeedInstructionDataArgs
@@ -173,7 +180,7 @@ export type ParsedAssignWithSeedInstruction<
   programAddress: Address<TProgram>;
   accounts: {
     account: TAccountMetas[0];
-    baseAccount: TAccountMetas[1];
+    baseAccount?: TAccountMetas[1] | undefined;
   };
   data: AssignWithSeedInstructionData;
 };
@@ -186,7 +193,7 @@ export function parseAssignWithSeedInstruction<
     InstructionWithAccounts<TAccountMetas> &
     InstructionWithData<ReadonlyUint8Array>
 ): ParsedAssignWithSeedInstruction<TProgram, TAccountMetas> {
-  if (instruction.accounts.length < 2) {
+  if (instruction.accounts.length < 1) {
     // TODO: Coded error.
     throw new Error('Not enough accounts');
   }
@@ -196,11 +203,17 @@ export function parseAssignWithSeedInstruction<
     accountIndex += 1;
     return accountMeta;
   };
+  let optionalAccountsRemaining = instruction.accounts.length - 1;
+  const getNextOptionalAccount = () => {
+    if (optionalAccountsRemaining === 0) return undefined;
+    optionalAccountsRemaining -= 1;
+    return getNextAccount();
+  };
   return {
     programAddress: instruction.programAddress,
     accounts: {
       account: getNextAccount(),
-      baseAccount: getNextAccount(),
+      baseAccount: getNextOptionalAccount(),
     },
     data: getAssignWithSeedInstructionDataDecoder().decode(instruction.data),
   };

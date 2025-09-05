@@ -12,25 +12,35 @@
             {
               "kind": "structFieldTypeNode",
               "name": "version",
-              "type": { "kind": "definedTypeLinkNode", "name": "nonceVersion" },
+              "type": {
+                "kind": "definedTypeLinkNode",
+                "name": "nonceVersion"
+              },
               "docs": []
             },
             {
               "kind": "structFieldTypeNode",
               "name": "state",
-              "type": { "kind": "definedTypeLinkNode", "name": "nonceState" },
+              "type": {
+                "kind": "definedTypeLinkNode",
+                "name": "nonceState"
+              },
               "docs": []
             },
             {
               "kind": "structFieldTypeNode",
               "name": "authority",
-              "type": { "kind": "publicKeyTypeNode" },
+              "type": {
+                "kind": "publicKeyTypeNode"
+              },
               "docs": []
             },
             {
               "kind": "structFieldTypeNode",
               "name": "blockhash",
-              "type": { "kind": "publicKeyTypeNode" },
+              "type": {
+                "kind": "publicKeyTypeNode"
+              },
               "docs": []
             },
             {
@@ -62,7 +72,9 @@
             "isSigner": true,
             "isOptional": false,
             "docs": [],
-            "defaultValue": { "kind": "payerValueNode" }
+            "defaultValue": {
+              "kind": "payerValueNode"
+            }
           },
           {
             "kind": "instructionAccountNode",
@@ -83,7 +95,10 @@
               "endian": "le"
             },
             "docs": [],
-            "defaultValue": { "kind": "numberValueNode", "number": 0 },
+            "defaultValue": {
+              "kind": "numberValueNode",
+              "number": 0
+            },
             "defaultValueStrategy": "omitted"
           },
           {
@@ -109,14 +124,19 @@
           {
             "kind": "instructionArgumentNode",
             "name": "programAddress",
-            "type": { "kind": "publicKeyTypeNode" },
+            "type": {
+              "kind": "publicKeyTypeNode"
+            },
             "docs": []
           }
         ],
         "byteDeltas": [
           {
             "kind": "instructionByteDeltaNode",
-            "value": { "kind": "argumentValueNode", "name": "space" },
+            "value": {
+              "kind": "argumentValueNode",
+              "name": "space"
+            },
             "withHeader": true
           }
         ],
@@ -130,7 +150,7 @@
         "name": "createAccount",
         "idlName": "CreateAccount",
         "docs": [],
-        "optionalAccountStrategy": "programId"
+        "optionalAccountStrategy": "omitted"
       },
       {
         "kind": "instructionNode",
@@ -154,13 +174,18 @@
               "endian": "le"
             },
             "docs": [],
-            "defaultValue": { "kind": "numberValueNode", "number": 1 },
+            "defaultValue": {
+              "kind": "numberValueNode",
+              "number": 1
+            },
             "defaultValueStrategy": "omitted"
           },
           {
             "kind": "instructionArgumentNode",
             "name": "programAddress",
-            "type": { "kind": "publicKeyTypeNode" },
+            "type": {
+              "kind": "publicKeyTypeNode"
+            },
             "docs": []
           }
         ],
@@ -174,7 +199,7 @@
         "name": "assign",
         "idlName": "Assign",
         "docs": [],
-        "optionalAccountStrategy": "programId"
+        "optionalAccountStrategy": "omitted"
       },
       {
         "kind": "instructionNode",
@@ -206,7 +231,10 @@
               "endian": "le"
             },
             "docs": [],
-            "defaultValue": { "kind": "numberValueNode", "number": 2 },
+            "defaultValue": {
+              "kind": "numberValueNode",
+              "number": 2
+            },
             "defaultValueStrategy": "omitted"
           },
           {
@@ -230,7 +258,7 @@
         "name": "transferSol",
         "idlName": "TransferSol",
         "docs": [],
-        "optionalAccountStrategy": "programId"
+        "optionalAccountStrategy": "omitted"
       },
       {
         "kind": "instructionNode",
@@ -242,7 +270,9 @@
             "isSigner": true,
             "isOptional": false,
             "docs": [],
-            "defaultValue": { "kind": "payerValueNode" }
+            "defaultValue": {
+              "kind": "payerValueNode"
+            }
           },
           {
             "kind": "instructionAccountNode",
@@ -257,7 +287,7 @@
             "name": "baseAccount",
             "isWritable": false,
             "isSigner": true,
-            "isOptional": false,
+            "isOptional": true,
             "docs": []
           }
         ],
@@ -271,13 +301,18 @@
               "endian": "le"
             },
             "docs": [],
-            "defaultValue": { "kind": "numberValueNode", "number": 3 },
+            "defaultValue": {
+              "kind": "numberValueNode",
+              "number": 3
+            },
             "defaultValueStrategy": "omitted"
           },
           {
             "kind": "instructionArgumentNode",
             "name": "base",
-            "type": { "kind": "publicKeyTypeNode" },
+            "type": {
+              "kind": "publicKeyTypeNode"
+            },
             "docs": []
           },
           {
@@ -285,7 +320,10 @@
             "name": "seed",
             "type": {
               "kind": "sizePrefixTypeNode",
-              "type": { "kind": "stringTypeNode", "encoding": "utf8" },
+              "type": {
+                "kind": "stringTypeNode",
+                "encoding": "utf8"
+              },
               "prefix": {
                 "kind": "numberTypeNode",
                 "format": "u64",
@@ -317,7 +355,9 @@
           {
             "kind": "instructionArgumentNode",
             "name": "programAddress",
-            "type": { "kind": "publicKeyTypeNode" },
+            "type": {
+              "kind": "publicKeyTypeNode"
+            },
             "docs": []
           }
         ],
@@ -331,7 +371,7 @@
         "name": "createAccountWithSeed",
         "idlName": "CreateAccountWithSeed",
         "docs": [],
-        "optionalAccountStrategy": "programId"
+        "optionalAccountStrategy": "omitted"
       },
       {
         "kind": "instructionNode",
@@ -375,7 +415,10 @@
               "endian": "le"
             },
             "docs": [],
-            "defaultValue": { "kind": "numberValueNode", "number": 4 },
+            "defaultValue": {
+              "kind": "numberValueNode",
+              "number": 4
+            },
             "defaultValueStrategy": "omitted"
           }
         ],
@@ -389,7 +432,7 @@
         "name": "advanceNonceAccount",
         "idlName": "AdvanceNonceAccount",
         "docs": [],
-        "optionalAccountStrategy": "programId"
+        "optionalAccountStrategy": "omitted"
       },
       {
         "kind": "instructionNode",
@@ -453,7 +496,10 @@
               "endian": "le"
             },
             "docs": [],
-            "defaultValue": { "kind": "numberValueNode", "number": 5 },
+            "defaultValue": {
+              "kind": "numberValueNode",
+              "number": 5
+            },
             "defaultValueStrategy": "omitted"
           },
           {
@@ -477,7 +523,7 @@
         "name": "withdrawNonceAccount",
         "idlName": "WithdrawNonceAccount",
         "docs": [],
-        "optionalAccountStrategy": "programId"
+        "optionalAccountStrategy": "omitted"
       },
       {
         "kind": "instructionNode",
@@ -525,13 +571,18 @@
               "endian": "le"
             },
             "docs": [],
-            "defaultValue": { "kind": "numberValueNode", "number": 6 },
+            "defaultValue": {
+              "kind": "numberValueNode",
+              "number": 6
+            },
             "defaultValueStrategy": "omitted"
           },
           {
             "kind": "instructionArgumentNode",
             "name": "nonceAuthority",
-            "type": { "kind": "publicKeyTypeNode" },
+            "type": {
+              "kind": "publicKeyTypeNode"
+            },
             "docs": []
           }
         ],
@@ -545,7 +596,7 @@
         "name": "initializeNonceAccount",
         "idlName": "InitializeNonceAccount",
         "docs": [],
-        "optionalAccountStrategy": "programId"
+        "optionalAccountStrategy": "omitted"
       },
       {
         "kind": "instructionNode",
@@ -577,13 +628,18 @@
               "endian": "le"
             },
             "docs": [],
-            "defaultValue": { "kind": "numberValueNode", "number": 7 },
+            "defaultValue": {
+              "kind": "numberValueNode",
+              "number": 7
+            },
             "defaultValueStrategy": "omitted"
           },
           {
             "kind": "instructionArgumentNode",
             "name": "newNonceAuthority",
-            "type": { "kind": "publicKeyTypeNode" },
+            "type": {
+              "kind": "publicKeyTypeNode"
+            },
             "docs": []
           }
         ],
@@ -597,7 +653,7 @@
         "name": "authorizeNonceAccount",
         "idlName": "AuthorizeNonceAccount",
         "docs": [],
-        "optionalAccountStrategy": "programId"
+        "optionalAccountStrategy": "omitted"
       },
       {
         "kind": "instructionNode",
@@ -621,7 +677,10 @@
               "endian": "le"
             },
             "docs": [],
-            "defaultValue": { "kind": "numberValueNode", "number": 8 },
+            "defaultValue": {
+              "kind": "numberValueNode",
+              "number": 8
+            },
             "defaultValueStrategy": "omitted"
           },
           {
@@ -645,7 +704,7 @@
         "name": "allocate",
         "idlName": "Allocate",
         "docs": [],
-        "optionalAccountStrategy": "programId"
+        "optionalAccountStrategy": "omitted"
       },
       {
         "kind": "instructionNode",
@@ -663,7 +722,7 @@
             "name": "baseAccount",
             "isWritable": false,
             "isSigner": true,
-            "isOptional": false,
+            "isOptional": true,
             "docs": []
           }
         ],
@@ -677,13 +736,18 @@
               "endian": "le"
             },
             "docs": [],
-            "defaultValue": { "kind": "numberValueNode", "number": 9 },
+            "defaultValue": {
+              "kind": "numberValueNode",
+              "number": 9
+            },
             "defaultValueStrategy": "omitted"
           },
           {
             "kind": "instructionArgumentNode",
             "name": "base",
-            "type": { "kind": "publicKeyTypeNode" },
+            "type": {
+              "kind": "publicKeyTypeNode"
+            },
             "docs": []
           },
           {
@@ -691,7 +755,10 @@
             "name": "seed",
             "type": {
               "kind": "sizePrefixTypeNode",
-              "type": { "kind": "stringTypeNode", "encoding": "utf8" },
+              "type": {
+                "kind": "stringTypeNode",
+                "encoding": "utf8"
+              },
               "prefix": {
                 "kind": "numberTypeNode",
                 "format": "u64",
@@ -713,7 +780,9 @@
           {
             "kind": "instructionArgumentNode",
             "name": "programAddress",
-            "type": { "kind": "publicKeyTypeNode" },
+            "type": {
+              "kind": "publicKeyTypeNode"
+            },
             "docs": []
           }
         ],
@@ -727,7 +796,7 @@
         "name": "allocateWithSeed",
         "idlName": "AllocateWithSeed",
         "docs": [],
-        "optionalAccountStrategy": "programId"
+        "optionalAccountStrategy": "omitted"
       },
       {
         "kind": "instructionNode",
@@ -745,7 +814,7 @@
             "name": "baseAccount",
             "isWritable": false,
             "isSigner": true,
-            "isOptional": false,
+            "isOptional": true,
             "docs": []
           }
         ],
@@ -759,13 +828,18 @@
               "endian": "le"
             },
             "docs": [],
-            "defaultValue": { "kind": "numberValueNode", "number": 10 },
+            "defaultValue": {
+              "kind": "numberValueNode",
+              "number": 10
+            },
             "defaultValueStrategy": "omitted"
           },
           {
             "kind": "instructionArgumentNode",
             "name": "base",
-            "type": { "kind": "publicKeyTypeNode" },
+            "type": {
+              "kind": "publicKeyTypeNode"
+            },
             "docs": []
           },
           {
@@ -773,7 +847,10 @@
             "name": "seed",
             "type": {
               "kind": "sizePrefixTypeNode",
-              "type": { "kind": "stringTypeNode", "encoding": "utf8" },
+              "type": {
+                "kind": "stringTypeNode",
+                "encoding": "utf8"
+              },
               "prefix": {
                 "kind": "numberTypeNode",
                 "format": "u64",
@@ -785,7 +862,9 @@
           {
             "kind": "instructionArgumentNode",
             "name": "programAddress",
-            "type": { "kind": "publicKeyTypeNode" },
+            "type": {
+              "kind": "publicKeyTypeNode"
+            },
             "docs": []
           }
         ],
@@ -799,7 +878,7 @@
         "name": "assignWithSeed",
         "idlName": "AssignWithSeed",
         "docs": [],
-        "optionalAccountStrategy": "programId"
+        "optionalAccountStrategy": "omitted"
       },
       {
         "kind": "instructionNode",
@@ -839,7 +918,10 @@
               "endian": "le"
             },
             "docs": [],
-            "defaultValue": { "kind": "numberValueNode", "number": 11 },
+            "defaultValue": {
+              "kind": "numberValueNode",
+              "number": 11
+            },
             "defaultValueStrategy": "omitted"
           },
           {
@@ -857,7 +939,10 @@
             "name": "fromSeed",
             "type": {
               "kind": "sizePrefixTypeNode",
-              "type": { "kind": "stringTypeNode", "encoding": "utf8" },
+              "type": {
+                "kind": "stringTypeNode",
+                "encoding": "utf8"
+              },
               "prefix": {
                 "kind": "numberTypeNode",
                 "format": "u64",
@@ -869,7 +954,9 @@
           {
             "kind": "instructionArgumentNode",
             "name": "fromOwner",
-            "type": { "kind": "publicKeyTypeNode" },
+            "type": {
+              "kind": "publicKeyTypeNode"
+            },
             "docs": []
           }
         ],
@@ -883,7 +970,7 @@
         "name": "transferSolWithSeed",
         "idlName": "TransferSolWithSeed",
         "docs": [],
-        "optionalAccountStrategy": "programId"
+        "optionalAccountStrategy": "omitted"
       },
       {
         "kind": "instructionNode",
@@ -907,7 +994,10 @@
               "endian": "le"
             },
             "docs": [],
-            "defaultValue": { "kind": "numberValueNode", "number": 12 },
+            "defaultValue": {
+              "kind": "numberValueNode",
+              "number": 12
+            },
             "defaultValueStrategy": "omitted"
           }
         ],
@@ -921,7 +1011,7 @@
         "name": "upgradeNonceAccount",
         "idlName": "UpgradeNonceAccount",
         "docs": [],
-        "optionalAccountStrategy": "programId"
+        "optionalAccountStrategy": "omitted"
       }
     ],
     "definedTypes": [
@@ -931,10 +1021,20 @@
         "type": {
           "kind": "enumTypeNode",
           "variants": [
-            { "kind": "enumEmptyVariantTypeNode", "name": "legacy" },
-            { "kind": "enumEmptyVariantTypeNode", "name": "current" }
+            {
+              "kind": "enumEmptyVariantTypeNode",
+              "name": "legacy"
+            },
+            {
+              "kind": "enumEmptyVariantTypeNode",
+              "name": "current"
+            }
           ],
-          "size": { "kind": "numberTypeNode", "format": "u32", "endian": "le" }
+          "size": {
+            "kind": "numberTypeNode",
+            "format": "u32",
+            "endian": "le"
+          }
         },
         "idlName": "NonceVersion",
         "docs": []
@@ -945,10 +1045,20 @@
         "type": {
           "kind": "enumTypeNode",
           "variants": [
-            { "kind": "enumEmptyVariantTypeNode", "name": "uninitialized" },
-            { "kind": "enumEmptyVariantTypeNode", "name": "initialized" }
+            {
+              "kind": "enumEmptyVariantTypeNode",
+              "name": "uninitialized"
+            },
+            {
+              "kind": "enumEmptyVariantTypeNode",
+              "name": "initialized"
+            }
           ],
-          "size": { "kind": "numberTypeNode", "format": "u32", "endian": "le" }
+          "size": {
+            "kind": "numberTypeNode",
+            "format": "u32",
+            "endian": "le"
+          }
         },
         "idlName": "NonceState",
         "docs": []
@@ -981,7 +1091,9 @@
         "idlName": "InvalidProgramId",
         "code": 2,
         "message": "cannot assign account to this program id",
-        "docs": ["InvalidProgramId: cannot assign account to this program id"]
+        "docs": [
+          "InvalidProgramId: cannot assign account to this program id"
+        ]
       },
       {
         "kind": "errorNode",
@@ -999,7 +1111,9 @@
         "idlName": "MaxSeedLengthExceeded",
         "code": 4,
         "message": "length of requested seed is too long",
-        "docs": ["MaxSeedLengthExceeded: length of requested seed is too long"]
+        "docs": [
+          "MaxSeedLengthExceeded: length of requested seed is too long"
+        ]
       },
       {
         "kind": "errorNode",
