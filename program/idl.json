@@ -296,7 +296,7 @@
           },
           {
             "kind": "instructionArgumentNode",
-            "name": "amount",
+            "name": "lamports",
             "type": {
               "kind": "numberTypeNode",
               "format": "u64",
