@@ -188,7 +188,7 @@ export function getCreateAccountWithSeedInstruction<
       getAccountMeta(accounts.payer),
       getAccountMeta(accounts.newAccount),
       getAccountMeta(accounts.baseAccount),
-    ].filter(<T,>(x: T | undefined): x is T => x !== undefined),
+    ].filter(<T>(x: T | undefined): x is T => x !== undefined),
     programAddress,
     data: getCreateAccountWithSeedInstructionDataEncoder().encode(
       args as CreateAccountWithSeedInstructionDataArgs
