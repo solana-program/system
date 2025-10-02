@@ -21,7 +21,7 @@ export default {
           anchorTraits: false,
           crateFolder: 'clients/rust',
           formatCode: true,
-          toolchain: '+1.86.0',
+          toolchain: '+nightly-2025-02-16',
         },
       ],
     },
