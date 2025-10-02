@@ -130,7 +130,7 @@
         "name": "createAccount",
         "idlName": "CreateAccount",
         "docs": [],
-        "optionalAccountStrategy": "programId"
+        "optionalAccountStrategy": "omitted"
       },
       {
         "kind": "instructionNode",
@@ -174,7 +174,7 @@
         "name": "assign",
         "idlName": "Assign",
         "docs": [],
-        "optionalAccountStrategy": "programId"
+        "optionalAccountStrategy": "omitted"
       },
       {
         "kind": "instructionNode",
@@ -230,7 +230,7 @@
         "name": "transferSol",
         "idlName": "TransferSol",
         "docs": [],
-        "optionalAccountStrategy": "programId"
+        "optionalAccountStrategy": "omitted"
       },
       {
         "kind": "instructionNode",
@@ -257,7 +257,7 @@
             "name": "baseAccount",
             "isWritable": false,
             "isSigner": true,
-            "isOptional": false,
+            "isOptional": true,
             "docs": []
           }
         ],
@@ -331,7 +331,7 @@
         "name": "createAccountWithSeed",
         "idlName": "CreateAccountWithSeed",
         "docs": [],
-        "optionalAccountStrategy": "programId"
+        "optionalAccountStrategy": "omitted"
       },
       {
         "kind": "instructionNode",
@@ -389,7 +389,7 @@
         "name": "advanceNonceAccount",
         "idlName": "AdvanceNonceAccount",
         "docs": [],
-        "optionalAccountStrategy": "programId"
+        "optionalAccountStrategy": "omitted"
       },
       {
         "kind": "instructionNode",
@@ -477,7 +477,7 @@
         "name": "withdrawNonceAccount",
         "idlName": "WithdrawNonceAccount",
         "docs": [],
-        "optionalAccountStrategy": "programId"
+        "optionalAccountStrategy": "omitted"
       },
       {
         "kind": "instructionNode",
@@ -545,7 +545,7 @@
         "name": "initializeNonceAccount",
         "idlName": "InitializeNonceAccount",
         "docs": [],
-        "optionalAccountStrategy": "programId"
+        "optionalAccountStrategy": "omitted"
       },
       {
         "kind": "instructionNode",
@@ -597,7 +597,7 @@
         "name": "authorizeNonceAccount",
         "idlName": "AuthorizeNonceAccount",
         "docs": [],
-        "optionalAccountStrategy": "programId"
+        "optionalAccountStrategy": "omitted"
       },
       {
         "kind": "instructionNode",
@@ -645,7 +645,7 @@
         "name": "allocate",
         "idlName": "Allocate",
         "docs": [],
-        "optionalAccountStrategy": "programId"
+        "optionalAccountStrategy": "omitted"
       },
       {
         "kind": "instructionNode",
@@ -727,7 +727,7 @@
         "name": "allocateWithSeed",
         "idlName": "AllocateWithSeed",
         "docs": [],
-        "optionalAccountStrategy": "programId"
+        "optionalAccountStrategy": "omitted"
       },
       {
         "kind": "instructionNode",
@@ -799,7 +799,7 @@
         "name": "assignWithSeed",
         "idlName": "AssignWithSeed",
         "docs": [],
-        "optionalAccountStrategy": "programId"
+        "optionalAccountStrategy": "omitted"
       },
       {
         "kind": "instructionNode",
@@ -883,7 +883,7 @@
         "name": "transferSolWithSeed",
         "idlName": "TransferSolWithSeed",
         "docs": [],
-        "optionalAccountStrategy": "programId"
+        "optionalAccountStrategy": "omitted"
       },
       {
         "kind": "instructionNode",
@@ -921,7 +921,7 @@
         "name": "upgradeNonceAccount",
         "idlName": "UpgradeNonceAccount",
         "docs": [],
-        "optionalAccountStrategy": "programId"
+        "optionalAccountStrategy": "omitted"
       }
     ],
     "definedTypes": [

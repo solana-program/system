@@ -1,8 +1,8 @@
 import path from 'node:path';
+import fs from 'node:fs';
 
-const { default: prettierOptions } = await import(
-  path.resolve('clients', 'js', '.prettierrc.json'),
-  { with: { type: 'json' } }
+const prettierOptions = JSON.parse(
+  fs.readFileSync(path.join('clients', 'js', '.prettierrc.json'), 'utf-8')
 );
 
 export default {
@@ -21,6 +21,7 @@ export default {
           anchorTraits: false,
           crateFolder: 'clients/rust',
           formatCode: true,
+          toolchain: '+nightly-2025-02-16',
         },
       ],
     },
