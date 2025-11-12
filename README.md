@@ -1,3 +1,10 @@
+> [!IMPORTANT]
+> This is a fork of the original `solana-system-program` repository that was used to make the code run in non-browser WASM environments, 
+> such as a canister running on the [Internet Computer](https://internetcomputer.org) (ICP).
+> This fork is not longer required since the `solana-system-interface` crate was moved back to the Solana SDK repository 
+> (see [this PR](https://github.com/anza-xyz/solana-sdk/pull/264)).
+> The [original repository]((https://github.com/anza-xyz/solana-sdk) should now be used instead of this fork.
+
 # System
 
 <a href="https://github.com/solana-program/system/actions/workflows/main.yml"><img src="https://img.shields.io/github/actions/workflow/status/solana-program/system/main.yml?logo=GitHub" /></a>
