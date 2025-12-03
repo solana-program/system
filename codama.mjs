@@ -1,10 +1,3 @@
-import fs from 'node:fs';
-import path from 'node:path';
-
-const prettierOptions = JSON.parse(
-  fs.readFileSync(path.join('clients', 'js', '.prettierrc.json'), 'utf-8')
-);
-
 export default {
   idl: 'program/idl.json',
   before: [],
@@ -15,7 +8,6 @@ export default {
         'clients/js/src/generated',
         {
           packageFolder: 'clients/js',
-          prettierOptions,
           syncPackageJson: true,
         },
       ],
