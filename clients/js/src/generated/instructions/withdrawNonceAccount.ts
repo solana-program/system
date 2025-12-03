@@ -43,9 +43,8 @@ export type WithdrawNonceAccountInstruction<
     TProgram extends string = typeof SYSTEM_PROGRAM_ADDRESS,
     TAccountNonceAccount extends string | AccountMeta<string> = string,
     TAccountRecipientAccount extends string | AccountMeta<string> = string,
-    TAccountRecentBlockhashesSysvar extends
-        | string
-        | AccountMeta<string> = 'SysvarRecentB1ockHashes11111111111111111111',
+    TAccountRecentBlockhashesSysvar extends string | AccountMeta<string> =
+        'SysvarRecentB1ockHashes11111111111111111111',
     TAccountRentSysvar extends string | AccountMeta<string> = 'SysvarRent111111111111111111111111111111111',
     TAccountNonceAuthority extends string | AccountMeta<string> = string,
     TRemainingAccounts extends readonly AccountMeta<string>[] = [],
