@@ -68,11 +68,7 @@ export type AssignWithSeedInstructionData = {
     programAddress: Address;
 };
 
-export type AssignWithSeedInstructionDataArgs = {
-    base: Address;
-    seed: string;
-    programAddress: Address;
-};
+export type AssignWithSeedInstructionDataArgs = { base: Address; seed: string; programAddress: Address };
 
 export function getAssignWithSeedInstructionDataEncoder(): Encoder<AssignWithSeedInstructionDataArgs> {
     return transformEncoder(

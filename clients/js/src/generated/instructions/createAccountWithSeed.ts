@@ -97,10 +97,7 @@ export function getCreateAccountWithSeedInstructionDataEncoder(): Encoder<Create
             ['space', getU64Encoder()],
             ['programAddress', getAddressEncoder()],
         ]),
-        value => ({
-            ...value,
-            discriminator: CREATE_ACCOUNT_WITH_SEED_DISCRIMINATOR,
-        }),
+        value => ({ ...value, discriminator: CREATE_ACCOUNT_WITH_SEED_DISCRIMINATOR }),
     );
 }
 
@@ -214,11 +211,7 @@ export function parseCreateAccountWithSeedInstruction<
     };
     return {
         programAddress: instruction.programAddress,
-        accounts: {
-            payer: getNextAccount(),
-            newAccount: getNextAccount(),
-            baseAccount: getNextOptionalAccount(),
-        },
+        accounts: { payer: getNextAccount(), newAccount: getNextAccount(), baseAccount: getNextOptionalAccount() },
         data: getCreateAccountWithSeedInstructionDataDecoder().decode(instruction.data),
     };
 }

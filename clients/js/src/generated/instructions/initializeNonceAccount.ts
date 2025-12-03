@@ -39,8 +39,9 @@ export function getInitializeNonceAccountDiscriminatorBytes() {
 export type InitializeNonceAccountInstruction<
     TProgram extends string = typeof SYSTEM_PROGRAM_ADDRESS,
     TAccountNonceAccount extends string | AccountMeta<string> = string,
-    TAccountRecentBlockhashesSysvar extends string | AccountMeta<string> =
-        'SysvarRecentB1ockHashes11111111111111111111',
+    TAccountRecentBlockhashesSysvar extends
+        | string
+        | AccountMeta<string> = 'SysvarRecentB1ockHashes11111111111111111111',
     TAccountRentSysvar extends string | AccountMeta<string> = 'SysvarRent111111111111111111111111111111111',
     TRemainingAccounts extends readonly AccountMeta<string>[] = [],
 > = Instruction<TProgram> &
@@ -56,14 +57,9 @@ export type InitializeNonceAccountInstruction<
         ]
     >;
 
-export type InitializeNonceAccountInstructionData = {
-    discriminator: number;
-    nonceAuthority: Address;
-};
+export type InitializeNonceAccountInstructionData = { discriminator: number; nonceAuthority: Address };
 
-export type InitializeNonceAccountInstructionDataArgs = {
-    nonceAuthority: Address;
-};
+export type InitializeNonceAccountInstructionDataArgs = { nonceAuthority: Address };
 
 export function getInitializeNonceAccountInstructionDataEncoder(): FixedSizeEncoder<InitializeNonceAccountInstructionDataArgs> {
     return transformEncoder(
@@ -71,10 +67,7 @@ export function getInitializeNonceAccountInstructionDataEncoder(): FixedSizeEnco
             ['discriminator', getU32Encoder()],
             ['nonceAuthority', getAddressEncoder()],
         ]),
-        value => ({
-            ...value,
-            discriminator: INITIALIZE_NONCE_ACCOUNT_DISCRIMINATOR,
-        }),
+        value => ({ ...value, discriminator: INITIALIZE_NONCE_ACCOUNT_DISCRIMINATOR }),
     );
 }
 
@@ -126,10 +119,7 @@ export function getInitializeNonceAccountInstruction<
     // Original accounts.
     const originalAccounts = {
         nonceAccount: { value: input.nonceAccount ?? null, isWritable: true },
-        recentBlockhashesSysvar: {
-            value: input.recentBlockhashesSysvar ?? null,
-            isWritable: false,
-        },
+        recentBlockhashesSysvar: { value: input.recentBlockhashesSysvar ?? null, isWritable: false },
         rentSysvar: { value: input.rentSysvar ?? null, isWritable: false },
     };
     const accounts = originalAccounts as Record<keyof typeof originalAccounts, ResolvedAccount>;

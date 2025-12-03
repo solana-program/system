@@ -96,9 +96,7 @@ export function getAllocateInstruction<
     const programAddress = config?.programAddress ?? SYSTEM_PROGRAM_ADDRESS;
 
     // Original accounts.
-    const originalAccounts = {
-        newAccount: { value: input.newAccount ?? null, isWritable: true },
-    };
+    const originalAccounts = { newAccount: { value: input.newAccount ?? null, isWritable: true } };
     const accounts = originalAccounts as Record<keyof typeof originalAccounts, ResolvedAccount>;
 
     // Original args.

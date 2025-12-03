@@ -52,10 +52,7 @@ export type AssignInstruction<
         ]
     >;
 
-export type AssignInstructionData = {
-    discriminator: number;
-    programAddress: Address;
-};
+export type AssignInstructionData = { discriminator: number; programAddress: Address };
 
 export type AssignInstructionDataArgs = { programAddress: Address };
 
@@ -96,9 +93,7 @@ export function getAssignInstruction<
     const programAddress = config?.programAddress ?? SYSTEM_PROGRAM_ADDRESS;
 
     // Original accounts.
-    const originalAccounts = {
-        account: { value: input.account ?? null, isWritable: true },
-    };
+    const originalAccounts = { account: { value: input.account ?? null, isWritable: true } };
     const accounts = originalAccounts as Record<keyof typeof originalAccounts, ResolvedAccount>;
 
     // Original args.

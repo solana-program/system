@@ -40,8 +40,9 @@ export function getAdvanceNonceAccountDiscriminatorBytes() {
 export type AdvanceNonceAccountInstruction<
     TProgram extends string = typeof SYSTEM_PROGRAM_ADDRESS,
     TAccountNonceAccount extends string | AccountMeta<string> = string,
-    TAccountRecentBlockhashesSysvar extends string | AccountMeta<string> =
-        'SysvarRecentB1ockHashes11111111111111111111',
+    TAccountRecentBlockhashesSysvar extends
+        | string
+        | AccountMeta<string> = 'SysvarRecentB1ockHashes11111111111111111111',
     TAccountNonceAuthority extends string | AccountMeta<string> = string,
     TRemainingAccounts extends readonly AccountMeta<string>[] = [],
 > = Instruction<TProgram> &
@@ -111,10 +112,7 @@ export function getAdvanceNonceAccountInstruction<
     // Original accounts.
     const originalAccounts = {
         nonceAccount: { value: input.nonceAccount ?? null, isWritable: true },
-        recentBlockhashesSysvar: {
-            value: input.recentBlockhashesSysvar ?? null,
-            isWritable: false,
-        },
+        recentBlockhashesSysvar: { value: input.recentBlockhashesSysvar ?? null, isWritable: false },
         nonceAuthority: { value: input.nonceAuthority ?? null, isWritable: false },
     };
     const accounts = originalAccounts as Record<keyof typeof originalAccounts, ResolvedAccount>;

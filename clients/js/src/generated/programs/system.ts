@@ -92,42 +92,18 @@ export function identifySystemInstruction(
 }
 
 export type ParsedSystemInstruction<TProgram extends string = '11111111111111111111111111111111'> =
-    | ({
-          instructionType: SystemInstruction.CreateAccount;
-      } & ParsedCreateAccountInstruction<TProgram>)
-    | ({
-          instructionType: SystemInstruction.Assign;
-      } & ParsedAssignInstruction<TProgram>)
-    | ({
-          instructionType: SystemInstruction.TransferSol;
-      } & ParsedTransferSolInstruction<TProgram>)
-    | ({
-          instructionType: SystemInstruction.CreateAccountWithSeed;
-      } & ParsedCreateAccountWithSeedInstruction<TProgram>)
-    | ({
-          instructionType: SystemInstruction.AdvanceNonceAccount;
-      } & ParsedAdvanceNonceAccountInstruction<TProgram>)
-    | ({
-          instructionType: SystemInstruction.WithdrawNonceAccount;
-      } & ParsedWithdrawNonceAccountInstruction<TProgram>)
+    | ({ instructionType: SystemInstruction.CreateAccount } & ParsedCreateAccountInstruction<TProgram>)
+    | ({ instructionType: SystemInstruction.Assign } & ParsedAssignInstruction<TProgram>)
+    | ({ instructionType: SystemInstruction.TransferSol } & ParsedTransferSolInstruction<TProgram>)
+    | ({ instructionType: SystemInstruction.CreateAccountWithSeed } & ParsedCreateAccountWithSeedInstruction<TProgram>)
+    | ({ instructionType: SystemInstruction.AdvanceNonceAccount } & ParsedAdvanceNonceAccountInstruction<TProgram>)
+    | ({ instructionType: SystemInstruction.WithdrawNonceAccount } & ParsedWithdrawNonceAccountInstruction<TProgram>)
     | ({
           instructionType: SystemInstruction.InitializeNonceAccount;
       } & ParsedInitializeNonceAccountInstruction<TProgram>)
-    | ({
-          instructionType: SystemInstruction.AuthorizeNonceAccount;
-      } & ParsedAuthorizeNonceAccountInstruction<TProgram>)
-    | ({
-          instructionType: SystemInstruction.Allocate;
-      } & ParsedAllocateInstruction<TProgram>)
-    | ({
-          instructionType: SystemInstruction.AllocateWithSeed;
-      } & ParsedAllocateWithSeedInstruction<TProgram>)
-    | ({
-          instructionType: SystemInstruction.AssignWithSeed;
-      } & ParsedAssignWithSeedInstruction<TProgram>)
-    | ({
-          instructionType: SystemInstruction.TransferSolWithSeed;
-      } & ParsedTransferSolWithSeedInstruction<TProgram>)
-    | ({
-          instructionType: SystemInstruction.UpgradeNonceAccount;
-      } & ParsedUpgradeNonceAccountInstruction<TProgram>);
+    | ({ instructionType: SystemInstruction.AuthorizeNonceAccount } & ParsedAuthorizeNonceAccountInstruction<TProgram>)
+    | ({ instructionType: SystemInstruction.Allocate } & ParsedAllocateInstruction<TProgram>)
+    | ({ instructionType: SystemInstruction.AllocateWithSeed } & ParsedAllocateWithSeedInstruction<TProgram>)
+    | ({ instructionType: SystemInstruction.AssignWithSeed } & ParsedAssignWithSeedInstruction<TProgram>)
+    | ({ instructionType: SystemInstruction.TransferSolWithSeed } & ParsedTransferSolWithSeedInstruction<TProgram>)
+    | ({ instructionType: SystemInstruction.UpgradeNonceAccount } & ParsedUpgradeNonceAccountInstruction<TProgram>);

@@ -83,9 +83,7 @@ export function getUpgradeNonceAccountInstruction<
     const programAddress = config?.programAddress ?? SYSTEM_PROGRAM_ADDRESS;
 
     // Original accounts.
-    const originalAccounts = {
-        nonceAccount: { value: input.nonceAccount ?? null, isWritable: true },
-    };
+    const originalAccounts = { nonceAccount: { value: input.nonceAccount ?? null, isWritable: true } };
     const accounts = originalAccounts as Record<keyof typeof originalAccounts, ResolvedAccount>;
 
     const getAccountMeta = getAccountMetaFactory(programAddress, 'omitted');

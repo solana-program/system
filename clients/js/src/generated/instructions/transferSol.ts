@@ -55,10 +55,7 @@ export type TransferSolInstruction<
         ]
     >;
 
-export type TransferSolInstructionData = {
-    discriminator: number;
-    amount: bigint;
-};
+export type TransferSolInstructionData = { discriminator: number; amount: bigint };
 
 export type TransferSolInstructionDataArgs = { amount: number | bigint };
 

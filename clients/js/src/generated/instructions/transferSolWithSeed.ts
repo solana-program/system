@@ -70,11 +70,7 @@ export type TransferSolWithSeedInstructionData = {
     fromOwner: Address;
 };
 
-export type TransferSolWithSeedInstructionDataArgs = {
-    amount: number | bigint;
-    fromSeed: string;
-    fromOwner: Address;
-};
+export type TransferSolWithSeedInstructionDataArgs = { amount: number | bigint; fromSeed: string; fromOwner: Address };
 
 export function getTransferSolWithSeedInstructionDataEncoder(): Encoder<TransferSolWithSeedInstructionDataArgs> {
     return transformEncoder(
@@ -84,10 +80,7 @@ export function getTransferSolWithSeedInstructionDataEncoder(): Encoder<Transfer
             ['fromSeed', addEncoderSizePrefix(getUtf8Encoder(), getU64Encoder())],
             ['fromOwner', getAddressEncoder()],
         ]),
-        value => ({
-            ...value,
-            discriminator: TRANSFER_SOL_WITH_SEED_DISCRIMINATOR,
-        }),
+        value => ({ ...value, discriminator: TRANSFER_SOL_WITH_SEED_DISCRIMINATOR }),
     );
 }
 
@@ -188,11 +181,7 @@ export function parseTransferSolWithSeedInstruction<
     };
     return {
         programAddress: instruction.programAddress,
-        accounts: {
-            source: getNextAccount(),
-            baseAccount: getNextAccount(),
-            destination: getNextAccount(),
-        },
+        accounts: { source: getNextAccount(), baseAccount: getNextAccount(), destination: getNextAccount() },
         data: getTransferSolWithSeedInstructionDataDecoder().decode(instruction.data),
     };
 }

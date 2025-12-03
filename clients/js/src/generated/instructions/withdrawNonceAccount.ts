@@ -43,8 +43,9 @@ export type WithdrawNonceAccountInstruction<
     TProgram extends string = typeof SYSTEM_PROGRAM_ADDRESS,
     TAccountNonceAccount extends string | AccountMeta<string> = string,
     TAccountRecipientAccount extends string | AccountMeta<string> = string,
-    TAccountRecentBlockhashesSysvar extends string | AccountMeta<string> =
-        'SysvarRecentB1ockHashes11111111111111111111',
+    TAccountRecentBlockhashesSysvar extends
+        | string
+        | AccountMeta<string> = 'SysvarRecentB1ockHashes11111111111111111111',
     TAccountRentSysvar extends string | AccountMeta<string> = 'SysvarRent111111111111111111111111111111111',
     TAccountNonceAuthority extends string | AccountMeta<string> = string,
     TRemainingAccounts extends readonly AccountMeta<string>[] = [],
@@ -67,14 +68,9 @@ export type WithdrawNonceAccountInstruction<
         ]
     >;
 
-export type WithdrawNonceAccountInstructionData = {
-    discriminator: number;
-    withdrawAmount: bigint;
-};
+export type WithdrawNonceAccountInstructionData = { discriminator: number; withdrawAmount: bigint };
 
-export type WithdrawNonceAccountInstructionDataArgs = {
-    withdrawAmount: number | bigint;
-};
+export type WithdrawNonceAccountInstructionDataArgs = { withdrawAmount: number | bigint };
 
 export function getWithdrawNonceAccountInstructionDataEncoder(): FixedSizeEncoder<WithdrawNonceAccountInstructionDataArgs> {
     return transformEncoder(
@@ -82,10 +78,7 @@ export function getWithdrawNonceAccountInstructionDataEncoder(): FixedSizeEncode
             ['discriminator', getU32Encoder()],
             ['withdrawAmount', getU64Encoder()],
         ]),
-        value => ({
-            ...value,
-            discriminator: WITHDRAW_NONCE_ACCOUNT_DISCRIMINATOR,
-        }),
+        value => ({ ...value, discriminator: WITHDRAW_NONCE_ACCOUNT_DISCRIMINATOR }),
     );
 }
 
@@ -151,14 +144,8 @@ export function getWithdrawNonceAccountInstruction<
     // Original accounts.
     const originalAccounts = {
         nonceAccount: { value: input.nonceAccount ?? null, isWritable: true },
-        recipientAccount: {
-            value: input.recipientAccount ?? null,
-            isWritable: true,
-        },
-        recentBlockhashesSysvar: {
-            value: input.recentBlockhashesSysvar ?? null,
-            isWritable: false,
-        },
+        recipientAccount: { value: input.recipientAccount ?? null, isWritable: true },
+        recentBlockhashesSysvar: { value: input.recentBlockhashesSysvar ?? null, isWritable: false },
         rentSysvar: { value: input.rentSysvar ?? null, isWritable: false },
         nonceAuthority: { value: input.nonceAuthority ?? null, isWritable: false },
     };

@@ -55,14 +55,9 @@ export type AuthorizeNonceAccountInstruction<
         ]
     >;
 
-export type AuthorizeNonceAccountInstructionData = {
-    discriminator: number;
-    newNonceAuthority: Address;
-};
+export type AuthorizeNonceAccountInstructionData = { discriminator: number; newNonceAuthority: Address };
 
-export type AuthorizeNonceAccountInstructionDataArgs = {
-    newNonceAuthority: Address;
-};
+export type AuthorizeNonceAccountInstructionDataArgs = { newNonceAuthority: Address };
 
 export function getAuthorizeNonceAccountInstructionDataEncoder(): FixedSizeEncoder<AuthorizeNonceAccountInstructionDataArgs> {
     return transformEncoder(
@@ -70,10 +65,7 @@ export function getAuthorizeNonceAccountInstructionDataEncoder(): FixedSizeEncod
             ['discriminator', getU32Encoder()],
             ['newNonceAuthority', getAddressEncoder()],
         ]),
-        value => ({
-            ...value,
-            discriminator: AUTHORIZE_NONCE_ACCOUNT_DISCRIMINATOR,
-        }),
+        value => ({ ...value, discriminator: AUTHORIZE_NONCE_ACCOUNT_DISCRIMINATOR }),
     );
 }
 
@@ -164,10 +156,7 @@ export function parseAuthorizeNonceAccountInstruction<
     };
     return {
         programAddress: instruction.programAddress,
-        accounts: {
-            nonceAccount: getNextAccount(),
-            nonceAuthority: getNextAccount(),
-        },
+        accounts: { nonceAccount: getNextAccount(), nonceAuthority: getNextAccount() },
         data: getAuthorizeNonceAccountInstructionDataDecoder().decode(instruction.data),
     };
 }
