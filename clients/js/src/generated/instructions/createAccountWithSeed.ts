@@ -7,34 +7,34 @@
  */
 
 import {
-  addDecoderSizePrefix,
-  addEncoderSizePrefix,
-  combineCodec,
-  getAddressDecoder,
-  getAddressEncoder,
-  getStructDecoder,
-  getStructEncoder,
-  getU32Decoder,
-  getU32Encoder,
-  getU64Decoder,
-  getU64Encoder,
-  getUtf8Decoder,
-  getUtf8Encoder,
-  transformEncoder,
-  type AccountMeta,
-  type AccountSignerMeta,
-  type Address,
-  type Codec,
-  type Decoder,
-  type Encoder,
-  type Instruction,
-  type InstructionWithAccounts,
-  type InstructionWithData,
-  type ReadonlySignerAccount,
-  type ReadonlyUint8Array,
-  type TransactionSigner,
-  type WritableAccount,
-  type WritableSignerAccount,
+    addDecoderSizePrefix,
+    addEncoderSizePrefix,
+    combineCodec,
+    getAddressDecoder,
+    getAddressEncoder,
+    getStructDecoder,
+    getStructEncoder,
+    getU32Decoder,
+    getU32Encoder,
+    getU64Decoder,
+    getU64Encoder,
+    getUtf8Decoder,
+    getUtf8Encoder,
+    transformEncoder,
+    type AccountMeta,
+    type AccountSignerMeta,
+    type Address,
+    type Codec,
+    type Decoder,
+    type Encoder,
+    type Instruction,
+    type InstructionWithAccounts,
+    type InstructionWithData,
+    type ReadonlySignerAccount,
+    type ReadonlyUint8Array,
+    type TransactionSigner,
+    type WritableAccount,
+    type WritableSignerAccount,
 } from '@solana/kit';
 import { SYSTEM_PROGRAM_ADDRESS } from '../programs';
 import { getAccountMetaFactory, type ResolvedAccount } from '../shared';
@@ -42,211 +42,183 @@ import { getAccountMetaFactory, type ResolvedAccount } from '../shared';
 export const CREATE_ACCOUNT_WITH_SEED_DISCRIMINATOR = 3;
 
 export function getCreateAccountWithSeedDiscriminatorBytes() {
-  return getU32Encoder().encode(CREATE_ACCOUNT_WITH_SEED_DISCRIMINATOR);
+    return getU32Encoder().encode(CREATE_ACCOUNT_WITH_SEED_DISCRIMINATOR);
 }
 
 export type CreateAccountWithSeedInstruction<
-  TProgram extends string = typeof SYSTEM_PROGRAM_ADDRESS,
-  TAccountPayer extends string | AccountMeta<string> = string,
-  TAccountNewAccount extends string | AccountMeta<string> = string,
-  TAccountBaseAccount extends
-    | string
-    | AccountMeta<string>
-    | undefined = undefined,
-  TRemainingAccounts extends readonly AccountMeta<string>[] = [],
+    TProgram extends string = typeof SYSTEM_PROGRAM_ADDRESS,
+    TAccountPayer extends string | AccountMeta<string> = string,
+    TAccountNewAccount extends string | AccountMeta<string> = string,
+    TAccountBaseAccount extends string | AccountMeta<string> | undefined = undefined,
+    TRemainingAccounts extends readonly AccountMeta<string>[] = [],
 > = Instruction<TProgram> &
-  InstructionWithData<ReadonlyUint8Array> &
-  InstructionWithAccounts<
-    [
-      TAccountPayer extends string
-        ? WritableSignerAccount<TAccountPayer> &
-            AccountSignerMeta<TAccountPayer>
-        : TAccountPayer,
-      TAccountNewAccount extends string
-        ? WritableAccount<TAccountNewAccount>
-        : TAccountNewAccount,
-      ...(TAccountBaseAccount extends undefined
-        ? []
-        : [
-            TAccountBaseAccount extends string
-              ? ReadonlySignerAccount<TAccountBaseAccount> &
-                  AccountSignerMeta<TAccountBaseAccount>
-              : TAccountBaseAccount,
-          ]),
-      ...TRemainingAccounts,
-    ]
-  >;
+    InstructionWithData<ReadonlyUint8Array> &
+    InstructionWithAccounts<
+        [
+            TAccountPayer extends string
+                ? WritableSignerAccount<TAccountPayer> & AccountSignerMeta<TAccountPayer>
+                : TAccountPayer,
+            TAccountNewAccount extends string ? WritableAccount<TAccountNewAccount> : TAccountNewAccount,
+            ...(TAccountBaseAccount extends undefined
+                ? []
+                : [
+                      TAccountBaseAccount extends string
+                          ? ReadonlySignerAccount<TAccountBaseAccount> & AccountSignerMeta<TAccountBaseAccount>
+                          : TAccountBaseAccount,
+                  ]),
+            ...TRemainingAccounts,
+        ]
+    >;
 
 export type CreateAccountWithSeedInstructionData = {
-  discriminator: number;
-  base: Address;
-  seed: string;
-  amount: bigint;
-  space: bigint;
-  programAddress: Address;
+    discriminator: number;
+    base: Address;
+    seed: string;
+    amount: bigint;
+    space: bigint;
+    programAddress: Address;
 };
 
 export type CreateAccountWithSeedInstructionDataArgs = {
-  base: Address;
-  seed: string;
-  amount: number | bigint;
-  space: number | bigint;
-  programAddress: Address;
+    base: Address;
+    seed: string;
+    amount: number | bigint;
+    space: number | bigint;
+    programAddress: Address;
 };
 
 export function getCreateAccountWithSeedInstructionDataEncoder(): Encoder<CreateAccountWithSeedInstructionDataArgs> {
-  return transformEncoder(
-    getStructEncoder([
-      ['discriminator', getU32Encoder()],
-      ['base', getAddressEncoder()],
-      ['seed', addEncoderSizePrefix(getUtf8Encoder(), getU64Encoder())],
-      ['amount', getU64Encoder()],
-      ['space', getU64Encoder()],
-      ['programAddress', getAddressEncoder()],
-    ]),
-    (value) => ({
-      ...value,
-      discriminator: CREATE_ACCOUNT_WITH_SEED_DISCRIMINATOR,
-    })
-  );
+    return transformEncoder(
+        getStructEncoder([
+            ['discriminator', getU32Encoder()],
+            ['base', getAddressEncoder()],
+            ['seed', addEncoderSizePrefix(getUtf8Encoder(), getU64Encoder())],
+            ['amount', getU64Encoder()],
+            ['space', getU64Encoder()],
+            ['programAddress', getAddressEncoder()],
+        ]),
+        value => ({
+            ...value,
+            discriminator: CREATE_ACCOUNT_WITH_SEED_DISCRIMINATOR,
+        }),
+    );
 }
 
 export function getCreateAccountWithSeedInstructionDataDecoder(): Decoder<CreateAccountWithSeedInstructionData> {
-  return getStructDecoder([
-    ['discriminator', getU32Decoder()],
-    ['base', getAddressDecoder()],
-    ['seed', addDecoderSizePrefix(getUtf8Decoder(), getU64Decoder())],
-    ['amount', getU64Decoder()],
-    ['space', getU64Decoder()],
-    ['programAddress', getAddressDecoder()],
-  ]);
+    return getStructDecoder([
+        ['discriminator', getU32Decoder()],
+        ['base', getAddressDecoder()],
+        ['seed', addDecoderSizePrefix(getUtf8Decoder(), getU64Decoder())],
+        ['amount', getU64Decoder()],
+        ['space', getU64Decoder()],
+        ['programAddress', getAddressDecoder()],
+    ]);
 }
 
 export function getCreateAccountWithSeedInstructionDataCodec(): Codec<
-  CreateAccountWithSeedInstructionDataArgs,
-  CreateAccountWithSeedInstructionData
+    CreateAccountWithSeedInstructionDataArgs,
+    CreateAccountWithSeedInstructionData
 > {
-  return combineCodec(
-    getCreateAccountWithSeedInstructionDataEncoder(),
-    getCreateAccountWithSeedInstructionDataDecoder()
-  );
+    return combineCodec(
+        getCreateAccountWithSeedInstructionDataEncoder(),
+        getCreateAccountWithSeedInstructionDataDecoder(),
+    );
 }
 
 export type CreateAccountWithSeedInput<
-  TAccountPayer extends string = string,
-  TAccountNewAccount extends string = string,
-  TAccountBaseAccount extends string = string,
+    TAccountPayer extends string = string,
+    TAccountNewAccount extends string = string,
+    TAccountBaseAccount extends string = string,
 > = {
-  payer: TransactionSigner<TAccountPayer>;
-  newAccount: Address<TAccountNewAccount>;
-  baseAccount?: TransactionSigner<TAccountBaseAccount>;
-  base: CreateAccountWithSeedInstructionDataArgs['base'];
-  seed: CreateAccountWithSeedInstructionDataArgs['seed'];
-  amount: CreateAccountWithSeedInstructionDataArgs['amount'];
-  space: CreateAccountWithSeedInstructionDataArgs['space'];
-  programAddress: CreateAccountWithSeedInstructionDataArgs['programAddress'];
+    payer: TransactionSigner<TAccountPayer>;
+    newAccount: Address<TAccountNewAccount>;
+    baseAccount?: TransactionSigner<TAccountBaseAccount>;
+    base: CreateAccountWithSeedInstructionDataArgs['base'];
+    seed: CreateAccountWithSeedInstructionDataArgs['seed'];
+    amount: CreateAccountWithSeedInstructionDataArgs['amount'];
+    space: CreateAccountWithSeedInstructionDataArgs['space'];
+    programAddress: CreateAccountWithSeedInstructionDataArgs['programAddress'];
 };
 
 export function getCreateAccountWithSeedInstruction<
-  TAccountPayer extends string,
-  TAccountNewAccount extends string,
-  TAccountBaseAccount extends string,
-  TProgramAddress extends Address = typeof SYSTEM_PROGRAM_ADDRESS,
+    TAccountPayer extends string,
+    TAccountNewAccount extends string,
+    TAccountBaseAccount extends string,
+    TProgramAddress extends Address = typeof SYSTEM_PROGRAM_ADDRESS,
 >(
-  input: CreateAccountWithSeedInput<
-    TAccountPayer,
-    TAccountNewAccount,
-    TAccountBaseAccount
-  >,
-  config?: { programAddress?: TProgramAddress }
-): CreateAccountWithSeedInstruction<
-  TProgramAddress,
-  TAccountPayer,
-  TAccountNewAccount,
-  TAccountBaseAccount
-> {
-  // Program address.
-  const programAddress = config?.programAddress ?? SYSTEM_PROGRAM_ADDRESS;
+    input: CreateAccountWithSeedInput<TAccountPayer, TAccountNewAccount, TAccountBaseAccount>,
+    config?: { programAddress?: TProgramAddress },
+): CreateAccountWithSeedInstruction<TProgramAddress, TAccountPayer, TAccountNewAccount, TAccountBaseAccount> {
+    // Program address.
+    const programAddress = config?.programAddress ?? SYSTEM_PROGRAM_ADDRESS;
 
-  // Original accounts.
-  const originalAccounts = {
-    payer: { value: input.payer ?? null, isWritable: true },
-    newAccount: { value: input.newAccount ?? null, isWritable: true },
-    baseAccount: { value: input.baseAccount ?? null, isWritable: false },
-  };
-  const accounts = originalAccounts as Record<
-    keyof typeof originalAccounts,
-    ResolvedAccount
-  >;
+    // Original accounts.
+    const originalAccounts = {
+        payer: { value: input.payer ?? null, isWritable: true },
+        newAccount: { value: input.newAccount ?? null, isWritable: true },
+        baseAccount: { value: input.baseAccount ?? null, isWritable: false },
+    };
+    const accounts = originalAccounts as Record<keyof typeof originalAccounts, ResolvedAccount>;
 
-  // Original args.
-  const args = { ...input };
+    // Original args.
+    const args = { ...input };
 
-  const getAccountMeta = getAccountMetaFactory(programAddress, 'omitted');
-  return Object.freeze({
-    accounts: [
-      getAccountMeta(accounts.payer),
-      getAccountMeta(accounts.newAccount),
-      getAccountMeta(accounts.baseAccount),
-    ].filter(<T>(x: T | undefined): x is T => x !== undefined),
-    data: getCreateAccountWithSeedInstructionDataEncoder().encode(
-      args as CreateAccountWithSeedInstructionDataArgs
-    ),
-    programAddress,
-  } as CreateAccountWithSeedInstruction<
-    TProgramAddress,
-    TAccountPayer,
-    TAccountNewAccount,
-    TAccountBaseAccount
-  >);
+    const getAccountMeta = getAccountMetaFactory(programAddress, 'omitted');
+    return Object.freeze({
+        accounts: [
+            getAccountMeta(accounts.payer),
+            getAccountMeta(accounts.newAccount),
+            getAccountMeta(accounts.baseAccount),
+        ].filter(<T>(x: T | undefined): x is T => x !== undefined),
+        data: getCreateAccountWithSeedInstructionDataEncoder().encode(args as CreateAccountWithSeedInstructionDataArgs),
+        programAddress,
+    } as CreateAccountWithSeedInstruction<TProgramAddress, TAccountPayer, TAccountNewAccount, TAccountBaseAccount>);
 }
 
 export type ParsedCreateAccountWithSeedInstruction<
-  TProgram extends string = typeof SYSTEM_PROGRAM_ADDRESS,
-  TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[],
+    TProgram extends string = typeof SYSTEM_PROGRAM_ADDRESS,
+    TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[],
 > = {
-  programAddress: Address<TProgram>;
-  accounts: {
-    payer: TAccountMetas[0];
-    newAccount: TAccountMetas[1];
-    baseAccount?: TAccountMetas[2] | undefined;
-  };
-  data: CreateAccountWithSeedInstructionData;
+    programAddress: Address<TProgram>;
+    accounts: {
+        payer: TAccountMetas[0];
+        newAccount: TAccountMetas[1];
+        baseAccount?: TAccountMetas[2] | undefined;
+    };
+    data: CreateAccountWithSeedInstructionData;
 };
 
 export function parseCreateAccountWithSeedInstruction<
-  TProgram extends string,
-  TAccountMetas extends readonly AccountMeta[],
+    TProgram extends string,
+    TAccountMetas extends readonly AccountMeta[],
 >(
-  instruction: Instruction<TProgram> &
-    InstructionWithAccounts<TAccountMetas> &
-    InstructionWithData<ReadonlyUint8Array>
+    instruction: Instruction<TProgram> &
+        InstructionWithAccounts<TAccountMetas> &
+        InstructionWithData<ReadonlyUint8Array>,
 ): ParsedCreateAccountWithSeedInstruction<TProgram, TAccountMetas> {
-  if (instruction.accounts.length < 2) {
-    // TODO: Coded error.
-    throw new Error('Not enough accounts');
-  }
-  let accountIndex = 0;
-  const getNextAccount = () => {
-    const accountMeta = (instruction.accounts as TAccountMetas)[accountIndex]!;
-    accountIndex += 1;
-    return accountMeta;
-  };
-  let optionalAccountsRemaining = instruction.accounts.length - 2;
-  const getNextOptionalAccount = () => {
-    if (optionalAccountsRemaining === 0) return undefined;
-    optionalAccountsRemaining -= 1;
-    return getNextAccount();
-  };
-  return {
-    programAddress: instruction.programAddress,
-    accounts: {
-      payer: getNextAccount(),
-      newAccount: getNextAccount(),
-      baseAccount: getNextOptionalAccount(),
-    },
-    data: getCreateAccountWithSeedInstructionDataDecoder().decode(
-      instruction.data
-    ),
-  };
+    if (instruction.accounts.length < 2) {
+        // TODO: Coded error.
+        throw new Error('Not enough accounts');
+    }
+    let accountIndex = 0;
+    const getNextAccount = () => {
+        const accountMeta = (instruction.accounts as TAccountMetas)[accountIndex]!;
+        accountIndex += 1;
+        return accountMeta;
+    };
+    let optionalAccountsRemaining = instruction.accounts.length - 2;
+    const getNextOptionalAccount = () => {
+        if (optionalAccountsRemaining === 0) return undefined;
+        optionalAccountsRemaining -= 1;
+        return getNextAccount();
+    };
+    return {
+        programAddress: instruction.programAddress,
+        accounts: {
+            payer: getNextAccount(),
+            newAccount: getNextAccount(),
+            baseAccount: getNextOptionalAccount(),
+        },
+        data: getCreateAccountWithSeedInstructionDataDecoder().decode(instruction.data),
+    };
 }

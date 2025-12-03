@@ -7,27 +7,27 @@
  */
 
 import {
-  combineCodec,
-  getAddressDecoder,
-  getAddressEncoder,
-  getStructDecoder,
-  getStructEncoder,
-  getU32Decoder,
-  getU32Encoder,
-  transformEncoder,
-  type AccountMeta,
-  type AccountSignerMeta,
-  type Address,
-  type FixedSizeCodec,
-  type FixedSizeDecoder,
-  type FixedSizeEncoder,
-  type Instruction,
-  type InstructionWithAccounts,
-  type InstructionWithData,
-  type ReadonlySignerAccount,
-  type ReadonlyUint8Array,
-  type TransactionSigner,
-  type WritableAccount,
+    combineCodec,
+    getAddressDecoder,
+    getAddressEncoder,
+    getStructDecoder,
+    getStructEncoder,
+    getU32Decoder,
+    getU32Encoder,
+    transformEncoder,
+    type AccountMeta,
+    type AccountSignerMeta,
+    type Address,
+    type FixedSizeCodec,
+    type FixedSizeDecoder,
+    type FixedSizeEncoder,
+    type Instruction,
+    type InstructionWithAccounts,
+    type InstructionWithData,
+    type ReadonlySignerAccount,
+    type ReadonlyUint8Array,
+    type TransactionSigner,
+    type WritableAccount,
 } from '@solana/kit';
 import { SYSTEM_PROGRAM_ADDRESS } from '../programs';
 import { getAccountMetaFactory, type ResolvedAccount } from '../shared';
@@ -35,163 +35,139 @@ import { getAccountMetaFactory, type ResolvedAccount } from '../shared';
 export const AUTHORIZE_NONCE_ACCOUNT_DISCRIMINATOR = 7;
 
 export function getAuthorizeNonceAccountDiscriminatorBytes() {
-  return getU32Encoder().encode(AUTHORIZE_NONCE_ACCOUNT_DISCRIMINATOR);
+    return getU32Encoder().encode(AUTHORIZE_NONCE_ACCOUNT_DISCRIMINATOR);
 }
 
 export type AuthorizeNonceAccountInstruction<
-  TProgram extends string = typeof SYSTEM_PROGRAM_ADDRESS,
-  TAccountNonceAccount extends string | AccountMeta<string> = string,
-  TAccountNonceAuthority extends string | AccountMeta<string> = string,
-  TRemainingAccounts extends readonly AccountMeta<string>[] = [],
+    TProgram extends string = typeof SYSTEM_PROGRAM_ADDRESS,
+    TAccountNonceAccount extends string | AccountMeta<string> = string,
+    TAccountNonceAuthority extends string | AccountMeta<string> = string,
+    TRemainingAccounts extends readonly AccountMeta<string>[] = [],
 > = Instruction<TProgram> &
-  InstructionWithData<ReadonlyUint8Array> &
-  InstructionWithAccounts<
-    [
-      TAccountNonceAccount extends string
-        ? WritableAccount<TAccountNonceAccount>
-        : TAccountNonceAccount,
-      TAccountNonceAuthority extends string
-        ? ReadonlySignerAccount<TAccountNonceAuthority> &
-            AccountSignerMeta<TAccountNonceAuthority>
-        : TAccountNonceAuthority,
-      ...TRemainingAccounts,
-    ]
-  >;
+    InstructionWithData<ReadonlyUint8Array> &
+    InstructionWithAccounts<
+        [
+            TAccountNonceAccount extends string ? WritableAccount<TAccountNonceAccount> : TAccountNonceAccount,
+            TAccountNonceAuthority extends string
+                ? ReadonlySignerAccount<TAccountNonceAuthority> & AccountSignerMeta<TAccountNonceAuthority>
+                : TAccountNonceAuthority,
+            ...TRemainingAccounts,
+        ]
+    >;
 
 export type AuthorizeNonceAccountInstructionData = {
-  discriminator: number;
-  newNonceAuthority: Address;
+    discriminator: number;
+    newNonceAuthority: Address;
 };
 
 export type AuthorizeNonceAccountInstructionDataArgs = {
-  newNonceAuthority: Address;
+    newNonceAuthority: Address;
 };
 
 export function getAuthorizeNonceAccountInstructionDataEncoder(): FixedSizeEncoder<AuthorizeNonceAccountInstructionDataArgs> {
-  return transformEncoder(
-    getStructEncoder([
-      ['discriminator', getU32Encoder()],
-      ['newNonceAuthority', getAddressEncoder()],
-    ]),
-    (value) => ({
-      ...value,
-      discriminator: AUTHORIZE_NONCE_ACCOUNT_DISCRIMINATOR,
-    })
-  );
+    return transformEncoder(
+        getStructEncoder([
+            ['discriminator', getU32Encoder()],
+            ['newNonceAuthority', getAddressEncoder()],
+        ]),
+        value => ({
+            ...value,
+            discriminator: AUTHORIZE_NONCE_ACCOUNT_DISCRIMINATOR,
+        }),
+    );
 }
 
 export function getAuthorizeNonceAccountInstructionDataDecoder(): FixedSizeDecoder<AuthorizeNonceAccountInstructionData> {
-  return getStructDecoder([
-    ['discriminator', getU32Decoder()],
-    ['newNonceAuthority', getAddressDecoder()],
-  ]);
+    return getStructDecoder([
+        ['discriminator', getU32Decoder()],
+        ['newNonceAuthority', getAddressDecoder()],
+    ]);
 }
 
 export function getAuthorizeNonceAccountInstructionDataCodec(): FixedSizeCodec<
-  AuthorizeNonceAccountInstructionDataArgs,
-  AuthorizeNonceAccountInstructionData
+    AuthorizeNonceAccountInstructionDataArgs,
+    AuthorizeNonceAccountInstructionData
 > {
-  return combineCodec(
-    getAuthorizeNonceAccountInstructionDataEncoder(),
-    getAuthorizeNonceAccountInstructionDataDecoder()
-  );
+    return combineCodec(
+        getAuthorizeNonceAccountInstructionDataEncoder(),
+        getAuthorizeNonceAccountInstructionDataDecoder(),
+    );
 }
 
 export type AuthorizeNonceAccountInput<
-  TAccountNonceAccount extends string = string,
-  TAccountNonceAuthority extends string = string,
+    TAccountNonceAccount extends string = string,
+    TAccountNonceAuthority extends string = string,
 > = {
-  nonceAccount: Address<TAccountNonceAccount>;
-  nonceAuthority: TransactionSigner<TAccountNonceAuthority>;
-  newNonceAuthority: AuthorizeNonceAccountInstructionDataArgs['newNonceAuthority'];
+    nonceAccount: Address<TAccountNonceAccount>;
+    nonceAuthority: TransactionSigner<TAccountNonceAuthority>;
+    newNonceAuthority: AuthorizeNonceAccountInstructionDataArgs['newNonceAuthority'];
 };
 
 export function getAuthorizeNonceAccountInstruction<
-  TAccountNonceAccount extends string,
-  TAccountNonceAuthority extends string,
-  TProgramAddress extends Address = typeof SYSTEM_PROGRAM_ADDRESS,
+    TAccountNonceAccount extends string,
+    TAccountNonceAuthority extends string,
+    TProgramAddress extends Address = typeof SYSTEM_PROGRAM_ADDRESS,
 >(
-  input: AuthorizeNonceAccountInput<
-    TAccountNonceAccount,
-    TAccountNonceAuthority
-  >,
-  config?: { programAddress?: TProgramAddress }
-): AuthorizeNonceAccountInstruction<
-  TProgramAddress,
-  TAccountNonceAccount,
-  TAccountNonceAuthority
-> {
-  // Program address.
-  const programAddress = config?.programAddress ?? SYSTEM_PROGRAM_ADDRESS;
+    input: AuthorizeNonceAccountInput<TAccountNonceAccount, TAccountNonceAuthority>,
+    config?: { programAddress?: TProgramAddress },
+): AuthorizeNonceAccountInstruction<TProgramAddress, TAccountNonceAccount, TAccountNonceAuthority> {
+    // Program address.
+    const programAddress = config?.programAddress ?? SYSTEM_PROGRAM_ADDRESS;
 
-  // Original accounts.
-  const originalAccounts = {
-    nonceAccount: { value: input.nonceAccount ?? null, isWritable: true },
-    nonceAuthority: { value: input.nonceAuthority ?? null, isWritable: false },
-  };
-  const accounts = originalAccounts as Record<
-    keyof typeof originalAccounts,
-    ResolvedAccount
-  >;
+    // Original accounts.
+    const originalAccounts = {
+        nonceAccount: { value: input.nonceAccount ?? null, isWritable: true },
+        nonceAuthority: { value: input.nonceAuthority ?? null, isWritable: false },
+    };
+    const accounts = originalAccounts as Record<keyof typeof originalAccounts, ResolvedAccount>;
 
-  // Original args.
-  const args = { ...input };
+    // Original args.
+    const args = { ...input };
 
-  const getAccountMeta = getAccountMetaFactory(programAddress, 'omitted');
-  return Object.freeze({
-    accounts: [
-      getAccountMeta(accounts.nonceAccount),
-      getAccountMeta(accounts.nonceAuthority),
-    ],
-    data: getAuthorizeNonceAccountInstructionDataEncoder().encode(
-      args as AuthorizeNonceAccountInstructionDataArgs
-    ),
-    programAddress,
-  } as AuthorizeNonceAccountInstruction<
-    TProgramAddress,
-    TAccountNonceAccount,
-    TAccountNonceAuthority
-  >);
+    const getAccountMeta = getAccountMetaFactory(programAddress, 'omitted');
+    return Object.freeze({
+        accounts: [getAccountMeta(accounts.nonceAccount), getAccountMeta(accounts.nonceAuthority)],
+        data: getAuthorizeNonceAccountInstructionDataEncoder().encode(args as AuthorizeNonceAccountInstructionDataArgs),
+        programAddress,
+    } as AuthorizeNonceAccountInstruction<TProgramAddress, TAccountNonceAccount, TAccountNonceAuthority>);
 }
 
 export type ParsedAuthorizeNonceAccountInstruction<
-  TProgram extends string = typeof SYSTEM_PROGRAM_ADDRESS,
-  TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[],
+    TProgram extends string = typeof SYSTEM_PROGRAM_ADDRESS,
+    TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[],
 > = {
-  programAddress: Address<TProgram>;
-  accounts: {
-    nonceAccount: TAccountMetas[0];
-    nonceAuthority: TAccountMetas[1];
-  };
-  data: AuthorizeNonceAccountInstructionData;
+    programAddress: Address<TProgram>;
+    accounts: {
+        nonceAccount: TAccountMetas[0];
+        nonceAuthority: TAccountMetas[1];
+    };
+    data: AuthorizeNonceAccountInstructionData;
 };
 
 export function parseAuthorizeNonceAccountInstruction<
-  TProgram extends string,
-  TAccountMetas extends readonly AccountMeta[],
+    TProgram extends string,
+    TAccountMetas extends readonly AccountMeta[],
 >(
-  instruction: Instruction<TProgram> &
-    InstructionWithAccounts<TAccountMetas> &
-    InstructionWithData<ReadonlyUint8Array>
+    instruction: Instruction<TProgram> &
+        InstructionWithAccounts<TAccountMetas> &
+        InstructionWithData<ReadonlyUint8Array>,
 ): ParsedAuthorizeNonceAccountInstruction<TProgram, TAccountMetas> {
-  if (instruction.accounts.length < 2) {
-    // TODO: Coded error.
-    throw new Error('Not enough accounts');
-  }
-  let accountIndex = 0;
-  const getNextAccount = () => {
-    const accountMeta = (instruction.accounts as TAccountMetas)[accountIndex]!;
-    accountIndex += 1;
-    return accountMeta;
-  };
-  return {
-    programAddress: instruction.programAddress,
-    accounts: {
-      nonceAccount: getNextAccount(),
-      nonceAuthority: getNextAccount(),
-    },
-    data: getAuthorizeNonceAccountInstructionDataDecoder().decode(
-      instruction.data
-    ),
-  };
+    if (instruction.accounts.length < 2) {
+        // TODO: Coded error.
+        throw new Error('Not enough accounts');
+    }
+    let accountIndex = 0;
+    const getNextAccount = () => {
+        const accountMeta = (instruction.accounts as TAccountMetas)[accountIndex]!;
+        accountIndex += 1;
+        return accountMeta;
+    };
+    return {
+        programAddress: instruction.programAddress,
+        accounts: {
+            nonceAccount: getNextAccount(),
+            nonceAuthority: getNextAccount(),
+        },
+        data: getAuthorizeNonceAccountInstructionDataDecoder().decode(instruction.data),
+    };
 }
