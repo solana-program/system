@@ -2,7 +2,7 @@
     "private": true,
     "scripts": {
         "generate": "pnpm generate:clients",
-        "generate:clients": "codama run --all && (cd clients/js && pnpm format:fix)"
+        "generate:clients": "codama run --all"
     },
     "devDependencies": {
         "@codama/renderers-js": "^1.5.5",
