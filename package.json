@@ -5,7 +5,7 @@
         "generate:clients": "codama run --all && (cd clients/js && pnpm format:fix)"
     },
     "devDependencies": {
-        "@codama/renderers-js": "^1.5.4",
+        "@codama/renderers-js": "^1.5.5",
         "@codama/renderers-rust": "~1.0",
         "@solana/prettier-config-solana": "0.0.5",
         "codama": "^1.4.4"
