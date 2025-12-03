@@ -1,0 +1,28 @@
+{
+    "idl": "program/idl.json",
+    "before": [],
+    "scripts": {
+        "js": {
+            "from": "@codama/renderers-js",
+            "args": [
+                "clients/js/src/generated",
+                {
+                    "packageFolder": "clients/js",
+                    "syncPackageJson": true
+                }
+            ]
+        },
+        "rust": {
+            "from": "@codama/renderers-rust",
+            "args": [
+                "clients/rust/src/generated",
+                {
+                    "anchorTraits": false,
+                    "crateFolder": "clients/rust",
+                    "formatCode": true,
+                    "toolchain": "+nightly-2025-02-16"
+                }
+            ]
+        }
+    }
+}
