@@ -7,34 +7,31 @@
  */
 
 import {
-  combineCodec,
-  getEnumDecoder,
-  getEnumEncoder,
-  getU32Decoder,
-  getU32Encoder,
-  type FixedSizeCodec,
-  type FixedSizeDecoder,
-  type FixedSizeEncoder,
+    combineCodec,
+    getEnumDecoder,
+    getEnumEncoder,
+    getU32Decoder,
+    getU32Encoder,
+    type FixedSizeCodec,
+    type FixedSizeDecoder,
+    type FixedSizeEncoder,
 } from '@solana/kit';
 
 export enum NonceVersion {
-  Legacy,
-  Current,
+    Legacy,
+    Current,
 }
 
 export type NonceVersionArgs = NonceVersion;
 
 export function getNonceVersionEncoder(): FixedSizeEncoder<NonceVersionArgs> {
-  return getEnumEncoder(NonceVersion, { size: getU32Encoder() });
+    return getEnumEncoder(NonceVersion, { size: getU32Encoder() });
 }
 
 export function getNonceVersionDecoder(): FixedSizeDecoder<NonceVersion> {
-  return getEnumDecoder(NonceVersion, { size: getU32Decoder() });
+    return getEnumDecoder(NonceVersion, { size: getU32Decoder() });
 }
 
-export function getNonceVersionCodec(): FixedSizeCodec<
-  NonceVersionArgs,
-  NonceVersion
-> {
-  return combineCodec(getNonceVersionEncoder(), getNonceVersionDecoder());
+export function getNonceVersionCodec(): FixedSizeCodec<NonceVersionArgs, NonceVersion> {
+    return combineCodec(getNonceVersionEncoder(), getNonceVersionDecoder());
 }

@@ -7,206 +7,170 @@
  */
 
 import {
-  BASE_ACCOUNT_SIZE,
-  combineCodec,
-  getAddressDecoder,
-  getAddressEncoder,
-  getStructDecoder,
-  getStructEncoder,
-  getU32Decoder,
-  getU32Encoder,
-  getU64Decoder,
-  getU64Encoder,
-  transformEncoder,
-  type AccountMeta,
-  type AccountSignerMeta,
-  type Address,
-  type FixedSizeCodec,
-  type FixedSizeDecoder,
-  type FixedSizeEncoder,
-  type Instruction,
-  type InstructionWithAccounts,
-  type InstructionWithData,
-  type ReadonlyUint8Array,
-  type TransactionSigner,
-  type WritableSignerAccount,
+    BASE_ACCOUNT_SIZE,
+    combineCodec,
+    getAddressDecoder,
+    getAddressEncoder,
+    getStructDecoder,
+    getStructEncoder,
+    getU32Decoder,
+    getU32Encoder,
+    getU64Decoder,
+    getU64Encoder,
+    transformEncoder,
+    type AccountMeta,
+    type AccountSignerMeta,
+    type Address,
+    type FixedSizeCodec,
+    type FixedSizeDecoder,
+    type FixedSizeEncoder,
+    type Instruction,
+    type InstructionWithAccounts,
+    type InstructionWithData,
+    type ReadonlyUint8Array,
+    type TransactionSigner,
+    type WritableSignerAccount,
 } from '@solana/kit';
 import { SYSTEM_PROGRAM_ADDRESS } from '../programs';
-import {
-  getAccountMetaFactory,
-  type InstructionWithByteDelta,
-  type ResolvedAccount,
-} from '../shared';
+import { getAccountMetaFactory, type InstructionWithByteDelta, type ResolvedAccount } from '../shared';
 
 export const CREATE_ACCOUNT_DISCRIMINATOR = 0;
 
 export function getCreateAccountDiscriminatorBytes() {
-  return getU32Encoder().encode(CREATE_ACCOUNT_DISCRIMINATOR);
+    return getU32Encoder().encode(CREATE_ACCOUNT_DISCRIMINATOR);
 }
 
 export type CreateAccountInstruction<
-  TProgram extends string = typeof SYSTEM_PROGRAM_ADDRESS,
-  TAccountPayer extends string | AccountMeta<string> = string,
-  TAccountNewAccount extends string | AccountMeta<string> = string,
-  TRemainingAccounts extends readonly AccountMeta<string>[] = [],
+    TProgram extends string = typeof SYSTEM_PROGRAM_ADDRESS,
+    TAccountPayer extends string | AccountMeta<string> = string,
+    TAccountNewAccount extends string | AccountMeta<string> = string,
+    TRemainingAccounts extends readonly AccountMeta<string>[] = [],
 > = Instruction<TProgram> &
-  InstructionWithData<ReadonlyUint8Array> &
-  InstructionWithAccounts<
-    [
-      TAccountPayer extends string
-        ? WritableSignerAccount<TAccountPayer> &
-            AccountSignerMeta<TAccountPayer>
-        : TAccountPayer,
-      TAccountNewAccount extends string
-        ? WritableSignerAccount<TAccountNewAccount> &
-            AccountSignerMeta<TAccountNewAccount>
-        : TAccountNewAccount,
-      ...TRemainingAccounts,
-    ]
-  >;
+    InstructionWithData<ReadonlyUint8Array> &
+    InstructionWithAccounts<
+        [
+            TAccountPayer extends string
+                ? WritableSignerAccount<TAccountPayer> & AccountSignerMeta<TAccountPayer>
+                : TAccountPayer,
+            TAccountNewAccount extends string
+                ? WritableSignerAccount<TAccountNewAccount> & AccountSignerMeta<TAccountNewAccount>
+                : TAccountNewAccount,
+            ...TRemainingAccounts,
+        ]
+    >;
 
 export type CreateAccountInstructionData = {
-  discriminator: number;
-  lamports: bigint;
-  space: bigint;
-  programAddress: Address;
+    discriminator: number;
+    lamports: bigint;
+    space: bigint;
+    programAddress: Address;
 };
 
 export type CreateAccountInstructionDataArgs = {
-  lamports: number | bigint;
-  space: number | bigint;
-  programAddress: Address;
+    lamports: number | bigint;
+    space: number | bigint;
+    programAddress: Address;
 };
 
 export function getCreateAccountInstructionDataEncoder(): FixedSizeEncoder<CreateAccountInstructionDataArgs> {
-  return transformEncoder(
-    getStructEncoder([
-      ['discriminator', getU32Encoder()],
-      ['lamports', getU64Encoder()],
-      ['space', getU64Encoder()],
-      ['programAddress', getAddressEncoder()],
-    ]),
-    (value) => ({ ...value, discriminator: CREATE_ACCOUNT_DISCRIMINATOR })
-  );
+    return transformEncoder(
+        getStructEncoder([
+            ['discriminator', getU32Encoder()],
+            ['lamports', getU64Encoder()],
+            ['space', getU64Encoder()],
+            ['programAddress', getAddressEncoder()],
+        ]),
+        value => ({ ...value, discriminator: CREATE_ACCOUNT_DISCRIMINATOR }),
+    );
 }
 
 export function getCreateAccountInstructionDataDecoder(): FixedSizeDecoder<CreateAccountInstructionData> {
-  return getStructDecoder([
-    ['discriminator', getU32Decoder()],
-    ['lamports', getU64Decoder()],
-    ['space', getU64Decoder()],
-    ['programAddress', getAddressDecoder()],
-  ]);
+    return getStructDecoder([
+        ['discriminator', getU32Decoder()],
+        ['lamports', getU64Decoder()],
+        ['space', getU64Decoder()],
+        ['programAddress', getAddressDecoder()],
+    ]);
 }
 
 export function getCreateAccountInstructionDataCodec(): FixedSizeCodec<
-  CreateAccountInstructionDataArgs,
-  CreateAccountInstructionData
+    CreateAccountInstructionDataArgs,
+    CreateAccountInstructionData
 > {
-  return combineCodec(
-    getCreateAccountInstructionDataEncoder(),
-    getCreateAccountInstructionDataDecoder()
-  );
+    return combineCodec(getCreateAccountInstructionDataEncoder(), getCreateAccountInstructionDataDecoder());
 }
 
-export type CreateAccountInput<
-  TAccountPayer extends string = string,
-  TAccountNewAccount extends string = string,
-> = {
-  payer: TransactionSigner<TAccountPayer>;
-  newAccount: TransactionSigner<TAccountNewAccount>;
-  lamports: CreateAccountInstructionDataArgs['lamports'];
-  space: CreateAccountInstructionDataArgs['space'];
-  programAddress: CreateAccountInstructionDataArgs['programAddress'];
+export type CreateAccountInput<TAccountPayer extends string = string, TAccountNewAccount extends string = string> = {
+    payer: TransactionSigner<TAccountPayer>;
+    newAccount: TransactionSigner<TAccountNewAccount>;
+    lamports: CreateAccountInstructionDataArgs['lamports'];
+    space: CreateAccountInstructionDataArgs['space'];
+    programAddress: CreateAccountInstructionDataArgs['programAddress'];
 };
 
 export function getCreateAccountInstruction<
-  TAccountPayer extends string,
-  TAccountNewAccount extends string,
-  TProgramAddress extends Address = typeof SYSTEM_PROGRAM_ADDRESS,
+    TAccountPayer extends string,
+    TAccountNewAccount extends string,
+    TProgramAddress extends Address = typeof SYSTEM_PROGRAM_ADDRESS,
 >(
-  input: CreateAccountInput<TAccountPayer, TAccountNewAccount>,
-  config?: { programAddress?: TProgramAddress }
-): CreateAccountInstruction<
-  TProgramAddress,
-  TAccountPayer,
-  TAccountNewAccount
-> &
-  InstructionWithByteDelta {
-  // Program address.
-  const programAddress = config?.programAddress ?? SYSTEM_PROGRAM_ADDRESS;
+    input: CreateAccountInput<TAccountPayer, TAccountNewAccount>,
+    config?: { programAddress?: TProgramAddress },
+): CreateAccountInstruction<TProgramAddress, TAccountPayer, TAccountNewAccount> & InstructionWithByteDelta {
+    // Program address.
+    const programAddress = config?.programAddress ?? SYSTEM_PROGRAM_ADDRESS;
 
-  // Original accounts.
-  const originalAccounts = {
-    payer: { value: input.payer ?? null, isWritable: true },
-    newAccount: { value: input.newAccount ?? null, isWritable: true },
-  };
-  const accounts = originalAccounts as Record<
-    keyof typeof originalAccounts,
-    ResolvedAccount
-  >;
+    // Original accounts.
+    const originalAccounts = {
+        payer: { value: input.payer ?? null, isWritable: true },
+        newAccount: { value: input.newAccount ?? null, isWritable: true },
+    };
+    const accounts = originalAccounts as Record<keyof typeof originalAccounts, ResolvedAccount>;
 
-  // Original args.
-  const args = { ...input };
+    // Original args.
+    const args = { ...input };
 
-  // Bytes created or reallocated by the instruction.
-  const byteDelta: number = [Number(args.space) + BASE_ACCOUNT_SIZE].reduce(
-    (a, b) => a + b,
-    0
-  );
+    // Bytes created or reallocated by the instruction.
+    const byteDelta: number = [Number(args.space) + BASE_ACCOUNT_SIZE].reduce((a, b) => a + b, 0);
 
-  const getAccountMeta = getAccountMetaFactory(programAddress, 'omitted');
-  return Object.freeze({
-    accounts: [
-      getAccountMeta(accounts.payer),
-      getAccountMeta(accounts.newAccount),
-    ],
-    byteDelta,
-    data: getCreateAccountInstructionDataEncoder().encode(
-      args as CreateAccountInstructionDataArgs
-    ),
-    programAddress,
-  } as CreateAccountInstruction<
-    TProgramAddress,
-    TAccountPayer,
-    TAccountNewAccount
-  > &
-    InstructionWithByteDelta);
+    const getAccountMeta = getAccountMetaFactory(programAddress, 'omitted');
+    return Object.freeze({
+        accounts: [getAccountMeta(accounts.payer), getAccountMeta(accounts.newAccount)],
+        byteDelta,
+        data: getCreateAccountInstructionDataEncoder().encode(args as CreateAccountInstructionDataArgs),
+        programAddress,
+    } as CreateAccountInstruction<TProgramAddress, TAccountPayer, TAccountNewAccount> & InstructionWithByteDelta);
 }
 
 export type ParsedCreateAccountInstruction<
-  TProgram extends string = typeof SYSTEM_PROGRAM_ADDRESS,
-  TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[],
+    TProgram extends string = typeof SYSTEM_PROGRAM_ADDRESS,
+    TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[],
 > = {
-  programAddress: Address<TProgram>;
-  accounts: {
-    payer: TAccountMetas[0];
-    newAccount: TAccountMetas[1];
-  };
-  data: CreateAccountInstructionData;
+    programAddress: Address<TProgram>;
+    accounts: {
+        payer: TAccountMetas[0];
+        newAccount: TAccountMetas[1];
+    };
+    data: CreateAccountInstructionData;
 };
 
-export function parseCreateAccountInstruction<
-  TProgram extends string,
-  TAccountMetas extends readonly AccountMeta[],
->(
-  instruction: Instruction<TProgram> &
-    InstructionWithAccounts<TAccountMetas> &
-    InstructionWithData<ReadonlyUint8Array>
+export function parseCreateAccountInstruction<TProgram extends string, TAccountMetas extends readonly AccountMeta[]>(
+    instruction: Instruction<TProgram> &
+        InstructionWithAccounts<TAccountMetas> &
+        InstructionWithData<ReadonlyUint8Array>,
 ): ParsedCreateAccountInstruction<TProgram, TAccountMetas> {
-  if (instruction.accounts.length < 2) {
-    // TODO: Coded error.
-    throw new Error('Not enough accounts');
-  }
-  let accountIndex = 0;
-  const getNextAccount = () => {
-    const accountMeta = (instruction.accounts as TAccountMetas)[accountIndex]!;
-    accountIndex += 1;
-    return accountMeta;
-  };
-  return {
-    programAddress: instruction.programAddress,
-    accounts: { payer: getNextAccount(), newAccount: getNextAccount() },
-    data: getCreateAccountInstructionDataDecoder().decode(instruction.data),
-  };
+    if (instruction.accounts.length < 2) {
+        // TODO: Coded error.
+        throw new Error('Not enough accounts');
+    }
+    let accountIndex = 0;
+    const getNextAccount = () => {
+        const accountMeta = (instruction.accounts as TAccountMetas)[accountIndex]!;
+        accountIndex += 1;
+        return accountMeta;
+    };
+    return {
+        programAddress: instruction.programAddress,
+        accounts: { payer: getNextAccount(), newAccount: getNextAccount() },
+        data: getCreateAccountInstructionDataDecoder().decode(instruction.data),
+    };
 }

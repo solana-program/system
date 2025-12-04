@@ -7,34 +7,31 @@
  */
 
 import {
-  combineCodec,
-  getEnumDecoder,
-  getEnumEncoder,
-  getU32Decoder,
-  getU32Encoder,
-  type FixedSizeCodec,
-  type FixedSizeDecoder,
-  type FixedSizeEncoder,
+    combineCodec,
+    getEnumDecoder,
+    getEnumEncoder,
+    getU32Decoder,
+    getU32Encoder,
+    type FixedSizeCodec,
+    type FixedSizeDecoder,
+    type FixedSizeEncoder,
 } from '@solana/kit';
 
 export enum NonceState {
-  Uninitialized,
-  Initialized,
+    Uninitialized,
+    Initialized,
 }
 
 export type NonceStateArgs = NonceState;
 
 export function getNonceStateEncoder(): FixedSizeEncoder<NonceStateArgs> {
-  return getEnumEncoder(NonceState, { size: getU32Encoder() });
+    return getEnumEncoder(NonceState, { size: getU32Encoder() });
 }
 
 export function getNonceStateDecoder(): FixedSizeDecoder<NonceState> {
-  return getEnumDecoder(NonceState, { size: getU32Decoder() });
+    return getEnumDecoder(NonceState, { size: getU32Decoder() });
 }
 
-export function getNonceStateCodec(): FixedSizeCodec<
-  NonceStateArgs,
-  NonceState
-> {
-  return combineCodec(getNonceStateEncoder(), getNonceStateDecoder());
+export function getNonceStateCodec(): FixedSizeCodec<NonceStateArgs, NonceState> {
+    return combineCodec(getNonceStateEncoder(), getNonceStateDecoder());
 }
