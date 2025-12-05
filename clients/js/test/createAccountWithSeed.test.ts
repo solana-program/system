@@ -5,7 +5,7 @@ import {
     generateKeyPairSigner,
     pipe,
 } from '@solana/kit';
-import test from 'ava';
+import { it, expect } from 'vitest';
 import { getCreateAccountWithSeedInstruction } from '../src';
 import {
     createDefaultSolanaClient,
@@ -14,7 +14,7 @@ import {
     signAndSendTransaction,
 } from './_setup';
 
-test('it creates a new empty account when base is not payer', async t => {
+it('creates a new empty account when base is not payer', async () => {
     const client = createDefaultSolanaClient();
     const space = 42n;
     const [payer, program, lamports] = await Promise.all([
@@ -51,7 +51,7 @@ test('it creates a new empty account when base is not payer', async t => {
 
     // Then we expect the following account data.
     const fetchedAccount = await fetchEncodedAccount(client.rpc, newAccount);
-    t.deepEqual(fetchedAccount, {
+    expect(fetchedAccount).toStrictEqual({
         executable: false,
         lamports,
         programAddress,
@@ -62,7 +62,7 @@ test('it creates a new empty account when base is not payer', async t => {
     });
 });
 
-test('it creates a new empty account when base is payer', async t => {
+it('creates a new empty account when base is payer', async () => {
     const client = createDefaultSolanaClient();
     const space = 42n;
     const [payer, program, lamports] = await Promise.all([
@@ -98,7 +98,7 @@ test('it creates a new empty account when base is payer', async t => {
 
     // Then we expect the following account data.
     const fetchedAccount = await fetchEncodedAccount(client.rpc, newAccount);
-    t.deepEqual(fetchedAccount, {
+    expect(fetchedAccount).toStrictEqual({
         executable: false,
         lamports,
         programAddress,

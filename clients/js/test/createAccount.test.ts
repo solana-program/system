@@ -1,5 +1,5 @@
 import { appendTransactionMessageInstruction, fetchEncodedAccount, generateKeyPairSigner, pipe } from '@solana/kit';
-import test from 'ava';
+import { it, expect } from 'vitest';
 import { SYSTEM_PROGRAM_ADDRESS, getCreateAccountInstruction } from '../src';
 import {
     createDefaultSolanaClient,
@@ -8,7 +8,7 @@ import {
     signAndSendTransaction,
 } from './_setup';
 
-test('it creates a new empty account', async t => {
+it('creates a new empty account', async () => {
     // Given we have a newly generated account keypair to create with 42 bytes of space.
     const client = createDefaultSolanaClient();
     const space = 42n;
@@ -34,7 +34,7 @@ test('it creates a new empty account', async t => {
 
     // Then we expect the following account data.
     const fetchedAccount = await fetchEncodedAccount(client.rpc, newAccount.address);
-    t.deepEqual(fetchedAccount, {
+    expect(fetchedAccount).toStrictEqual({
         executable: false,
         lamports,
         programAddress: SYSTEM_PROGRAM_ADDRESS,

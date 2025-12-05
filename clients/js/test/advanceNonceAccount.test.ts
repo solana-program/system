@@ -1,5 +1,5 @@
 import { appendTransactionMessageInstruction, generateKeyPairSigner, pipe } from '@solana/kit';
-import test from 'ava';
+import { it, expect } from 'vitest';
 import { fetchNonce, getAdvanceNonceAccountInstruction } from '../src';
 import {
     createDefaultSolanaClient,
@@ -9,7 +9,7 @@ import {
     signAndSendTransaction,
 } from './_setup';
 
-test('it advances the nonce account', async t => {
+it('advances the nonce account', async () => {
     // Given an existing nonce account.
     const client = createDefaultSolanaClient();
     const [payer, nonce, authority] = await Promise.all([
@@ -33,5 +33,5 @@ test('it advances the nonce account', async t => {
 
     // Then we expect the blockhash to have been updated.
     const updatedNonceAccount = await fetchNonce(client.rpc, nonce.address);
-    t.not(originalNonceAccount.data.blockhash, updatedNonceAccount.data.blockhash);
+    expect(originalNonceAccount.data.blockhash).not.toBe(updatedNonceAccount.data.blockhash);
 });
