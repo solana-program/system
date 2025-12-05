@@ -1,12 +1,5 @@
-import {
-    AccountRole,
-    Address,
-    appendTransactionMessageInstruction,
-    generateKeyPairSigner,
-    lamports,
-    pipe,
-} from '@solana/kit';
-import test from 'ava';
+import { AccountRole, appendTransactionMessageInstruction, generateKeyPairSigner, lamports, pipe } from '@solana/kit';
+import { it, expect } from 'vitest';
 import { getTransferSolInstruction, parseTransferSolInstruction } from '../src';
 import {
     createDefaultSolanaClient,
@@ -16,7 +9,7 @@ import {
     signAndSendTransaction,
 } from './_setup';
 
-test('it transfers SOL from one account to another', async t => {
+it('transfers SOL from one account to another', async () => {
     // Given a source account with 3 SOL and a destination account with no SOL.
     const client = createDefaultSolanaClient();
     const source = await generateKeyPairSignerWithSol(client, 3_000_000_000n);
@@ -36,14 +29,14 @@ test('it transfers SOL from one account to another', async t => {
 
     // Then the source account now has roughly 2 SOL (minus the transaction fee).
     const sourceBalance = await getBalance(client, source.address);
-    t.true(sourceBalance < 2_000_000_000n);
-    t.true(sourceBalance > 1_999_000_000n);
+    expect(sourceBalance).toBeLessThan(2_000_000_000n);
+    expect(sourceBalance).toBeGreaterThan(1_999_000_000n);
 
     // And the destination account has exactly 1 SOL.
-    t.is(await getBalance(client, destination), lamports(1_000_000_000n));
+    expect(await getBalance(client, destination)).toBe(lamports(1_000_000_000n));
 });
 
-test('it parses the accounts and the data of an existing transfer SOL instruction', async t => {
+it('parses the accounts and the data of an existing transfer SOL instruction', async () => {
     // Given a transfer SOL instruction with the following accounts and data.
     const source = await generateKeyPairSigner();
     const destination = (await generateKeyPairSigner()).address;
@@ -57,14 +50,11 @@ test('it parses the accounts and the data of an existing transfer SOL instructio
     const parsedTransferSol = parseTransferSolInstruction(transferSol);
 
     // Then we expect the following accounts and data.
-    t.is(parsedTransferSol.accounts.source.address, source.address);
-    t.is(parsedTransferSol.accounts.source.role, AccountRole.WRITABLE_SIGNER);
-    t.is(parsedTransferSol.accounts.source.signer, source);
-    t.is(parsedTransferSol.accounts.destination.address, destination);
-    t.is(parsedTransferSol.accounts.destination.role, AccountRole.WRITABLE);
-    t.is(parsedTransferSol.data.amount, 1_000_000_000n);
-    t.is(
-        parsedTransferSol.programAddress,
-        '11111111111111111111111111111111' as Address<'11111111111111111111111111111111'>,
-    );
+    expect(parsedTransferSol.accounts.source.address).toBe(source.address);
+    expect(parsedTransferSol.accounts.source.role).toBe(AccountRole.WRITABLE_SIGNER);
+    expect(parsedTransferSol.accounts.source.signer).toBe(source);
+    expect(parsedTransferSol.accounts.destination.address).toBe(destination);
+    expect(parsedTransferSol.accounts.destination.role).toBe(AccountRole.WRITABLE);
+    expect(parsedTransferSol.data.amount).toBe(1_000_000_000n);
+    expect(parsedTransferSol.programAddress).toBe('11111111111111111111111111111111');
 });

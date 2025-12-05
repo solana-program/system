@@ -1,5 +1,5 @@
 import { Account, appendTransactionMessageInstruction, generateKeyPairSigner, pipe } from '@solana/kit';
-import test from 'ava';
+import { it, expect } from 'vitest';
 import {
     Nonce,
     NonceState,
@@ -17,7 +17,7 @@ import {
     signAndSendTransaction,
 } from './_setup';
 
-test('it creates and initialize a durable nonce account', async t => {
+it('creates and initialize a durable nonce account', async () => {
     // Given some brand now payer, authority, and nonce KeyPairSigners.
     const client = createDefaultSolanaClient();
     const payer = await generateKeyPairSignerWithSol(client);
@@ -46,7 +46,7 @@ test('it creates and initialize a durable nonce account', async t => {
     );
 
     // Then we expect the nonce account to exist with the following data.
-    t.like(await fetchNonce(client.rpc, nonce.address), <Account<Nonce>>{
+    expect(await fetchNonce(client.rpc, nonce.address)).toMatchObject(<Account<Nonce>>{
         address: nonce.address,
         data: {
             version: NonceVersion.Current,
