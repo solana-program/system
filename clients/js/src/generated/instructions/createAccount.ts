@@ -61,14 +61,20 @@ export type CreateAccountInstruction<
 
 export type CreateAccountInstructionData = {
     discriminator: number;
+    /** The amount of lamports to transfer to the new account */
     lamports: bigint;
+    /** The number of bytes to allocate for the new account */
     space: bigint;
+    /** The address of the program that will own the new account */
     programAddress: Address;
 };
 
 export type CreateAccountInstructionDataArgs = {
+    /** The amount of lamports to transfer to the new account */
     lamports: number | bigint;
+    /** The number of bytes to allocate for the new account */
     space: number | bigint;
+    /** The address of the program that will own the new account */
     programAddress: Address;
 };
 
@@ -101,7 +107,9 @@ export function getCreateAccountInstructionDataCodec(): FixedSizeCodec<
 }
 
 export type CreateAccountInput<TAccountPayer extends string = string, TAccountNewAccount extends string = string> = {
+    /** The account that will pay for the new account */
     payer: TransactionSigner<TAccountPayer>;
+    /** The account to create */
     newAccount: TransactionSigner<TAccountNewAccount>;
     lamports: CreateAccountInstructionDataArgs['lamports'];
     space: CreateAccountInstructionDataArgs['space'];
@@ -147,7 +155,9 @@ export type ParsedCreateAccountInstruction<
 > = {
     programAddress: Address<TProgram>;
     accounts: {
+        /** The account that will pay for the new account */
         payer: TAccountMetas[0];
+        /** The account to create */
         newAccount: TAccountMetas[1];
     };
     data: CreateAccountInstructionData;

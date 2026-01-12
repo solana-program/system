@@ -52,9 +52,16 @@ export type AllocateInstruction<
         ]
     >;
 
-export type AllocateInstructionData = { discriminator: number; space: bigint };
+export type AllocateInstructionData = {
+    discriminator: number;
+    /** The number of bytes to allocate */
+    space: bigint;
+};
 
-export type AllocateInstructionDataArgs = { space: number | bigint };
+export type AllocateInstructionDataArgs = {
+    /** The number of bytes to allocate */
+    space: number | bigint;
+};
 
 export function getAllocateInstructionDataEncoder(): FixedSizeEncoder<AllocateInstructionDataArgs> {
     return transformEncoder(
@@ -81,6 +88,7 @@ export function getAllocateInstructionDataCodec(): FixedSizeCodec<
 }
 
 export type AllocateInput<TAccountNewAccount extends string = string> = {
+    /** The account to allocate space for */
     newAccount: TransactionSigner<TAccountNewAccount>;
     space: AllocateInstructionDataArgs['space'];
 };
@@ -116,6 +124,7 @@ export type ParsedAllocateInstruction<
 > = {
     programAddress: Address<TProgram>;
     accounts: {
+        /** The account to allocate space for */
         newAccount: TAccountMetas[0];
     };
     data: AllocateInstructionData;
