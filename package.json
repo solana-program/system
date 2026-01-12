@@ -2,7 +2,10 @@
     "private": true,
     "scripts": {
         "generate": "pnpm generate:clients",
-        "generate:clients": "codama run --all"
+        "generate:clients": "codama run --all",
+        "validator:start": "solana-test-validator --reset --quiet",
+        "validator:stop": "pkill -f solana-test-validator",
+        "validator:restart": "pnpm validator:stop && pnpm validator:start"
     },
     "devDependencies": {
         "@codama/renderers-js": "^1.5.5",
