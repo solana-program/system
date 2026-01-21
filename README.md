@@ -32,20 +32,14 @@ The following clients are available for the System program. You may use the foll
 
 ## Starting and stopping the local validator
 
-The following script is available to start your local validator.
+The following script is available to start or restart your local validator.
 
 ```sh
-pnpm validator:start
-```
-
-By default, if a local validator is already running, the script will be skipped. You may use the `validator:restart` script instead to force the validator to restart.
-
-```sh
-pnpm validator:restart
+./scripts/restart-test-validator.sh
 ```
 
 Finally, you may stop the local validator using the following command.
 
 ```sh
-pnpm validator:stop
+./scripts/stop-test-validator.sh
 ```
