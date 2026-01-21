@@ -1,6 +1,6 @@
 import { appendTransactionMessageInstruction, fetchEncodedAccount, generateKeyPairSigner, pipe } from '@solana/kit';
 import { it, expect } from 'vitest';
-import { SYSTEM_PROGRAM_ADDRESS, getAssignInstruction, getCreateAccountInstruction } from '../src';
+import { SYSTEM_PROGRAM_ADDRESS, getAssignInstruction, getTransferSolInstruction } from '../src';
 import {
     createDefaultSolanaClient,
     createDefaultTransaction,
@@ -22,12 +22,10 @@ it('assigns a new owner to an account', async () => {
     const space = 0n;
     const lamports = await client.rpc.getMinimumBalanceForRentExemption(space).send();
 
-    const createAccount = getCreateAccountInstruction({
-        payer,
-        newAccount: accountToAssign,
-        lamports: lamports, // Fix: Use return value directly
-        space,
-        programAddress: SYSTEM_PROGRAM_ADDRESS,
+    const transfer = getTransferSolInstruction({
+        source: payer,
+        destination: accountToAssign.address,
+        amount: lamports,
     });
 
     // 3. Use getAssignInstruction to change the owner of accountToAssign to newOwner.
@@ -39,7 +37,7 @@ it('assigns a new owner to an account', async () => {
     // 4. Sign and send the transaction.
     await pipe(
         await createDefaultTransaction(client, payer),
-        tx => appendTransactionMessageInstruction(createAccount, tx),
+        tx => appendTransactionMessageInstruction(transfer, tx),
         tx => appendTransactionMessageInstruction(assign, tx),
         tx => signAndSendTransaction(client, tx),
     );
