@@ -55,16 +55,9 @@ export type TransferSolInstruction<
         ]
     >;
 
-export type TransferSolInstructionData = {
-    discriminator: number;
-    /** The amount of lamports to transfer */
-    amount: bigint;
-};
+export type TransferSolInstructionData = { discriminator: number; amount: bigint };
 
-export type TransferSolInstructionDataArgs = {
-    /** The amount of lamports to transfer */
-    amount: number | bigint;
-};
+export type TransferSolInstructionDataArgs = { amount: number | bigint };
 
 export function getTransferSolInstructionDataEncoder(): FixedSizeEncoder<TransferSolInstructionDataArgs> {
     return transformEncoder(
@@ -91,9 +84,7 @@ export function getTransferSolInstructionDataCodec(): FixedSizeCodec<
 }
 
 export type TransferSolInput<TAccountSource extends string = string, TAccountDestination extends string = string> = {
-    /** The account referencing the source of the transfer */
     source: TransactionSigner<TAccountSource>;
-    /** The account referencing the destination of the transfer */
     destination: Address<TAccountDestination>;
     amount: TransferSolInstructionDataArgs['amount'];
 };
@@ -133,9 +124,7 @@ export type ParsedTransferSolInstruction<
 > = {
     programAddress: Address<TProgram>;
     accounts: {
-        /** The account referencing the source of the transfer */
         source: TAccountMetas[0];
-        /** The account referencing the destination of the transfer */
         destination: TAccountMetas[1];
     };
     data: TransferSolInstructionData;
