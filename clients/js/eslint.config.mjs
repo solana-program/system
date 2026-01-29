@@ -11,6 +11,7 @@ export default defineConfig([
             '@typescript-eslint/sort-type-constituents': 'off',
             '@typescript-eslint/no-unnecessary-type-assertion': 'off',
             '@typescript-eslint/no-empty-object-type': 'off',
+            '@typescript-eslint/restrict-plus-operands': 'off',
             'prefer-destructuring': 'off',
             'simple-import-sort/imports': 'off',
             'sort-keys-fix/sort-keys-fix': 'off',
