@@ -6,8 +6,29 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import { containsBytes, getU32Encoder, type Address, type ReadonlyUint8Array } from '@solana/kit';
 import {
+    assertIsInstructionWithAccounts,
+    containsBytes,
+    getU32Encoder,
+    type Address,
+    type Instruction,
+    type InstructionWithData,
+    type ReadonlyUint8Array,
+} from '@solana/kit';
+import {
+    parseAdvanceNonceAccountInstruction,
+    parseAllocateInstruction,
+    parseAllocateWithSeedInstruction,
+    parseAssignInstruction,
+    parseAssignWithSeedInstruction,
+    parseAuthorizeNonceAccountInstruction,
+    parseCreateAccountInstruction,
+    parseCreateAccountWithSeedInstruction,
+    parseInitializeNonceAccountInstruction,
+    parseTransferSolInstruction,
+    parseTransferSolWithSeedInstruction,
+    parseUpgradeNonceAccountInstruction,
+    parseWithdrawNonceAccountInstruction,
     type ParsedAdvanceNonceAccountInstruction,
     type ParsedAllocateInstruction,
     type ParsedAllocateWithSeedInstruction,
@@ -107,3 +128,92 @@ export type ParsedSystemInstruction<TProgram extends string = '11111111111111111
     | ({ instructionType: SystemInstruction.AssignWithSeed } & ParsedAssignWithSeedInstruction<TProgram>)
     | ({ instructionType: SystemInstruction.TransferSolWithSeed } & ParsedTransferSolWithSeedInstruction<TProgram>)
     | ({ instructionType: SystemInstruction.UpgradeNonceAccount } & ParsedUpgradeNonceAccountInstruction<TProgram>);
+
+export function parseSystemInstruction<TProgram extends string>(
+    instruction: Instruction<TProgram> & InstructionWithData<ReadonlyUint8Array>,
+): ParsedSystemInstruction<TProgram> {
+    const instructionType = identifySystemInstruction(instruction);
+    switch (instructionType) {
+        case SystemInstruction.CreateAccount: {
+            assertIsInstructionWithAccounts(instruction);
+            return { instructionType: SystemInstruction.CreateAccount, ...parseCreateAccountInstruction(instruction) };
+        }
+        case SystemInstruction.Assign: {
+            assertIsInstructionWithAccounts(instruction);
+            return { instructionType: SystemInstruction.Assign, ...parseAssignInstruction(instruction) };
+        }
+        case SystemInstruction.TransferSol: {
+            assertIsInstructionWithAccounts(instruction);
+            return { instructionType: SystemInstruction.TransferSol, ...parseTransferSolInstruction(instruction) };
+        }
+        case SystemInstruction.CreateAccountWithSeed: {
+            assertIsInstructionWithAccounts(instruction);
+            return {
+                instructionType: SystemInstruction.CreateAccountWithSeed,
+                ...parseCreateAccountWithSeedInstruction(instruction),
+            };
+        }
+        case SystemInstruction.AdvanceNonceAccount: {
+            assertIsInstructionWithAccounts(instruction);
+            return {
+                instructionType: SystemInstruction.AdvanceNonceAccount,
+                ...parseAdvanceNonceAccountInstruction(instruction),
+            };
+        }
+        case SystemInstruction.WithdrawNonceAccount: {
+            assertIsInstructionWithAccounts(instruction);
+            return {
+                instructionType: SystemInstruction.WithdrawNonceAccount,
+                ...parseWithdrawNonceAccountInstruction(instruction),
+            };
+        }
+        case SystemInstruction.InitializeNonceAccount: {
+            assertIsInstructionWithAccounts(instruction);
+            return {
+                instructionType: SystemInstruction.InitializeNonceAccount,
+                ...parseInitializeNonceAccountInstruction(instruction),
+            };
+        }
+        case SystemInstruction.AuthorizeNonceAccount: {
+            assertIsInstructionWithAccounts(instruction);
+            return {
+                instructionType: SystemInstruction.AuthorizeNonceAccount,
+                ...parseAuthorizeNonceAccountInstruction(instruction),
+            };
+        }
+        case SystemInstruction.Allocate: {
+            assertIsInstructionWithAccounts(instruction);
+            return { instructionType: SystemInstruction.Allocate, ...parseAllocateInstruction(instruction) };
+        }
+        case SystemInstruction.AllocateWithSeed: {
+            assertIsInstructionWithAccounts(instruction);
+            return {
+                instructionType: SystemInstruction.AllocateWithSeed,
+                ...parseAllocateWithSeedInstruction(instruction),
+            };
+        }
+        case SystemInstruction.AssignWithSeed: {
+            assertIsInstructionWithAccounts(instruction);
+            return {
+                instructionType: SystemInstruction.AssignWithSeed,
+                ...parseAssignWithSeedInstruction(instruction),
+            };
+        }
+        case SystemInstruction.TransferSolWithSeed: {
+            assertIsInstructionWithAccounts(instruction);
+            return {
+                instructionType: SystemInstruction.TransferSolWithSeed,
+                ...parseTransferSolWithSeedInstruction(instruction),
+            };
+        }
+        case SystemInstruction.UpgradeNonceAccount: {
+            assertIsInstructionWithAccounts(instruction);
+            return {
+                instructionType: SystemInstruction.UpgradeNonceAccount,
+                ...parseUpgradeNonceAccountInstruction(instruction),
+            };
+        }
+        default:
+            throw new Error(`Unrecognized instruction type: ${instructionType as string}`);
+    }
+}

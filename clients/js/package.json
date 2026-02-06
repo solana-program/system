@@ -43,18 +43,18 @@
     },
     "homepage": "https://github.com/solana-program/system#readme",
     "peerDependencies": {
-        "@solana/kit": "^5.0"
+        "@solana/kit": "^6.0.0"
     },
     "devDependencies": {
-        "@solana/eslint-config-solana": "^5.0.0",
-        "@solana/kit": "^5.0",
+        "@solana/eslint-config-solana": "^6.0.0",
+        "@solana/kit": "^6.0.0",
         "@types/node": "^24",
-        "eslint": "^9.35.0",
+        "eslint": "^9.39.2",
         "prettier": "^3.7.4",
         "rimraf": "^6.1.2",
         "tsup": "^8.1.2",
         "typedoc": "^0.28.15",
-        "typescript": "^5.5.3",
+        "typescript": "^5.9.3",
         "vitest": "^4.0.15"
     }
 }
