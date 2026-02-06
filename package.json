@@ -5,10 +5,10 @@
         "generate:clients": "codama run --all"
     },
     "devDependencies": {
-        "@codama/renderers-js": "^1.6.0",
+        "@codama/renderers-js": "^1.7.0",
         "@codama/renderers-rust": "~1.0",
-        "@solana/prettier-config-solana": "0.0.5",
-        "codama": "^1.4.4"
+        "@solana/prettier-config-solana": "0.0.6",
+        "codama": "^1.5.0"
     },
     "engines": {
         "node": ">=v20.0.0"
