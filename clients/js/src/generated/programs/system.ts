@@ -10,12 +10,41 @@ import {
     assertIsInstructionWithAccounts,
     containsBytes,
     getU32Encoder,
+    SOLANA_ERROR__PROGRAM_CLIENTS__FAILED_TO_IDENTIFY_INSTRUCTION,
+    SOLANA_ERROR__PROGRAM_CLIENTS__UNRECOGNIZED_INSTRUCTION_TYPE,
+    SolanaError,
     type Address,
+    type ClientWithPayer,
+    type ClientWithRpc,
+    type ClientWithTransactionPlanning,
+    type ClientWithTransactionSending,
+    type GetAccountInfoApi,
+    type GetMultipleAccountsApi,
     type Instruction,
     type InstructionWithData,
     type ReadonlyUint8Array,
 } from '@solana/kit';
 import {
+    addSelfFetchFunctions,
+    addSelfPlanAndSendFunctions,
+    type SelfFetchFunctions,
+    type SelfPlanAndSendFunctions,
+} from '@solana/kit/program-client-core';
+import { getNonceCodec, type Nonce, type NonceArgs } from '../accounts';
+import {
+    getAdvanceNonceAccountInstruction,
+    getAllocateInstruction,
+    getAllocateWithSeedInstruction,
+    getAssignInstruction,
+    getAssignWithSeedInstruction,
+    getAuthorizeNonceAccountInstruction,
+    getCreateAccountInstruction,
+    getCreateAccountWithSeedInstruction,
+    getInitializeNonceAccountInstruction,
+    getTransferSolInstruction,
+    getTransferSolWithSeedInstruction,
+    getUpgradeNonceAccountInstruction,
+    getWithdrawNonceAccountInstruction,
     parseAdvanceNonceAccountInstruction,
     parseAllocateInstruction,
     parseAllocateWithSeedInstruction,
@@ -29,6 +58,15 @@ import {
     parseTransferSolWithSeedInstruction,
     parseUpgradeNonceAccountInstruction,
     parseWithdrawNonceAccountInstruction,
+    type AdvanceNonceAccountInput,
+    type AllocateInput,
+    type AllocateWithSeedInput,
+    type AssignInput,
+    type AssignWithSeedInput,
+    type AuthorizeNonceAccountInput,
+    type CreateAccountInput,
+    type CreateAccountWithSeedInput,
+    type InitializeNonceAccountInput,
     type ParsedAdvanceNonceAccountInstruction,
     type ParsedAllocateInstruction,
     type ParsedAllocateWithSeedInstruction,
@@ -42,6 +80,10 @@ import {
     type ParsedTransferSolWithSeedInstruction,
     type ParsedUpgradeNonceAccountInstruction,
     type ParsedWithdrawNonceAccountInstruction,
+    type TransferSolInput,
+    type TransferSolWithSeedInput,
+    type UpgradeNonceAccountInput,
+    type WithdrawNonceAccountInput,
 } from '../instructions';
 
 export const SYSTEM_PROGRAM_ADDRESS = '11111111111111111111111111111111' as Address<'11111111111111111111111111111111'>;
@@ -109,7 +151,10 @@ export function identifySystemInstruction(
     if (containsBytes(data, getU32Encoder().encode(12), 0)) {
         return SystemInstruction.UpgradeNonceAccount;
     }
-    throw new Error('The provided instruction could not be identified as a system instruction.');
+    throw new SolanaError(SOLANA_ERROR__PROGRAM_CLIENTS__FAILED_TO_IDENTIFY_INSTRUCTION, {
+        instructionData: data,
+        programName: 'system',
+    });
 }
 
 export type ParsedSystemInstruction<TProgram extends string = '11111111111111111111111111111111'> =
@@ -214,6 +259,97 @@ export function parseSystemInstruction<TProgram extends string>(
             };
         }
         default:
-            throw new Error(`Unrecognized instruction type: ${instructionType as string}`);
+            throw new SolanaError(SOLANA_ERROR__PROGRAM_CLIENTS__UNRECOGNIZED_INSTRUCTION_TYPE, {
+                instructionType: instructionType as string,
+                programName: 'system',
+            });
     }
 }
+
+export type SystemPlugin = { accounts: SystemPluginAccounts; instructions: SystemPluginInstructions };
+
+export type SystemPluginAccounts = { nonce: ReturnType<typeof getNonceCodec> & SelfFetchFunctions<NonceArgs, Nonce> };
+
+export type SystemPluginInstructions = {
+    createAccount: (
+        input: MakeOptional<CreateAccountInput, 'payer'>,
+    ) => ReturnType<typeof getCreateAccountInstruction> & SelfPlanAndSendFunctions;
+    assign: (input: AssignInput) => ReturnType<typeof getAssignInstruction> & SelfPlanAndSendFunctions;
+    transferSol: (input: TransferSolInput) => ReturnType<typeof getTransferSolInstruction> & SelfPlanAndSendFunctions;
+    createAccountWithSeed: (
+        input: MakeOptional<CreateAccountWithSeedInput, 'payer'>,
+    ) => ReturnType<typeof getCreateAccountWithSeedInstruction> & SelfPlanAndSendFunctions;
+    advanceNonceAccount: (
+        input: AdvanceNonceAccountInput,
+    ) => ReturnType<typeof getAdvanceNonceAccountInstruction> & SelfPlanAndSendFunctions;
+    withdrawNonceAccount: (
+        input: WithdrawNonceAccountInput,
+    ) => ReturnType<typeof getWithdrawNonceAccountInstruction> & SelfPlanAndSendFunctions;
+    initializeNonceAccount: (
+        input: InitializeNonceAccountInput,
+    ) => ReturnType<typeof getInitializeNonceAccountInstruction> & SelfPlanAndSendFunctions;
+    authorizeNonceAccount: (
+        input: AuthorizeNonceAccountInput,
+    ) => ReturnType<typeof getAuthorizeNonceAccountInstruction> & SelfPlanAndSendFunctions;
+    allocate: (input: AllocateInput) => ReturnType<typeof getAllocateInstruction> & SelfPlanAndSendFunctions;
+    allocateWithSeed: (
+        input: AllocateWithSeedInput,
+    ) => ReturnType<typeof getAllocateWithSeedInstruction> & SelfPlanAndSendFunctions;
+    assignWithSeed: (
+        input: AssignWithSeedInput,
+    ) => ReturnType<typeof getAssignWithSeedInstruction> & SelfPlanAndSendFunctions;
+    transferSolWithSeed: (
+        input: TransferSolWithSeedInput,
+    ) => ReturnType<typeof getTransferSolWithSeedInstruction> & SelfPlanAndSendFunctions;
+    upgradeNonceAccount: (
+        input: UpgradeNonceAccountInput,
+    ) => ReturnType<typeof getUpgradeNonceAccountInstruction> & SelfPlanAndSendFunctions;
+};
+
+export type SystemPluginRequirements = ClientWithRpc<GetAccountInfoApi & GetMultipleAccountsApi> &
+    ClientWithPayer &
+    ClientWithTransactionPlanning &
+    ClientWithTransactionSending;
+
+export function systemProgram() {
+    return <T extends SystemPluginRequirements>(client: T) => {
+        return {
+            ...client,
+            system: <SystemPlugin>{
+                accounts: { nonce: addSelfFetchFunctions(client, getNonceCodec()) },
+                instructions: {
+                    createAccount: input =>
+                        addSelfPlanAndSendFunctions(
+                            client,
+                            getCreateAccountInstruction({ ...input, payer: input.payer ?? client.payer }),
+                        ),
+                    assign: input => addSelfPlanAndSendFunctions(client, getAssignInstruction(input)),
+                    transferSol: input => addSelfPlanAndSendFunctions(client, getTransferSolInstruction(input)),
+                    createAccountWithSeed: input =>
+                        addSelfPlanAndSendFunctions(
+                            client,
+                            getCreateAccountWithSeedInstruction({ ...input, payer: input.payer ?? client.payer }),
+                        ),
+                    advanceNonceAccount: input =>
+                        addSelfPlanAndSendFunctions(client, getAdvanceNonceAccountInstruction(input)),
+                    withdrawNonceAccount: input =>
+                        addSelfPlanAndSendFunctions(client, getWithdrawNonceAccountInstruction(input)),
+                    initializeNonceAccount: input =>
+                        addSelfPlanAndSendFunctions(client, getInitializeNonceAccountInstruction(input)),
+                    authorizeNonceAccount: input =>
+                        addSelfPlanAndSendFunctions(client, getAuthorizeNonceAccountInstruction(input)),
+                    allocate: input => addSelfPlanAndSendFunctions(client, getAllocateInstruction(input)),
+                    allocateWithSeed: input =>
+                        addSelfPlanAndSendFunctions(client, getAllocateWithSeedInstruction(input)),
+                    assignWithSeed: input => addSelfPlanAndSendFunctions(client, getAssignWithSeedInstruction(input)),
+                    transferSolWithSeed: input =>
+                        addSelfPlanAndSendFunctions(client, getTransferSolWithSeedInstruction(input)),
+                    upgradeNonceAccount: input =>
+                        addSelfPlanAndSendFunctions(client, getUpgradeNonceAccountInstruction(input)),
+                },
+            },
+        };
+    };
+}
+
+type MakeOptional<T, K extends keyof T> = Omit<T, K> & Partial<Pick<T, K>>;

@@ -20,7 +20,7 @@ pnpm install
 You can generate clients for them using the following command.
 
 ```sh
-pnpm generate:clients
+make generate-clients
 ```
 
 ## Managing clients

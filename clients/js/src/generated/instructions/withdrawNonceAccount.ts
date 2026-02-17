@@ -14,6 +14,8 @@ import {
     getU32Encoder,
     getU64Decoder,
     getU64Encoder,
+    SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
+    SolanaError,
     transformEncoder,
     type AccountMeta,
     type AccountSignerMeta,
@@ -30,8 +32,8 @@ import {
     type TransactionSigner,
     type WritableAccount,
 } from '@solana/kit';
+import { getAccountMetaFactory, type ResolvedInstructionAccount } from '@solana/kit/program-client-core';
 import { SYSTEM_PROGRAM_ADDRESS } from '../programs';
-import { getAccountMetaFactory, type ResolvedAccount } from '../shared';
 
 export const WITHDRAW_NONCE_ACCOUNT_DISCRIMINATOR = 5;
 
@@ -148,7 +150,7 @@ export function getWithdrawNonceAccountInstruction<
         rentSysvar: { value: input.rentSysvar ?? null, isWritable: false },
         nonceAuthority: { value: input.nonceAuthority ?? null, isWritable: false },
     };
-    const accounts = originalAccounts as Record<keyof typeof originalAccounts, ResolvedAccount>;
+    const accounts = originalAccounts as Record<keyof typeof originalAccounts, ResolvedInstructionAccount>;
 
     // Original args.
     const args = { ...input };
@@ -166,11 +168,11 @@ export function getWithdrawNonceAccountInstruction<
     const getAccountMeta = getAccountMetaFactory(programAddress, 'omitted');
     return Object.freeze({
         accounts: [
-            getAccountMeta(accounts.nonceAccount),
-            getAccountMeta(accounts.recipientAccount),
-            getAccountMeta(accounts.recentBlockhashesSysvar),
-            getAccountMeta(accounts.rentSysvar),
-            getAccountMeta(accounts.nonceAuthority),
+            getAccountMeta('nonceAccount', accounts.nonceAccount),
+            getAccountMeta('recipientAccount', accounts.recipientAccount),
+            getAccountMeta('recentBlockhashesSysvar', accounts.recentBlockhashesSysvar),
+            getAccountMeta('rentSysvar', accounts.rentSysvar),
+            getAccountMeta('nonceAuthority', accounts.nonceAuthority),
         ],
         data: getWithdrawNonceAccountInstructionDataEncoder().encode(args as WithdrawNonceAccountInstructionDataArgs),
         programAddress,
@@ -208,8 +210,10 @@ export function parseWithdrawNonceAccountInstruction<
         InstructionWithData<ReadonlyUint8Array>,
 ): ParsedWithdrawNonceAccountInstruction<TProgram, TAccountMetas> {
     if (instruction.accounts.length < 5) {
-        // TODO: Coded error.
-        throw new Error('Not enough accounts');
+        throw new SolanaError(SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS, {
+            actualAccountMetas: instruction.accounts.length,
+            expectedAccountMetas: 5,
+        });
     }
     let accountIndex = 0;
     const getNextAccount = () => {

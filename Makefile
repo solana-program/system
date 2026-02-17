@@ -26,6 +26,9 @@ lint-features-%:
 test-%:
 	cargo $(nightly) test --manifest-path $(subst -,/,$*)/Cargo.toml
 
+generate-clients:
+	pnpm codama run --all $(ARGS)
+
 format-js:
 	cd ./clients/js && pnpm install && pnpm format
 
