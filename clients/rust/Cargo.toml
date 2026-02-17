@@ -14,7 +14,7 @@ serde = ["dep:serde", "dep:serde_with", "kaigan/serde"]
 
 [dependencies]
 borsh = "^0.10"
-kaigan = "^0.2"
+kaigan = "^0.3"
 num-derive = "^0.4"
 num-traits = "^0.2"
 serde = { version = "^1.0", features = ["derive"], optional = true }
@@ -23,3 +23,9 @@ solana-client = { version = "2.3.4", optional = true }
 solana-sdk = { version = "2.2.1", optional = true }
 solana-program = "2.2.1"
 thiserror = "^1.0"
+solana-account = "~2.2"
+solana-account-info = "~2.3"
+solana-instruction = "~2.3"
+solana-program-error = "~2.2"
+solana-pubkey = { version = "~2.4", features = ["curve25519", "borsh"] }
+solana-cpi = "~2.2"
