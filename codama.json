@@ -15,10 +15,9 @@
         "rust": {
             "from": "@codama/renderers-rust",
             "args": [
-                "clients/rust/src/generated",
+                "clients/rust",
                 {
                     "anchorTraits": false,
-                    "crateFolder": "clients/rust",
                     "formatCode": true,
                     "toolchain": "+nightly-2025-02-16"
                 }

@@ -1833,9 +1833,9 @@ dependencies = [
 
 [[package]]
 name = "kaigan"
-version = "0.2.5"
+version = "0.3.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "b6dd100976df9dd59d0c3fecf6f9ad3f161a087374d1b2a77ebb4ad8920f11bb"
+checksum = "4f25ded719a2354f6b1a51d0c0741c25bc7afe038617664eb37f6418439eb084"
 dependencies = [
  "borsh 0.10.4",
  "serde",
@@ -3156,9 +3156,9 @@ dependencies = [
 
 [[package]]
 name = "solana-account-info"
-version = "2.2.1"
+version = "2.3.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "e0c17d606a298a205fae325489fbed88ee6dc4463c111672172327e741c8905d"
+checksum = "c8f5152a288ef1912300fc6efa6c2d1f9bb55d9398eb6c72326360b8063987da"
 dependencies = [
  "bincode",
  "serde",
@@ -4761,8 +4761,14 @@ dependencies = [
  "num-traits",
  "serde",
  "serde_with",
+ "solana-account",
+ "solana-account-info",
  "solana-client",
+ "solana-cpi",
+ "solana-instruction",
  "solana-program",
+ "solana-program-error",
+ "solana-pubkey",
  "solana-sdk",
  "thiserror 1.0.69",
 ]
