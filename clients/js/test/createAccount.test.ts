@@ -1,11 +1,5 @@
-import {
-    appendTransactionMessageInstruction,
-    fetchEncodedAccount,
-    generateKeyPairSigner,
-    Lamports,
-    pipe,
-} from '@solana/kit';
-import { createDefaultLiteSVMClient } from '@solana/kit-plugins';
+import { appendTransactionMessageInstruction, fetchEncodedAccount, generateKeyPairSigner, pipe } from '@solana/kit';
+import { createDefaultLocalhostRpcClient } from '@solana/kit-plugins';
 import { expect, it } from 'vitest';
 import { SYSTEM_PROGRAM_ADDRESS, getCreateAccountInstruction, systemProgram } from '../src';
 import {
@@ -54,10 +48,12 @@ it('creates a new empty account', async () => {
 
 it('creates a new empty account using the generated plugin', async () => {
     // Given a client with the system program plugin installed.
-    const client = await createDefaultLiteSVMClient().use(systemProgram());
-    const newAccount = await generateKeyPairSigner();
+    const client = await createDefaultLocalhostRpcClient().use(systemProgram());
     const space = 42n;
-    const lamports = client.svm.minimumBalanceForRentExemption(space) as Lamports;
+    const [newAccount, lamports] = await Promise.all([
+        generateKeyPairSigner(),
+        client.rpc.getMinimumBalanceForRentExemption(space).send(),
+    ]);
 
     // When we call createAccount on the plugin.
     await client.system.instructions
