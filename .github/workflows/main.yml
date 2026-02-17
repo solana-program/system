@@ -62,7 +62,7 @@ jobs:
           toolchain: format
 
       - name: Generate Clients
-        run: pnpm generate:clients
+        run: make generate-clients
 
       - name: Check Working Directory
         run: |

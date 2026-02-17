@@ -12,6 +12,8 @@ import {
     getStructEncoder,
     getU32Decoder,
     getU32Encoder,
+    SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
+    SolanaError,
     transformEncoder,
     type AccountMeta,
     type AccountSignerMeta,
@@ -28,8 +30,8 @@ import {
     type TransactionSigner,
     type WritableAccount,
 } from '@solana/kit';
+import { getAccountMetaFactory, type ResolvedInstructionAccount } from '@solana/kit/program-client-core';
 import { SYSTEM_PROGRAM_ADDRESS } from '../programs';
-import { getAccountMetaFactory, type ResolvedAccount } from '../shared';
 
 export const ADVANCE_NONCE_ACCOUNT_DISCRIMINATOR = 4;
 
@@ -114,7 +116,7 @@ export function getAdvanceNonceAccountInstruction<
         recentBlockhashesSysvar: { value: input.recentBlockhashesSysvar ?? null, isWritable: false },
         nonceAuthority: { value: input.nonceAuthority ?? null, isWritable: false },
     };
-    const accounts = originalAccounts as Record<keyof typeof originalAccounts, ResolvedAccount>;
+    const accounts = originalAccounts as Record<keyof typeof originalAccounts, ResolvedInstructionAccount>;
 
     // Resolve default values.
     if (!accounts.recentBlockhashesSysvar.value) {
@@ -125,9 +127,9 @@ export function getAdvanceNonceAccountInstruction<
     const getAccountMeta = getAccountMetaFactory(programAddress, 'omitted');
     return Object.freeze({
         accounts: [
-            getAccountMeta(accounts.nonceAccount),
-            getAccountMeta(accounts.recentBlockhashesSysvar),
-            getAccountMeta(accounts.nonceAuthority),
+            getAccountMeta('nonceAccount', accounts.nonceAccount),
+            getAccountMeta('recentBlockhashesSysvar', accounts.recentBlockhashesSysvar),
+            getAccountMeta('nonceAuthority', accounts.nonceAuthority),
         ],
         data: getAdvanceNonceAccountInstructionDataEncoder().encode({}),
         programAddress,
@@ -161,8 +163,10 @@ export function parseAdvanceNonceAccountInstruction<
         InstructionWithData<ReadonlyUint8Array>,
 ): ParsedAdvanceNonceAccountInstruction<TProgram, TAccountMetas> {
     if (instruction.accounts.length < 3) {
-        // TODO: Coded error.
-        throw new Error('Not enough accounts');
+        throw new SolanaError(SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS, {
+            actualAccountMetas: instruction.accounts.length,
+            expectedAccountMetas: 3,
+        });
     }
     let accountIndex = 0;
     const getNextAccount = () => {

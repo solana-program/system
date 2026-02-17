@@ -20,6 +20,8 @@ import {
     getU64Encoder,
     getUtf8Decoder,
     getUtf8Encoder,
+    SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
+    SolanaError,
     transformEncoder,
     type AccountMeta,
     type AccountSignerMeta,
@@ -36,8 +38,8 @@ import {
     type WritableAccount,
     type WritableSignerAccount,
 } from '@solana/kit';
+import { getAccountMetaFactory, type ResolvedInstructionAccount } from '@solana/kit/program-client-core';
 import { SYSTEM_PROGRAM_ADDRESS } from '../programs';
-import { getAccountMetaFactory, type ResolvedAccount } from '../shared';
 
 export const CREATE_ACCOUNT_WITH_SEED_DISCRIMINATOR = 3;
 
@@ -155,7 +157,7 @@ export function getCreateAccountWithSeedInstruction<
         newAccount: { value: input.newAccount ?? null, isWritable: true },
         baseAccount: { value: input.baseAccount ?? null, isWritable: false },
     };
-    const accounts = originalAccounts as Record<keyof typeof originalAccounts, ResolvedAccount>;
+    const accounts = originalAccounts as Record<keyof typeof originalAccounts, ResolvedInstructionAccount>;
 
     // Original args.
     const args = { ...input };
@@ -163,9 +165,9 @@ export function getCreateAccountWithSeedInstruction<
     const getAccountMeta = getAccountMetaFactory(programAddress, 'omitted');
     return Object.freeze({
         accounts: [
-            getAccountMeta(accounts.payer),
-            getAccountMeta(accounts.newAccount),
-            getAccountMeta(accounts.baseAccount),
+            getAccountMeta('payer', accounts.payer),
+            getAccountMeta('newAccount', accounts.newAccount),
+            getAccountMeta('baseAccount', accounts.baseAccount),
         ].filter(<T>(x: T | undefined): x is T => x !== undefined),
         data: getCreateAccountWithSeedInstructionDataEncoder().encode(args as CreateAccountWithSeedInstructionDataArgs),
         programAddress,
@@ -194,8 +196,10 @@ export function parseCreateAccountWithSeedInstruction<
         InstructionWithData<ReadonlyUint8Array>,
 ): ParsedCreateAccountWithSeedInstruction<TProgram, TAccountMetas> {
     if (instruction.accounts.length < 2) {
-        // TODO: Coded error.
-        throw new Error('Not enough accounts');
+        throw new SolanaError(SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS, {
+            actualAccountMetas: instruction.accounts.length,
+            expectedAccountMetas: 2,
+        });
     }
     let accountIndex = 0;
     const getNextAccount = () => {
