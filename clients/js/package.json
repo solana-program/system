@@ -47,6 +47,7 @@
     },
     "devDependencies": {
         "@solana/eslint-config-solana": "^6.0.0",
+        "@solana/kit-plugins": "^0.5.0",
         "@solana/kit": "^6.1.0",
         "@types/node": "^24",
         "eslint": "^9.39.2",

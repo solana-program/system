@@ -1,6 +1,13 @@
-import { appendTransactionMessageInstruction, fetchEncodedAccount, generateKeyPairSigner, pipe } from '@solana/kit';
-import { it, expect } from 'vitest';
-import { SYSTEM_PROGRAM_ADDRESS, getCreateAccountInstruction } from '../src';
+import {
+    appendTransactionMessageInstruction,
+    fetchEncodedAccount,
+    generateKeyPairSigner,
+    Lamports,
+    pipe,
+} from '@solana/kit';
+import { createDefaultLiteSVMClient } from '@solana/kit-plugins';
+import { expect, it } from 'vitest';
+import { SYSTEM_PROGRAM_ADDRESS, getCreateAccountInstruction, systemProgram } from '../src';
 import {
     createDefaultSolanaClient,
     createDefaultTransaction,
@@ -42,5 +49,30 @@ it('creates a new empty account', async () => {
         data: new Uint8Array(Array.from({ length: 42 }, () => 0)),
         exists: true,
         space: 42n,
+    });
+});
+
+it('creates a new empty account using the generated plugin', async () => {
+    // Given a client with the system program plugin installed.
+    const client = await createDefaultLiteSVMClient().use(systemProgram());
+    const newAccount = await generateKeyPairSigner();
+    const space = 42n;
+    const lamports = client.svm.minimumBalanceForRentExemption(space) as Lamports;
+
+    // When we call createAccount on the plugin.
+    await client.system.instructions
+        .createAccount({ newAccount, space, lamports, programAddress: SYSTEM_PROGRAM_ADDRESS })
+        .sendTransaction();
+
+    // Then we expect the following account data.
+    const fetchedAccount = await fetchEncodedAccount(client.rpc, newAccount.address);
+    expect(fetchedAccount).toStrictEqual({
+        executable: false,
+        lamports,
+        programAddress: SYSTEM_PROGRAM_ADDRESS,
+        address: newAccount.address,
+        data: new Uint8Array(Array.from({ length: Number(space) }, () => 0)),
+        exists: true,
+        space,
     });
 });
