@@ -1,37 +1,23 @@
-import { appendTransactionMessageInstruction, generateKeyPairSigner, pipe } from '@solana/kit';
-import { it, expect } from 'vitest';
-import { fetchNonce, getAdvanceNonceAccountInstruction } from '../src';
-import {
-    createDefaultSolanaClient,
-    createDefaultTransaction,
-    createNonceAccount,
-    generateKeyPairSignerWithSol,
-    signAndSendTransaction,
-} from './_setup';
+import { generateKeyPairSigner } from '@solana/kit';
+import { expect, it } from 'vitest';
+import { createClient, getCreateNonceInstructionPlan } from './_setup';
 
 it('advances the nonce account', async () => {
     // Given an existing nonce account.
-    const client = createDefaultSolanaClient();
-    const [payer, nonce, authority] = await Promise.all([
-        generateKeyPairSignerWithSol(client),
+    const [client, nonce, authority] = await Promise.all([
+        createClient(),
         generateKeyPairSigner(),
         generateKeyPairSigner(),
     ]);
-    await createNonceAccount(client, payer, nonce, authority);
-    const originalNonceAccount = await fetchNonce(client.rpc, nonce.address);
+    await client.sendTransaction(await getCreateNonceInstructionPlan(client, nonce, authority));
+    const originalNonceAccount = await client.system.accounts.nonce.fetch(nonce.address);
 
     // When the authority advances the nonce account.
-    const createAccount = getAdvanceNonceAccountInstruction({
-        nonceAccount: nonce.address,
-        nonceAuthority: authority,
-    });
-    await pipe(
-        await createDefaultTransaction(client, payer),
-        tx => appendTransactionMessageInstruction(createAccount, tx),
-        tx => signAndSendTransaction(client, tx),
-    );
+    await client.system.instructions
+        .advanceNonceAccount({ nonceAccount: nonce.address, nonceAuthority: authority })
+        .sendTransaction();
 
     // Then we expect the blockhash to have been updated.
-    const updatedNonceAccount = await fetchNonce(client.rpc, nonce.address);
+    const updatedNonceAccount = await client.system.accounts.nonce.fetch(nonce.address);
     expect(originalNonceAccount.data.blockhash).not.toBe(updatedNonceAccount.data.blockhash);
 });

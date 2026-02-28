@@ -1,60 +1,29 @@
-import {
-    appendTransactionMessageInstruction,
-    fetchEncodedAccount,
-    generateKeyPairSigner,
-    pipe,
-    airdropFactory,
-    lamports,
-} from '@solana/kit';
-import { it, expect } from 'vitest';
-import { getAllocateInstruction } from '../src';
-import {
-    createDefaultSolanaClient,
-    createDefaultTransaction,
-    generateKeyPairSignerWithSol,
-    signAndSendTransaction,
-} from './_setup';
+import { assertAccountExists, fetchEncodedAccount, generateKeyPairSigner } from '@solana/kit';
+import { expect, it } from 'vitest';
+import { createClient } from './_setup';
 
 it('allocates space for an account', async () => {
-    // 1. Setup client and payer.
-    const client = createDefaultSolanaClient();
-    const [payer, accountToAllocate] = await Promise.all([
-        generateKeyPairSignerWithSol(client),
+    // Given an existing account with some SOL and 0 data.
+    const client = await createClient();
+    const newSpace = 100n;
+    const [accountToAllocate, newRent] = await Promise.all([
         generateKeyPairSigner(),
+        client.rpc.getMinimumBalanceForRentExemption(newSpace).send(),
     ]);
+    await client.airdrop(accountToAllocate.address, newRent);
 
-    // 2. Airdrop lamports to the account so it exists (system owned, 0 data).
-    await airdropFactory(client)({
-        recipientAddress: accountToAllocate.address,
-        lamports: lamports(await client.rpc.getMinimumBalanceForRentExemption(100n).send()),
-        commitment: 'confirmed',
-    });
-
-    // Verify initial state
+    // And given we verify the account has 0 data length before allocation.
     let fetchedAccount = await fetchEncodedAccount(client.rpc, accountToAllocate.address);
     expect(fetchedAccount.exists).toBe(true);
-    if (fetchedAccount.exists) {
-        expect(fetchedAccount.data.length).toBe(0);
-    }
+    assertAccountExists(fetchedAccount);
+    expect(fetchedAccount.data.length).toBe(0);
 
-    // 3. Use getAllocateInstruction to allocate 100 bytes.
-    const newSpace = 100n;
-    const allocate = getAllocateInstruction({
-        newAccount: accountToAllocate,
-        space: newSpace,
-    });
+    // When we allocate 100 bytes of space for this account.
+    await client.system.instructions.allocate({ newAccount: accountToAllocate, space: newSpace }).sendTransaction();
 
-    // 4. Send transaction
-    await pipe(
-        await createDefaultTransaction(client, payer),
-        tx => appendTransactionMessageInstruction(allocate, tx),
-        tx => signAndSendTransaction(client, tx),
-    );
-
-    // 5. Verify the account's data length is exactly 100 bytes.
+    // Then the account's data length should be exactly 100 bytes.
     fetchedAccount = await fetchEncodedAccount(client.rpc, accountToAllocate.address);
     expect(fetchedAccount.exists).toBe(true);
-    if (fetchedAccount.exists) {
-        expect(fetchedAccount.data.length).toBe(100);
-    }
+    assertAccountExists(fetchedAccount);
+    expect(fetchedAccount.data.length).toBe(100);
 });
