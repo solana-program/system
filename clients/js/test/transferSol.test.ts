@@ -1,24 +1,27 @@
 import { AccountRole, generateKeyPairSigner, lamports } from '@solana/kit';
 import { expect, it } from 'vitest';
 import { getTransferSolInstruction, parseTransferSolInstruction } from '../src';
-import { createClient, generateKeyPairSignerWithSol, getBalance } from './_setup';
+import { createClient } from './_setup';
 
 it('transfers SOL from one account to another', async () => {
     // Given a source account with 3 SOL and a destination account with no SOL.
     const client = await createClient();
     const [source, destination] = await Promise.all([
-        generateKeyPairSignerWithSol(client, 3_000_000_000n),
+        generateKeyPairSigner(),
         generateKeyPairSigner().then(signer => signer.address),
     ]);
+    await client.airdrop(source.address, lamports(3_000_000_000n));
 
     // When the source account transfers 1 SOL to the destination account.
     await client.system.instructions.transferSol({ source, destination, amount: 1_000_000_000 }).sendTransaction();
 
     // Then the source account now has exactly 2 SOL.
-    expect(await getBalance(client, source.address)).toBe(lamports(2_000_000_000n));
+    const { value: sourceBalance } = await client.rpc.getBalance(source.address, { commitment: 'confirmed' }).send();
+    expect(sourceBalance).toBe(lamports(2_000_000_000n));
 
     // And the destination account has exactly 1 SOL.
-    expect(await getBalance(client, destination)).toBe(lamports(1_000_000_000n));
+    const { value: destinationBalance } = await client.rpc.getBalance(destination, { commitment: 'confirmed' }).send();
+    expect(destinationBalance).toBe(lamports(1_000_000_000n));
 });
 
 it('parses the accounts and the data of an existing transfer SOL instruction', async () => {
