@@ -1,60 +1,42 @@
-import {
-    appendTransactionMessageInstruction,
-    createAddressWithSeed,
-    fetchEncodedAccount,
-    generateKeyPairSigner,
-    pipe,
-} from '@solana/kit';
-import { it, expect } from 'vitest';
-import { getCreateAccountWithSeedInstruction } from '../src';
-import {
-    createDefaultSolanaClient,
-    createDefaultTransaction,
-    generateKeyPairSignerWithSol,
-    signAndSendTransaction,
-} from './_setup';
+import { createAddressWithSeed, fetchEncodedAccount, generateKeyPairSigner } from '@solana/kit';
+import { expect, it } from 'vitest';
+import { createClient } from './_setup';
 
 it('creates a new empty account when base is not payer', async () => {
-    const client = createDefaultSolanaClient();
+    // Given a program, a base account, and an address derived from them with a seed.
+    const client = await createClient();
     const space = 42n;
-    const [payer, program, lamports] = await Promise.all([
-        generateKeyPairSignerWithSol(client),
+    const [program, baseAccount, rent] = await Promise.all([
+        generateKeyPairSigner(),
         generateKeyPairSigner(),
         client.rpc.getMinimumBalanceForRentExemption(space).send(),
     ]);
-    const baseAccount = await generateKeyPairSigner();
-
-    const programAddress = program.address;
-    const SEED = '123456789';
+    const seed = '123456789';
     const newAccount = await createAddressWithSeed({
         baseAddress: baseAccount.address,
-        programAddress,
-        seed: SEED,
+        programAddress: program.address,
+        seed,
     });
 
-    // When we call createAccountWithSeed in a transaction.
-    const createAccount = getCreateAccountWithSeedInstruction({
-        payer,
-        newAccount,
-        baseAccount,
-        base: baseAccount.address,
-        seed: SEED,
-        space,
-        amount: lamports,
-        programAddress,
-    });
-    await pipe(
-        await createDefaultTransaction(client, payer),
-        tx => appendTransactionMessageInstruction(createAccount, tx),
-        tx => signAndSendTransaction(client, tx),
-    );
+    // When we create a new account for this address derived from a seed.
+    await client.system.instructions
+        .createAccountWithSeed({
+            newAccount,
+            baseAccount,
+            base: baseAccount.address,
+            seed,
+            space,
+            amount: rent,
+            programAddress: program.address,
+        })
+        .sendTransaction();
 
     // Then we expect the following account data.
     const fetchedAccount = await fetchEncodedAccount(client.rpc, newAccount);
     expect(fetchedAccount).toStrictEqual({
         executable: false,
-        lamports,
-        programAddress,
+        lamports: rent,
+        programAddress: program.address,
         address: newAccount,
         data: new Uint8Array(Array.from({ length: 42 }, () => 0)),
         exists: true,
@@ -63,45 +45,38 @@ it('creates a new empty account when base is not payer', async () => {
 });
 
 it('creates a new empty account when base is payer', async () => {
-    const client = createDefaultSolanaClient();
+    // Given a program and an address derived from the program and the payer with a seed.
+    const client = await createClient();
     const space = 42n;
-    const [payer, program, lamports] = await Promise.all([
-        generateKeyPairSignerWithSol(client),
+    const [program, rent] = await Promise.all([
         generateKeyPairSigner(),
         client.rpc.getMinimumBalanceForRentExemption(space).send(),
     ]);
-    const baseAddress = payer.address;
-
-    const programAddress = program.address;
-    const SEED = '123456789';
+    const seed = '123456789';
     const newAccount = await createAddressWithSeed({
-        baseAddress,
-        programAddress,
-        seed: SEED,
+        baseAddress: client.payer.address,
+        programAddress: program.address,
+        seed,
     });
 
-    // When we call createAccountWithSeed in a transaction.
-    const createAccount = getCreateAccountWithSeedInstruction({
-        payer,
-        newAccount,
-        base: baseAddress,
-        seed: SEED,
-        space,
-        amount: lamports,
-        programAddress,
-    });
-    await pipe(
-        await createDefaultTransaction(client, payer),
-        tx => appendTransactionMessageInstruction(createAccount, tx),
-        tx => signAndSendTransaction(client, tx),
-    );
+    // When we create a new account for this address derived from a seed.
+    await client.system.instructions
+        .createAccountWithSeed({
+            newAccount,
+            base: client.payer.address,
+            seed,
+            space,
+            amount: rent,
+            programAddress: program.address,
+        })
+        .sendTransaction();
 
     // Then we expect the following account data.
     const fetchedAccount = await fetchEncodedAccount(client.rpc, newAccount);
     expect(fetchedAccount).toStrictEqual({
         executable: false,
-        lamports,
-        programAddress,
+        lamports: rent,
+        programAddress: program.address,
         address: newAccount,
         data: new Uint8Array(Array.from({ length: 42 }, () => 0)),
         exists: true,

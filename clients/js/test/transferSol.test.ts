@@ -1,39 +1,27 @@
-import { AccountRole, appendTransactionMessageInstruction, generateKeyPairSigner, lamports, pipe } from '@solana/kit';
-import { it, expect } from 'vitest';
+import { AccountRole, generateKeyPairSigner, lamports } from '@solana/kit';
+import { expect, it } from 'vitest';
 import { getTransferSolInstruction, parseTransferSolInstruction } from '../src';
-import {
-    createDefaultSolanaClient,
-    createDefaultTransaction,
-    generateKeyPairSignerWithSol,
-    getBalance,
-    signAndSendTransaction,
-} from './_setup';
+import { createClient } from './_setup';
 
 it('transfers SOL from one account to another', async () => {
     // Given a source account with 3 SOL and a destination account with no SOL.
-    const client = createDefaultSolanaClient();
-    const source = await generateKeyPairSignerWithSol(client, 3_000_000_000n);
-    const destination = (await generateKeyPairSigner()).address;
+    const client = await createClient();
+    const [source, destination] = await Promise.all([
+        generateKeyPairSigner(),
+        generateKeyPairSigner().then(signer => signer.address),
+    ]);
+    await client.airdrop(source.address, lamports(3_000_000_000n));
 
     // When the source account transfers 1 SOL to the destination account.
-    const transferSol = getTransferSolInstruction({
-        source,
-        destination,
-        amount: 1_000_000_000,
-    });
-    await pipe(
-        await createDefaultTransaction(client, source),
-        tx => appendTransactionMessageInstruction(transferSol, tx),
-        tx => signAndSendTransaction(client, tx),
-    );
+    await client.system.instructions.transferSol({ source, destination, amount: 1_000_000_000 }).sendTransaction();
 
-    // Then the source account now has roughly 2 SOL (minus the transaction fee).
-    const sourceBalance = await getBalance(client, source.address);
-    expect(sourceBalance).toBeLessThan(2_000_000_000n);
-    expect(sourceBalance).toBeGreaterThan(1_999_000_000n);
+    // Then the source account now has exactly 2 SOL.
+    const { value: sourceBalance } = await client.rpc.getBalance(source.address, { commitment: 'confirmed' }).send();
+    expect(sourceBalance).toBe(lamports(2_000_000_000n));
 
     // And the destination account has exactly 1 SOL.
-    expect(await getBalance(client, destination)).toBe(lamports(1_000_000_000n));
+    const { value: destinationBalance } = await client.rpc.getBalance(destination, { commitment: 'confirmed' }).send();
+    expect(destinationBalance).toBe(lamports(1_000_000_000n));
 });
 
 it('parses the accounts and the data of an existing transfer SOL instruction', async () => {

@@ -1,52 +1,35 @@
-import { Account, appendTransactionMessageInstruction, generateKeyPairSigner, pipe } from '@solana/kit';
-import { it, expect } from 'vitest';
-import {
-    Nonce,
-    NonceState,
-    NonceVersion,
-    SYSTEM_PROGRAM_ADDRESS,
-    fetchNonce,
-    getCreateAccountInstruction,
-    getInitializeNonceAccountInstruction,
-    getNonceSize,
-} from '../src';
-import {
-    createDefaultSolanaClient,
-    createDefaultTransaction,
-    generateKeyPairSignerWithSol,
-    signAndSendTransaction,
-} from './_setup';
+import { generateKeyPairSigner } from '@solana/kit';
+import { expect, it } from 'vitest';
+import { NonceState, NonceVersion, SYSTEM_PROGRAM_ADDRESS, getNonceSize } from '../src';
+import { createClient } from './_setup';
 
 it('creates and initialize a durable nonce account', async () => {
-    // Given some brand now payer, authority, and nonce KeyPairSigners.
-    const client = createDefaultSolanaClient();
-    const payer = await generateKeyPairSignerWithSol(client);
-    const nonce = await generateKeyPairSigner();
-    const nonceAuthority = await generateKeyPairSigner();
+    // Given some brand new authority, and nonce KeyPairSigners.
+    const client = await createClient();
+    const space = BigInt(getNonceSize());
+    const [nonce, nonceAuthority, rent] = await Promise.all([
+        generateKeyPairSigner(),
+        generateKeyPairSigner(),
+        client.rpc.getMinimumBalanceForRentExemption(space).send(),
+    ]);
 
     // When we use them to create and initialize a nonce account.
-    const space = BigInt(getNonceSize());
-    const rent = await client.rpc.getMinimumBalanceForRentExemption(space).send();
-    const createAccount = getCreateAccountInstruction({
-        payer,
-        newAccount: nonce,
-        lamports: rent,
-        space,
-        programAddress: SYSTEM_PROGRAM_ADDRESS,
-    });
-    const initializeNonceAccount = getInitializeNonceAccountInstruction({
-        nonceAccount: nonce.address,
-        nonceAuthority: nonceAuthority.address,
-    });
-    await pipe(
-        await createDefaultTransaction(client, payer),
-        tx => appendTransactionMessageInstruction(createAccount, tx),
-        tx => appendTransactionMessageInstruction(initializeNonceAccount, tx),
-        tx => signAndSendTransaction(client, tx),
-    );
+    await client.sendTransaction([
+        client.system.instructions.createAccount({
+            newAccount: nonce,
+            lamports: rent,
+            space,
+            programAddress: SYSTEM_PROGRAM_ADDRESS,
+        }),
+        client.system.instructions.initializeNonceAccount({
+            nonceAccount: nonce.address,
+            nonceAuthority: nonceAuthority.address,
+        }),
+    ]);
 
     // Then we expect the nonce account to exist with the following data.
-    expect(await fetchNonce(client.rpc, nonce.address)).toMatchObject(<Account<Nonce>>{
+    const nonceAccount = await client.system.accounts.nonce.fetch(nonce.address);
+    expect(nonceAccount).toMatchObject({
         address: nonce.address,
         data: {
             version: NonceVersion.Current,
