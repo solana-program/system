@@ -13,7 +13,7 @@
                 {
                     "anchorTraits": false,
                     "formatCode": true,
-                    "toolchain": "+nightly-2025-02-16"
+                    "toolchain": "+nightly-2025-08-07"
                 }
             ]
         }
