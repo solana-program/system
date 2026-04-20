@@ -8,7 +8,7 @@
 #[cfg(feature = "fetch")]
 #[derive(Debug, Clone)]
 pub struct DecodedAccount<T> {
-    pub address: solana_pubkey::Pubkey,
+    pub address: solana_address::Address,
     pub account: solana_account::Account,
     pub data: T,
 }
@@ -17,5 +17,5 @@ pub struct DecodedAccount<T> {
 #[derive(Debug, Clone)]
 pub enum MaybeAccount<T> {
     Exists(DecodedAccount<T>),
-    NotFound(solana_pubkey::Pubkey),
+    NotFound(solana_address::Address),
 }

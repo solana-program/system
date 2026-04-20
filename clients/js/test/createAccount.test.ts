@@ -1,11 +1,11 @@
 import { fetchEncodedAccount, generateKeyPairSigner } from '@solana/kit';
 import { expect, it } from 'vitest';
 import { SYSTEM_PROGRAM_ADDRESS } from '../src';
-import { createClient } from './_setup';
+import { createTestClient } from './_setup';
 
 it('creates a new empty account', async () => {
     // Given a new keypair and the computed rent for 42 bytes of space.
-    const client = await createClient();
+    const client = await createTestClient();
     const space = 42n;
     const [newAccount, lamports] = await Promise.all([
         generateKeyPairSigner(),

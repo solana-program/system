@@ -1,11 +1,11 @@
 import { generateKeyPairSigner } from '@solana/kit';
 import { expect, it } from 'vitest';
 import { NonceState, NonceVersion, SYSTEM_PROGRAM_ADDRESS, getNonceSize } from '../src';
-import { createClient } from './_setup';
+import { createTestClient } from './_setup';
 
 it('creates and initialize a durable nonce account', async () => {
     // Given some brand new authority, and nonce KeyPairSigners.
-    const client = await createClient();
+    const client = await createTestClient();
     const space = BigInt(getNonceSize());
     const [nonce, nonceAuthority, rent] = await Promise.all([
         generateKeyPairSigner(),

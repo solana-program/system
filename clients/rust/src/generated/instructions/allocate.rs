@@ -13,7 +13,7 @@ pub const ALLOCATE_DISCRIMINATOR: u32 = 8;
 /// Accounts.
 #[derive(Debug)]
 pub struct Allocate {
-    pub new_account: solana_pubkey::Pubkey,
+    pub new_account: solana_address::Address,
 }
 
 impl Allocate {
@@ -43,7 +43,6 @@ impl Allocate {
 }
 
 #[derive(BorshSerialize, BorshDeserialize, Clone, Debug, Eq, PartialEq)]
-#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct AllocateInstructionData {
     discriminator: u32,
 }
@@ -65,7 +64,6 @@ impl Default for AllocateInstructionData {
 }
 
 #[derive(BorshSerialize, BorshDeserialize, Clone, Debug, Eq, PartialEq)]
-#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct AllocateInstructionArgs {
     pub space: u64,
 }
@@ -83,7 +81,7 @@ impl AllocateInstructionArgs {
 ///   0. `[writable, signer]` new_account
 #[derive(Clone, Debug, Default)]
 pub struct AllocateBuilder {
-    new_account: Option<solana_pubkey::Pubkey>,
+    new_account: Option<solana_address::Address>,
     space: Option<u64>,
     __remaining_accounts: Vec<solana_instruction::AccountMeta>,
 }
@@ -93,7 +91,7 @@ impl AllocateBuilder {
         Self::default()
     }
     #[inline(always)]
-    pub fn new_account(&mut self, new_account: solana_pubkey::Pubkey) -> &mut Self {
+    pub fn new_account(&mut self, new_account: solana_address::Address) -> &mut Self {
         self.new_account = Some(new_account);
         self
     }

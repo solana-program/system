@@ -3,9 +3,12 @@ import {
     ClientWithRpc,
     GetMinimumBalanceForRentExemptionApi,
     TransactionSigner,
+    createClient,
+    lamports,
     sequentialInstructionPlan,
 } from '@solana/kit';
-import { createLocalClient } from '@solana/kit-client-rpc';
+import { solanaLocalRpc } from '@solana/kit-plugin-rpc';
+import { airdropSigner, generatedSigner } from '@solana/kit-plugin-signer';
 import {
     SYSTEM_PROGRAM_ADDRESS,
     getCreateAccountInstruction,
@@ -14,8 +17,12 @@ import {
     systemProgram,
 } from '../src';
 
-export const createClient = () => {
-    return createLocalClient().use(systemProgram());
+export const createTestClient = () => {
+    return createClient()
+        .use(generatedSigner())
+        .use(solanaLocalRpc())
+        .use(systemProgram())
+        .use(airdropSigner(lamports(1_000_000_000n)));
 };
 
 export const getCreateNonceInstructionPlan = async (

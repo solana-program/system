@@ -42,7 +42,7 @@ import { SYSTEM_PROGRAM_ADDRESS } from '../programs';
 
 export const ASSIGN_WITH_SEED_DISCRIMINATOR = 10;
 
-export function getAssignWithSeedDiscriminatorBytes() {
+export function getAssignWithSeedDiscriminatorBytes(): ReadonlyUint8Array {
     return getU32Encoder().encode(ASSIGN_WITH_SEED_DISCRIMINATOR);
 }
 

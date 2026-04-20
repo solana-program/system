@@ -13,9 +13,9 @@ pub const TRANSFER_SOL_DISCRIMINATOR: u32 = 2;
 /// Accounts.
 #[derive(Debug)]
 pub struct TransferSol {
-    pub source: solana_pubkey::Pubkey,
+    pub source: solana_address::Address,
 
-    pub destination: solana_pubkey::Pubkey,
+    pub destination: solana_address::Address,
 }
 
 impl TransferSol {
@@ -49,7 +49,6 @@ impl TransferSol {
 }
 
 #[derive(BorshSerialize, BorshDeserialize, Clone, Debug, Eq, PartialEq)]
-#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct TransferSolInstructionData {
     discriminator: u32,
 }
@@ -71,7 +70,6 @@ impl Default for TransferSolInstructionData {
 }
 
 #[derive(BorshSerialize, BorshDeserialize, Clone, Debug, Eq, PartialEq)]
-#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct TransferSolInstructionArgs {
     pub amount: u64,
 }
@@ -90,8 +88,8 @@ impl TransferSolInstructionArgs {
 ///   1. `[writable]` destination
 #[derive(Clone, Debug, Default)]
 pub struct TransferSolBuilder {
-    source: Option<solana_pubkey::Pubkey>,
-    destination: Option<solana_pubkey::Pubkey>,
+    source: Option<solana_address::Address>,
+    destination: Option<solana_address::Address>,
     amount: Option<u64>,
     __remaining_accounts: Vec<solana_instruction::AccountMeta>,
 }
@@ -101,12 +99,12 @@ impl TransferSolBuilder {
         Self::default()
     }
     #[inline(always)]
-    pub fn source(&mut self, source: solana_pubkey::Pubkey) -> &mut Self {
+    pub fn source(&mut self, source: solana_address::Address) -> &mut Self {
         self.source = Some(source);
         self
     }
     #[inline(always)]
-    pub fn destination(&mut self, destination: solana_pubkey::Pubkey) -> &mut Self {
+    pub fn destination(&mut self, destination: solana_address::Address) -> &mut Self {
         self.destination = Some(destination);
         self
     }

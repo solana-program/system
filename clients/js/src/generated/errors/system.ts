@@ -45,7 +45,7 @@ export type SystemError =
     | typeof SYSTEM_ERROR__RESULT_WITH_NEGATIVE_LAMPORTS;
 
 let systemErrorMessages: Record<SystemError, string> | undefined;
-if (process.env.NODE_ENV !== 'production') {
+if (process.env['NODE_ENV'] !== 'production') {
     systemErrorMessages = {
         [SYSTEM_ERROR__ACCOUNT_ALREADY_IN_USE]: `an account with the same address already exists`,
         [SYSTEM_ERROR__ADDRESS_WITH_SEED_MISMATCH]: `provided address does not match addressed derived from seed`,
@@ -60,7 +60,7 @@ if (process.env.NODE_ENV !== 'production') {
 }
 
 export function getSystemErrorMessage(code: SystemError): string {
-    if (process.env.NODE_ENV !== 'production') {
+    if (process.env['NODE_ENV'] !== 'production') {
         return (systemErrorMessages as Record<SystemError, string>)[code];
     }
 

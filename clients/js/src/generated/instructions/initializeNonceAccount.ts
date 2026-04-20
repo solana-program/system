@@ -34,7 +34,7 @@ import { SYSTEM_PROGRAM_ADDRESS } from '../programs';
 
 export const INITIALIZE_NONCE_ACCOUNT_DISCRIMINATOR = 6;
 
-export function getInitializeNonceAccountDiscriminatorBytes() {
+export function getInitializeNonceAccountDiscriminatorBytes(): ReadonlyUint8Array {
     return getU32Encoder().encode(INITIALIZE_NONCE_ACCOUNT_DISCRIMINATOR);
 }
 

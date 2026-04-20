@@ -1,10 +1,10 @@
 import { assertAccountExists, fetchEncodedAccount, generateKeyPairSigner } from '@solana/kit';
 import { expect, it } from 'vitest';
-import { createClient } from './_setup';
+import { createTestClient } from './_setup';
 
 it('allocates space for an account', async () => {
     // Given an existing account with some SOL and 0 data.
-    const client = await createClient();
+    const client = await createTestClient();
     const newSpace = 100n;
     const [accountToAllocate, newRent] = await Promise.all([
         generateKeyPairSigner(),
