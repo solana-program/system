@@ -7,7 +7,7 @@ import {
     lamports,
     sequentialInstructionPlan,
 } from '@solana/kit';
-import { solanaLocalRpc } from '@solana/kit-plugin-rpc';
+import { litesvm } from '@solana/kit-plugin-litesvm';
 import { airdropSigner, generatedSigner } from '@solana/kit-plugin-signer';
 import {
     SYSTEM_PROGRAM_ADDRESS,
@@ -20,7 +20,7 @@ import {
 export const createTestClient = () => {
     return createClient()
         .use(generatedSigner())
-        .use(solanaLocalRpc())
+        .use(litesvm())
         .use(systemProgram())
         .use(airdropSigner(lamports(1_000_000_000n)));
 };

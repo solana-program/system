@@ -48,7 +48,7 @@
     },
     "devDependencies": {
         "@solana/eslint-config-solana": "^6.0.0",
-        "@solana/kit-plugin-rpc": "^0.10.0",
+        "@solana/kit-plugin-litesvm": "^0.10.0",
         "@solana/kit-plugin-signer": "^0.10.0",
         "@solana/kit": "^6.4.0",
         "@types/node": "^24",

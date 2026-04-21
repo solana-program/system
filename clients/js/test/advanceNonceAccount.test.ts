@@ -12,6 +12,12 @@ it('advances the nonce account', async () => {
     await client.sendTransaction(await getCreateNonceInstructionPlan(client, nonce, authority));
     const originalNonceAccount = await client.system.accounts.nonce.fetch(nonce.address);
 
+    // Expire the blockhash so the nonce's stored blockhash is no longer in the
+    // RecentBlockhashes sysvar. On a live cluster this happens naturally between
+    // blocks; under LiteSVM we have to trigger it explicitly, otherwise the
+    // System Program returns NonceBlockhashNotExpired (error 7).
+    client.svm.expireBlockhash();
+
     // When the authority advances the nonce account.
     await client.system.instructions
         .advanceNonceAccount({ nonceAccount: nonce.address, nonceAuthority: authority })
