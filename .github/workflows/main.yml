@@ -80,7 +80,6 @@ jobs:
         uses: ./.github/actions/setup
         with:
           pnpm: true
-          solana: true
 
       - name: Test Client JS
         run: make test-js

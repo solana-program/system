@@ -29,17 +29,3 @@ The following clients are available for the System program. You may use the foll
 
 - [JS client](./clients/js)
 - [Rust client](./clients/rust)
-
-## Starting and stopping the local validator
-
-The following script is available to start or restart your local validator.
-
-```sh
-./scripts/restart-test-validator.sh
-```
-
-Finally, you may stop the local validator using the following command.
-
-```sh
-./scripts/stop-test-validator.sh
-```
