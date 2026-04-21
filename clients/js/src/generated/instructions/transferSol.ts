@@ -36,7 +36,7 @@ import { SYSTEM_PROGRAM_ADDRESS } from '../programs';
 
 export const TRANSFER_SOL_DISCRIMINATOR = 2;
 
-export function getTransferSolDiscriminatorBytes() {
+export function getTransferSolDiscriminatorBytes(): ReadonlyUint8Array {
     return getU32Encoder().encode(TRANSFER_SOL_DISCRIMINATOR);
 }
 

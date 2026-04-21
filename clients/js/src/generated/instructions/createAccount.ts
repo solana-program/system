@@ -42,7 +42,7 @@ import { SYSTEM_PROGRAM_ADDRESS } from '../programs';
 
 export const CREATE_ACCOUNT_DISCRIMINATOR = 0;
 
-export function getCreateAccountDiscriminatorBytes() {
+export function getCreateAccountDiscriminatorBytes(): ReadonlyUint8Array {
     return getU32Encoder().encode(CREATE_ACCOUNT_DISCRIMINATOR);
 }
 

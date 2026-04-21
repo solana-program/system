@@ -31,7 +31,7 @@ import { SYSTEM_PROGRAM_ADDRESS } from '../programs';
 
 export const UPGRADE_NONCE_ACCOUNT_DISCRIMINATOR = 12;
 
-export function getUpgradeNonceAccountDiscriminatorBytes() {
+export function getUpgradeNonceAccountDiscriminatorBytes(): ReadonlyUint8Array {
     return getU32Encoder().encode(UPGRADE_NONCE_ACCOUNT_DISCRIMINATOR);
 }
 

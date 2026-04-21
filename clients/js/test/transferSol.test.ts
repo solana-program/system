@@ -1,11 +1,11 @@
 import { AccountRole, generateKeyPairSigner, lamports } from '@solana/kit';
 import { expect, it } from 'vitest';
 import { getTransferSolInstruction, parseTransferSolInstruction } from '../src';
-import { createClient } from './_setup';
+import { createTestClient } from './_setup';
 
 it('transfers SOL from one account to another', async () => {
     // Given a source account with 3 SOL and a destination account with no SOL.
-    const client = await createClient();
+    const client = await createTestClient();
     const [source, destination] = await Promise.all([
         generateKeyPairSigner(),
         generateKeyPairSigner().then(signer => signer.address),

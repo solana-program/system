@@ -1,11 +1,11 @@
 import { generateKeyPairSigner } from '@solana/kit';
 import { expect, it } from 'vitest';
-import { createClient, getCreateNonceInstructionPlan } from './_setup';
+import { createTestClient, getCreateNonceInstructionPlan } from './_setup';
 
 it('advances the nonce account', async () => {
     // Given an existing nonce account.
     const [client, nonce, authority] = await Promise.all([
-        createClient(),
+        createTestClient(),
         generateKeyPairSigner(),
         generateKeyPairSigner(),
     ]);

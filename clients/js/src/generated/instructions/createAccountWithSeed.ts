@@ -43,7 +43,7 @@ import { SYSTEM_PROGRAM_ADDRESS } from '../programs';
 
 export const CREATE_ACCOUNT_WITH_SEED_DISCRIMINATOR = 3;
 
-export function getCreateAccountWithSeedDiscriminatorBytes() {
+export function getCreateAccountWithSeedDiscriminatorBytes(): ReadonlyUint8Array {
     return getU32Encoder().encode(CREATE_ACCOUNT_WITH_SEED_DISCRIMINATOR);
 }
 

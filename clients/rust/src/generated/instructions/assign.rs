@@ -7,14 +7,14 @@
 
 use borsh::BorshDeserialize;
 use borsh::BorshSerialize;
-use solana_pubkey::Pubkey;
+use solana_address::Address;
 
 pub const ASSIGN_DISCRIMINATOR: u32 = 1;
 
 /// Accounts.
 #[derive(Debug)]
 pub struct Assign {
-    pub account: solana_pubkey::Pubkey,
+    pub account: solana_address::Address,
 }
 
 impl Assign {
@@ -44,7 +44,6 @@ impl Assign {
 }
 
 #[derive(BorshSerialize, BorshDeserialize, Clone, Debug, Eq, PartialEq)]
-#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct AssignInstructionData {
     discriminator: u32,
 }
@@ -66,9 +65,8 @@ impl Default for AssignInstructionData {
 }
 
 #[derive(BorshSerialize, BorshDeserialize, Clone, Debug, Eq, PartialEq)]
-#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct AssignInstructionArgs {
-    pub program_address: Pubkey,
+    pub program_address: Address,
 }
 
 impl AssignInstructionArgs {
@@ -84,8 +82,8 @@ impl AssignInstructionArgs {
 ///   0. `[writable, signer]` account
 #[derive(Clone, Debug, Default)]
 pub struct AssignBuilder {
-    account: Option<solana_pubkey::Pubkey>,
-    program_address: Option<Pubkey>,
+    account: Option<solana_address::Address>,
+    program_address: Option<Address>,
     __remaining_accounts: Vec<solana_instruction::AccountMeta>,
 }
 
@@ -94,12 +92,12 @@ impl AssignBuilder {
         Self::default()
     }
     #[inline(always)]
-    pub fn account(&mut self, account: solana_pubkey::Pubkey) -> &mut Self {
+    pub fn account(&mut self, account: solana_address::Address) -> &mut Self {
         self.account = Some(account);
         self
     }
     #[inline(always)]
-    pub fn program_address(&mut self, program_address: Pubkey) -> &mut Self {
+    pub fn program_address(&mut self, program_address: Address) -> &mut Self {
         self.program_address = Some(program_address);
         self
     }
@@ -246,7 +244,7 @@ impl<'a, 'b> AssignCpiBuilder<'a, 'b> {
         self
     }
     #[inline(always)]
-    pub fn program_address(&mut self, program_address: Pubkey) -> &mut Self {
+    pub fn program_address(&mut self, program_address: Address) -> &mut Self {
         self.instruction.program_address = Some(program_address);
         self
     }
@@ -308,7 +306,7 @@ impl<'a, 'b> AssignCpiBuilder<'a, 'b> {
 struct AssignCpiBuilderInstruction<'a, 'b> {
     __program: &'b solana_account_info::AccountInfo<'a>,
     account: Option<&'b solana_account_info::AccountInfo<'a>>,
-    program_address: Option<Pubkey>,
+    program_address: Option<Address>,
     /// Additional instruction accounts `(AccountInfo, is_writable, is_signer)`.
     __remaining_accounts: Vec<(&'b solana_account_info::AccountInfo<'a>, bool, bool)>,
 }

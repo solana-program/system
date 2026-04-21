@@ -35,7 +35,7 @@ import { SYSTEM_PROGRAM_ADDRESS } from '../programs';
 
 export const ASSIGN_DISCRIMINATOR = 1;
 
-export function getAssignDiscriminatorBytes() {
+export function getAssignDiscriminatorBytes(): ReadonlyUint8Array {
     return getU32Encoder().encode(ASSIGN_DISCRIMINATOR);
 }
 

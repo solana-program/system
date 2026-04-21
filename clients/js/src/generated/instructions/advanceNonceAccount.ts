@@ -35,7 +35,7 @@ import { SYSTEM_PROGRAM_ADDRESS } from '../programs';
 
 export const ADVANCE_NONCE_ACCOUNT_DISCRIMINATOR = 4;
 
-export function getAdvanceNonceAccountDiscriminatorBytes() {
+export function getAdvanceNonceAccountDiscriminatorBytes(): ReadonlyUint8Array {
     return getU32Encoder().encode(ADVANCE_NONCE_ACCOUNT_DISCRIMINATOR);
 }
 

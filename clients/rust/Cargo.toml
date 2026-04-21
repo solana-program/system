@@ -8,24 +8,25 @@ readme = "README.md"
 license-file = "../../LICENSE"
 
 [features]
-fetch = ["dep:solana-client", "dep:solana-sdk"]
+fetch = ["dep:solana-client"]
 test-sbf = []
-serde = ["dep:serde", "dep:serde_with", "kaigan/serde"]
 
 [dependencies]
-borsh = "^0.10"
-kaigan = "^0.3"
+borsh = "^1.0"
 num-derive = "^0.4"
 num-traits = "^0.2"
-serde = { version = "^1.0", features = ["derive"], optional = true }
-serde_with = { version = "^3.0", optional = true }
-solana-client = { version = "2.3.4", optional = true }
-solana-sdk = { version = "2.2.1", optional = true }
-solana-program = "2.2.1"
+solana-account = "~3.0"
+solana-account-info = "~3.1"
+solana-address = { version = "~2.4", features = [
+  'borsh',
+  'copy',
+  'curve25519',
+  'decode',
+] }
+solana-client = { version = "^3.0", optional = true }
+solana-cpi = "~3.1"
+solana-decode-error = "~2.3"
+solana-instruction = "~3.2"
+solana-program-error = "~3.0"
+spl-collections = { version = "^0.1", features = ["borsh"] }
 thiserror = "^1.0"
-solana-account = "~2.2"
-solana-account-info = "~2.3"
-solana-instruction = "~2.3"
-solana-program-error = "~2.2"
-solana-pubkey = { version = "~2.4", features = ["curve25519", "borsh"] }
-solana-cpi = "~2.2"

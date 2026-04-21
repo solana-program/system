@@ -1,10 +1,10 @@
 import { fetchEncodedAccount, generateKeyPairSigner } from '@solana/kit';
 import { expect, it } from 'vitest';
-import { createClient } from './_setup';
+import { createTestClient } from './_setup';
 
 it('assigns a new owner to an account', async () => {
     // Given an existing account with enough SOL to be rent exempt with 0 data.
-    const client = await createClient();
+    const client = await createTestClient();
     const space = 0n;
     const [accountToAssign, newOwner, rent] = await Promise.all([
         generateKeyPairSigner(),

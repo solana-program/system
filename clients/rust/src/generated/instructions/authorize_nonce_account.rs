@@ -7,16 +7,16 @@
 
 use borsh::BorshDeserialize;
 use borsh::BorshSerialize;
-use solana_pubkey::Pubkey;
+use solana_address::Address;
 
 pub const AUTHORIZE_NONCE_ACCOUNT_DISCRIMINATOR: u32 = 7;
 
 /// Accounts.
 #[derive(Debug)]
 pub struct AuthorizeNonceAccount {
-    pub nonce_account: solana_pubkey::Pubkey,
+    pub nonce_account: solana_address::Address,
 
-    pub nonce_authority: solana_pubkey::Pubkey,
+    pub nonce_authority: solana_address::Address,
 }
 
 impl AuthorizeNonceAccount {
@@ -58,7 +58,6 @@ impl AuthorizeNonceAccount {
 }
 
 #[derive(BorshSerialize, BorshDeserialize, Clone, Debug, Eq, PartialEq)]
-#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct AuthorizeNonceAccountInstructionData {
     discriminator: u32,
 }
@@ -80,9 +79,8 @@ impl Default for AuthorizeNonceAccountInstructionData {
 }
 
 #[derive(BorshSerialize, BorshDeserialize, Clone, Debug, Eq, PartialEq)]
-#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct AuthorizeNonceAccountInstructionArgs {
-    pub new_nonce_authority: Pubkey,
+    pub new_nonce_authority: Address,
 }
 
 impl AuthorizeNonceAccountInstructionArgs {
@@ -99,9 +97,9 @@ impl AuthorizeNonceAccountInstructionArgs {
 ///   1. `[signer]` nonce_authority
 #[derive(Clone, Debug, Default)]
 pub struct AuthorizeNonceAccountBuilder {
-    nonce_account: Option<solana_pubkey::Pubkey>,
-    nonce_authority: Option<solana_pubkey::Pubkey>,
-    new_nonce_authority: Option<Pubkey>,
+    nonce_account: Option<solana_address::Address>,
+    nonce_authority: Option<solana_address::Address>,
+    new_nonce_authority: Option<Address>,
     __remaining_accounts: Vec<solana_instruction::AccountMeta>,
 }
 
@@ -110,17 +108,17 @@ impl AuthorizeNonceAccountBuilder {
         Self::default()
     }
     #[inline(always)]
-    pub fn nonce_account(&mut self, nonce_account: solana_pubkey::Pubkey) -> &mut Self {
+    pub fn nonce_account(&mut self, nonce_account: solana_address::Address) -> &mut Self {
         self.nonce_account = Some(nonce_account);
         self
     }
     #[inline(always)]
-    pub fn nonce_authority(&mut self, nonce_authority: solana_pubkey::Pubkey) -> &mut Self {
+    pub fn nonce_authority(&mut self, nonce_authority: solana_address::Address) -> &mut Self {
         self.nonce_authority = Some(nonce_authority);
         self
     }
     #[inline(always)]
-    pub fn new_nonce_authority(&mut self, new_nonce_authority: Pubkey) -> &mut Self {
+    pub fn new_nonce_authority(&mut self, new_nonce_authority: Address) -> &mut Self {
         self.new_nonce_authority = Some(new_nonce_authority);
         self
     }
@@ -293,7 +291,7 @@ impl<'a, 'b> AuthorizeNonceAccountCpiBuilder<'a, 'b> {
         self
     }
     #[inline(always)]
-    pub fn new_nonce_authority(&mut self, new_nonce_authority: Pubkey) -> &mut Self {
+    pub fn new_nonce_authority(&mut self, new_nonce_authority: Address) -> &mut Self {
         self.instruction.new_nonce_authority = Some(new_nonce_authority);
         self
     }
@@ -364,7 +362,7 @@ struct AuthorizeNonceAccountCpiBuilderInstruction<'a, 'b> {
     __program: &'b solana_account_info::AccountInfo<'a>,
     nonce_account: Option<&'b solana_account_info::AccountInfo<'a>>,
     nonce_authority: Option<&'b solana_account_info::AccountInfo<'a>>,
-    new_nonce_authority: Option<Pubkey>,
+    new_nonce_authority: Option<Address>,
     /// Additional instruction accounts `(AccountInfo, is_writable, is_signer)`.
     __remaining_accounts: Vec<(&'b solana_account_info::AccountInfo<'a>, bool, bool)>,
 }

@@ -13,7 +13,7 @@ pub const UPGRADE_NONCE_ACCOUNT_DISCRIMINATOR: u32 = 12;
 /// Accounts.
 #[derive(Debug)]
 pub struct UpgradeNonceAccount {
-    pub nonce_account: solana_pubkey::Pubkey,
+    pub nonce_account: solana_address::Address,
 }
 
 impl UpgradeNonceAccount {
@@ -45,7 +45,6 @@ impl UpgradeNonceAccount {
 }
 
 #[derive(BorshSerialize, BorshDeserialize, Clone, Debug, Eq, PartialEq)]
-#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct UpgradeNonceAccountInstructionData {
     discriminator: u32,
 }
@@ -73,7 +72,7 @@ impl Default for UpgradeNonceAccountInstructionData {
 ///   0. `[writable]` nonce_account
 #[derive(Clone, Debug, Default)]
 pub struct UpgradeNonceAccountBuilder {
-    nonce_account: Option<solana_pubkey::Pubkey>,
+    nonce_account: Option<solana_address::Address>,
     __remaining_accounts: Vec<solana_instruction::AccountMeta>,
 }
 
@@ -82,7 +81,7 @@ impl UpgradeNonceAccountBuilder {
         Self::default()
     }
     #[inline(always)]
-    pub fn nonce_account(&mut self, nonce_account: solana_pubkey::Pubkey) -> &mut Self {
+    pub fn nonce_account(&mut self, nonce_account: solana_address::Address) -> &mut Self {
         self.nonce_account = Some(nonce_account);
         self
     }

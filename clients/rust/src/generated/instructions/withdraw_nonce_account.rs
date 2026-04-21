@@ -13,15 +13,15 @@ pub const WITHDRAW_NONCE_ACCOUNT_DISCRIMINATOR: u32 = 5;
 /// Accounts.
 #[derive(Debug)]
 pub struct WithdrawNonceAccount {
-    pub nonce_account: solana_pubkey::Pubkey,
+    pub nonce_account: solana_address::Address,
 
-    pub recipient_account: solana_pubkey::Pubkey,
+    pub recipient_account: solana_address::Address,
 
-    pub recent_blockhashes_sysvar: solana_pubkey::Pubkey,
+    pub recent_blockhashes_sysvar: solana_address::Address,
 
-    pub rent_sysvar: solana_pubkey::Pubkey,
+    pub rent_sysvar: solana_address::Address,
 
-    pub nonce_authority: solana_pubkey::Pubkey,
+    pub nonce_authority: solana_address::Address,
 }
 
 impl WithdrawNonceAccount {
@@ -75,7 +75,6 @@ impl WithdrawNonceAccount {
 }
 
 #[derive(BorshSerialize, BorshDeserialize, Clone, Debug, Eq, PartialEq)]
-#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct WithdrawNonceAccountInstructionData {
     discriminator: u32,
 }
@@ -97,7 +96,6 @@ impl Default for WithdrawNonceAccountInstructionData {
 }
 
 #[derive(BorshSerialize, BorshDeserialize, Clone, Debug, Eq, PartialEq)]
-#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct WithdrawNonceAccountInstructionArgs {
     pub withdraw_amount: u64,
 }
@@ -119,11 +117,11 @@ impl WithdrawNonceAccountInstructionArgs {
 ///   4. `[signer]` nonce_authority
 #[derive(Clone, Debug, Default)]
 pub struct WithdrawNonceAccountBuilder {
-    nonce_account: Option<solana_pubkey::Pubkey>,
-    recipient_account: Option<solana_pubkey::Pubkey>,
-    recent_blockhashes_sysvar: Option<solana_pubkey::Pubkey>,
-    rent_sysvar: Option<solana_pubkey::Pubkey>,
-    nonce_authority: Option<solana_pubkey::Pubkey>,
+    nonce_account: Option<solana_address::Address>,
+    recipient_account: Option<solana_address::Address>,
+    recent_blockhashes_sysvar: Option<solana_address::Address>,
+    rent_sysvar: Option<solana_address::Address>,
+    nonce_authority: Option<solana_address::Address>,
     withdraw_amount: Option<u64>,
     __remaining_accounts: Vec<solana_instruction::AccountMeta>,
 }
@@ -133,12 +131,12 @@ impl WithdrawNonceAccountBuilder {
         Self::default()
     }
     #[inline(always)]
-    pub fn nonce_account(&mut self, nonce_account: solana_pubkey::Pubkey) -> &mut Self {
+    pub fn nonce_account(&mut self, nonce_account: solana_address::Address) -> &mut Self {
         self.nonce_account = Some(nonce_account);
         self
     }
     #[inline(always)]
-    pub fn recipient_account(&mut self, recipient_account: solana_pubkey::Pubkey) -> &mut Self {
+    pub fn recipient_account(&mut self, recipient_account: solana_address::Address) -> &mut Self {
         self.recipient_account = Some(recipient_account);
         self
     }
@@ -146,19 +144,19 @@ impl WithdrawNonceAccountBuilder {
     #[inline(always)]
     pub fn recent_blockhashes_sysvar(
         &mut self,
-        recent_blockhashes_sysvar: solana_pubkey::Pubkey,
+        recent_blockhashes_sysvar: solana_address::Address,
     ) -> &mut Self {
         self.recent_blockhashes_sysvar = Some(recent_blockhashes_sysvar);
         self
     }
     /// `[optional account, default to 'SysvarRent111111111111111111111111111111111']`
     #[inline(always)]
-    pub fn rent_sysvar(&mut self, rent_sysvar: solana_pubkey::Pubkey) -> &mut Self {
+    pub fn rent_sysvar(&mut self, rent_sysvar: solana_address::Address) -> &mut Self {
         self.rent_sysvar = Some(rent_sysvar);
         self
     }
     #[inline(always)]
-    pub fn nonce_authority(&mut self, nonce_authority: solana_pubkey::Pubkey) -> &mut Self {
+    pub fn nonce_authority(&mut self, nonce_authority: solana_address::Address) -> &mut Self {
         self.nonce_authority = Some(nonce_authority);
         self
     }
@@ -190,9 +188,9 @@ impl WithdrawNonceAccountBuilder {
                 .recipient_account
                 .expect("recipient_account is not set"),
             recent_blockhashes_sysvar: self.recent_blockhashes_sysvar.unwrap_or(
-                solana_pubkey::pubkey!("SysvarRecentB1ockHashes11111111111111111111"),
+                solana_address::address!("SysvarRecentB1ockHashes11111111111111111111"),
             ),
-            rent_sysvar: self.rent_sysvar.unwrap_or(solana_pubkey::pubkey!(
+            rent_sysvar: self.rent_sysvar.unwrap_or(solana_address::address!(
                 "SysvarRent111111111111111111111111111111111"
             )),
             nonce_authority: self.nonce_authority.expect("nonce_authority is not set"),

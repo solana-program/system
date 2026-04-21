@@ -1,10 +1,10 @@
 import { createAddressWithSeed, fetchEncodedAccount, generateKeyPairSigner } from '@solana/kit';
 import { expect, it } from 'vitest';
-import { createClient } from './_setup';
+import { createTestClient } from './_setup';
 
 it('creates a new empty account when base is not payer', async () => {
     // Given a program, a base account, and an address derived from them with a seed.
-    const client = await createClient();
+    const client = await createTestClient();
     const space = 42n;
     const [program, baseAccount, rent] = await Promise.all([
         generateKeyPairSigner(),
@@ -46,7 +46,7 @@ it('creates a new empty account when base is not payer', async () => {
 
 it('creates a new empty account when base is payer', async () => {
     // Given a program and an address derived from the program and the payer with a seed.
-    const client = await createClient();
+    const client = await createTestClient();
     const space = 42n;
     const [program, rent] = await Promise.all([
         generateKeyPairSigner(),
