@@ -39,7 +39,6 @@ jobs:
         uses: ./.github/actions/setup
         with:
           pnpm: true
-          solana: true
 
       - name: Format
         run: make format-js
