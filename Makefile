@@ -36,6 +36,4 @@ lint-js:
 	cd ./clients/js && pnpm install && pnpm lint
 
 test-js:
-	./scripts/restart-test-validator.sh
 	cd ./clients/js && pnpm install && pnpm build && pnpm test
-	./scripts/stop-test-validator.sh
