@@ -16,7 +16,7 @@ it('parses a transfer SOL instruction', () => {
     const transferInstruction = getTransferInstruction({
         source,
         destination,
-        amount: 1_000_000_000,
+        lamports: 1_000_000_000,
     });
 
     // When we parse this instruction.
@@ -37,7 +37,7 @@ it('parses a transfer SOL instruction', () => {
         },
     });
     expect(parsedInstruction.data).toStrictEqual({
-        amount: 1_000_000_000n,
+        lamports: 1_000_000_000n,
         discriminator: TRANSFER_DISCRIMINATOR,
     });
 });

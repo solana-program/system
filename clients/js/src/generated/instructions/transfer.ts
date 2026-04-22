@@ -57,15 +57,15 @@ export type TransferInstruction<
         ]
     >;
 
-export type TransferInstructionData = { discriminator: number; amount: bigint };
+export type TransferInstructionData = { discriminator: number; lamports: bigint };
 
-export type TransferInstructionDataArgs = { amount: number | bigint };
+export type TransferInstructionDataArgs = { lamports: number | bigint };
 
 export function getTransferInstructionDataEncoder(): FixedSizeEncoder<TransferInstructionDataArgs> {
     return transformEncoder(
         getStructEncoder([
             ['discriminator', getU32Encoder()],
-            ['amount', getU64Encoder()],
+            ['lamports', getU64Encoder()],
         ]),
         value => ({ ...value, discriminator: TRANSFER_DISCRIMINATOR }),
     );
@@ -74,7 +74,7 @@ export function getTransferInstructionDataEncoder(): FixedSizeEncoder<TransferIn
 export function getTransferInstructionDataDecoder(): FixedSizeDecoder<TransferInstructionData> {
     return getStructDecoder([
         ['discriminator', getU32Decoder()],
-        ['amount', getU64Decoder()],
+        ['lamports', getU64Decoder()],
     ]);
 }
 
@@ -88,7 +88,7 @@ export function getTransferInstructionDataCodec(): FixedSizeCodec<
 export type TransferInput<TAccountSource extends string = string, TAccountDestination extends string = string> = {
     source: TransactionSigner<TAccountSource>;
     destination: Address<TAccountDestination>;
-    amount: TransferInstructionDataArgs['amount'];
+    lamports: TransferInstructionDataArgs['lamports'];
 };
 
 export function getTransferInstruction<

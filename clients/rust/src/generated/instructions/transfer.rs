@@ -71,7 +71,7 @@ impl Default for TransferInstructionData {
 
 #[derive(BorshSerialize, BorshDeserialize, Clone, Debug, Eq, PartialEq)]
 pub struct TransferInstructionArgs {
-    pub amount: u64,
+    pub lamports: u64,
 }
 
 impl TransferInstructionArgs {
@@ -90,7 +90,7 @@ impl TransferInstructionArgs {
 pub struct TransferBuilder {
     source: Option<solana_address::Address>,
     destination: Option<solana_address::Address>,
-    amount: Option<u64>,
+    lamports: Option<u64>,
     __remaining_accounts: Vec<solana_instruction::AccountMeta>,
 }
 
@@ -109,8 +109,8 @@ impl TransferBuilder {
         self
     }
     #[inline(always)]
-    pub fn amount(&mut self, amount: u64) -> &mut Self {
-        self.amount = Some(amount);
+    pub fn lamports(&mut self, lamports: u64) -> &mut Self {
+        self.lamports = Some(lamports);
         self
     }
     /// Add an additional account to the instruction.
@@ -135,7 +135,7 @@ impl TransferBuilder {
             destination: self.destination.expect("destination is not set"),
         };
         let args = TransferInstructionArgs {
-            amount: self.amount.clone().expect("amount is not set"),
+            lamports: self.lamports.clone().expect("lamports is not set"),
         };
 
         accounts.instruction_with_remaining_accounts(args, &self.__remaining_accounts)
@@ -252,7 +252,7 @@ impl<'a, 'b> TransferCpiBuilder<'a, 'b> {
             __program: program,
             source: None,
             destination: None,
-            amount: None,
+            lamports: None,
             __remaining_accounts: Vec::new(),
         });
         Self { instruction }
@@ -271,8 +271,8 @@ impl<'a, 'b> TransferCpiBuilder<'a, 'b> {
         self
     }
     #[inline(always)]
-    pub fn amount(&mut self, amount: u64) -> &mut Self {
-        self.instruction.amount = Some(amount);
+    pub fn lamports(&mut self, lamports: u64) -> &mut Self {
+        self.instruction.lamports = Some(lamports);
         self
     }
     /// Add an additional account to the instruction.
@@ -310,7 +310,11 @@ impl<'a, 'b> TransferCpiBuilder<'a, 'b> {
     #[allow(clippy::vec_init_then_push)]
     pub fn invoke_signed(&self, signers_seeds: &[&[&[u8]]]) -> solana_program_error::ProgramResult {
         let args = TransferInstructionArgs {
-            amount: self.instruction.amount.clone().expect("amount is not set"),
+            lamports: self
+                .instruction
+                .lamports
+                .clone()
+                .expect("lamports is not set"),
         };
         let instruction = TransferCpi {
             __program: self.instruction.__program,
@@ -335,7 +339,7 @@ struct TransferCpiBuilderInstruction<'a, 'b> {
     __program: &'b solana_account_info::AccountInfo<'a>,
     source: Option<&'b solana_account_info::AccountInfo<'a>>,
     destination: Option<&'b solana_account_info::AccountInfo<'a>>,
-    amount: Option<u64>,
+    lamports: Option<u64>,
     /// Additional instruction accounts `(AccountInfo, is_writable, is_signer)`.
     __remaining_accounts: Vec<(&'b solana_account_info::AccountInfo<'a>, bool, bool)>,
 }

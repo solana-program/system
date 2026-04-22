@@ -82,7 +82,7 @@ impl Default for TransferWithSeedInstructionData {
 
 #[derive(BorshSerialize, BorshDeserialize, Clone, Debug, Eq, PartialEq)]
 pub struct TransferWithSeedInstructionArgs {
-    pub amount: u64,
+    pub lamports: u64,
     pub from_seed: U64PrefixedStr,
     pub from_owner: Address,
 }
@@ -105,7 +105,7 @@ pub struct TransferWithSeedBuilder {
     source: Option<solana_address::Address>,
     base_account: Option<solana_address::Address>,
     destination: Option<solana_address::Address>,
-    amount: Option<u64>,
+    lamports: Option<u64>,
     from_seed: Option<U64PrefixedStr>,
     from_owner: Option<Address>,
     __remaining_accounts: Vec<solana_instruction::AccountMeta>,
@@ -131,8 +131,8 @@ impl TransferWithSeedBuilder {
         self
     }
     #[inline(always)]
-    pub fn amount(&mut self, amount: u64) -> &mut Self {
-        self.amount = Some(amount);
+    pub fn lamports(&mut self, lamports: u64) -> &mut Self {
+        self.lamports = Some(lamports);
         self
     }
     #[inline(always)]
@@ -168,7 +168,7 @@ impl TransferWithSeedBuilder {
             destination: self.destination.expect("destination is not set"),
         };
         let args = TransferWithSeedInstructionArgs {
-            amount: self.amount.clone().expect("amount is not set"),
+            lamports: self.lamports.clone().expect("lamports is not set"),
             from_seed: self.from_seed.clone().expect("from_seed is not set"),
             from_owner: self.from_owner.clone().expect("from_owner is not set"),
         };
@@ -302,7 +302,7 @@ impl<'a, 'b> TransferWithSeedCpiBuilder<'a, 'b> {
             source: None,
             base_account: None,
             destination: None,
-            amount: None,
+            lamports: None,
             from_seed: None,
             from_owner: None,
             __remaining_accounts: Vec::new(),
@@ -331,8 +331,8 @@ impl<'a, 'b> TransferWithSeedCpiBuilder<'a, 'b> {
         self
     }
     #[inline(always)]
-    pub fn amount(&mut self, amount: u64) -> &mut Self {
-        self.instruction.amount = Some(amount);
+    pub fn lamports(&mut self, lamports: u64) -> &mut Self {
+        self.instruction.lamports = Some(lamports);
         self
     }
     #[inline(always)]
@@ -380,7 +380,11 @@ impl<'a, 'b> TransferWithSeedCpiBuilder<'a, 'b> {
     #[allow(clippy::vec_init_then_push)]
     pub fn invoke_signed(&self, signers_seeds: &[&[&[u8]]]) -> solana_program_error::ProgramResult {
         let args = TransferWithSeedInstructionArgs {
-            amount: self.instruction.amount.clone().expect("amount is not set"),
+            lamports: self
+                .instruction
+                .lamports
+                .clone()
+                .expect("lamports is not set"),
             from_seed: self
                 .instruction
                 .from_seed
@@ -421,7 +425,7 @@ struct TransferWithSeedCpiBuilderInstruction<'a, 'b> {
     source: Option<&'b solana_account_info::AccountInfo<'a>>,
     base_account: Option<&'b solana_account_info::AccountInfo<'a>>,
     destination: Option<&'b solana_account_info::AccountInfo<'a>>,
-    amount: Option<u64>,
+    lamports: Option<u64>,
     from_seed: Option<U64PrefixedStr>,
     from_owner: Option<Address>,
     /// Additional instruction accounts `(AccountInfo, is_writable, is_signer)`.

@@ -67,18 +67,18 @@ export type TransferWithSeedInstruction<
 
 export type TransferWithSeedInstructionData = {
     discriminator: number;
-    amount: bigint;
+    lamports: bigint;
     fromSeed: string;
     fromOwner: Address;
 };
 
-export type TransferWithSeedInstructionDataArgs = { amount: number | bigint; fromSeed: string; fromOwner: Address };
+export type TransferWithSeedInstructionDataArgs = { lamports: number | bigint; fromSeed: string; fromOwner: Address };
 
 export function getTransferWithSeedInstructionDataEncoder(): Encoder<TransferWithSeedInstructionDataArgs> {
     return transformEncoder(
         getStructEncoder([
             ['discriminator', getU32Encoder()],
-            ['amount', getU64Encoder()],
+            ['lamports', getU64Encoder()],
             ['fromSeed', addEncoderSizePrefix(getUtf8Encoder(), getU64Encoder())],
             ['fromOwner', getAddressEncoder()],
         ]),
@@ -89,7 +89,7 @@ export function getTransferWithSeedInstructionDataEncoder(): Encoder<TransferWit
 export function getTransferWithSeedInstructionDataDecoder(): Decoder<TransferWithSeedInstructionData> {
     return getStructDecoder([
         ['discriminator', getU32Decoder()],
-        ['amount', getU64Decoder()],
+        ['lamports', getU64Decoder()],
         ['fromSeed', addDecoderSizePrefix(getUtf8Decoder(), getU64Decoder())],
         ['fromOwner', getAddressDecoder()],
     ]);
@@ -110,7 +110,7 @@ export type TransferWithSeedInput<
     source: Address<TAccountSource>;
     baseAccount: TransactionSigner<TAccountBaseAccount>;
     destination: Address<TAccountDestination>;
-    amount: TransferWithSeedInstructionDataArgs['amount'];
+    lamports: TransferWithSeedInstructionDataArgs['lamports'];
     fromSeed: TransferWithSeedInstructionDataArgs['fromSeed'];
     fromOwner: TransferWithSeedInstructionDataArgs['fromOwner'];
 };

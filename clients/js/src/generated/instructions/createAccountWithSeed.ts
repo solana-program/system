@@ -76,7 +76,7 @@ export type CreateAccountWithSeedInstructionData = {
     discriminator: number;
     base: Address;
     seed: string;
-    amount: bigint;
+    lamports: bigint;
     space: bigint;
     programAddress: Address;
 };
@@ -84,7 +84,7 @@ export type CreateAccountWithSeedInstructionData = {
 export type CreateAccountWithSeedInstructionDataArgs = {
     base: Address;
     seed: string;
-    amount: number | bigint;
+    lamports: number | bigint;
     space: number | bigint;
     programAddress: Address;
 };
@@ -95,7 +95,7 @@ export function getCreateAccountWithSeedInstructionDataEncoder(): Encoder<Create
             ['discriminator', getU32Encoder()],
             ['base', getAddressEncoder()],
             ['seed', addEncoderSizePrefix(getUtf8Encoder(), getU64Encoder())],
-            ['amount', getU64Encoder()],
+            ['lamports', getU64Encoder()],
             ['space', getU64Encoder()],
             ['programAddress', getAddressEncoder()],
         ]),
@@ -108,7 +108,7 @@ export function getCreateAccountWithSeedInstructionDataDecoder(): Decoder<Create
         ['discriminator', getU32Decoder()],
         ['base', getAddressDecoder()],
         ['seed', addDecoderSizePrefix(getUtf8Decoder(), getU64Decoder())],
-        ['amount', getU64Decoder()],
+        ['lamports', getU64Decoder()],
         ['space', getU64Decoder()],
         ['programAddress', getAddressDecoder()],
     ]);
@@ -134,7 +134,7 @@ export type CreateAccountWithSeedInput<
     baseAccount?: TransactionSigner<TAccountBaseAccount>;
     base: CreateAccountWithSeedInstructionDataArgs['base'];
     seed: CreateAccountWithSeedInstructionDataArgs['seed'];
-    amount: CreateAccountWithSeedInstructionDataArgs['amount'];
+    lamports: CreateAccountWithSeedInstructionDataArgs['lamports'];
     space: CreateAccountWithSeedInstructionDataArgs['space'];
     programAddress: CreateAccountWithSeedInstructionDataArgs['programAddress'];
 };

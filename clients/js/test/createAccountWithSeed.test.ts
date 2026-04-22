@@ -26,7 +26,7 @@ it('creates a new empty account when base is not payer', async () => {
             base: baseAccount.address,
             seed,
             space,
-            amount: rent,
+            lamports: rent,
             programAddress: program.address,
         })
         .sendTransaction();
@@ -66,7 +66,7 @@ it('creates a new empty account when base is payer', async () => {
             base: client.payer.address,
             seed,
             space,
-            amount: rent,
+            lamports: rent,
             programAddress: program.address,
         })
         .sendTransaction();
