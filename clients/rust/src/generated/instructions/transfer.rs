@@ -7,49 +7,36 @@
 
 use borsh::BorshDeserialize;
 use borsh::BorshSerialize;
-use solana_address::Address;
-use spl_collections::U64PrefixedStr;
 
-pub const TRANSFER_SOL_WITH_SEED_DISCRIMINATOR: u32 = 11;
+pub const TRANSFER_DISCRIMINATOR: u32 = 2;
 
 /// Accounts.
 #[derive(Debug)]
-pub struct TransferSolWithSeed {
+pub struct Transfer {
     pub source: solana_address::Address,
-
-    pub base_account: solana_address::Address,
 
     pub destination: solana_address::Address,
 }
 
-impl TransferSolWithSeed {
-    pub fn instruction(
-        &self,
-        args: TransferSolWithSeedInstructionArgs,
-    ) -> solana_instruction::Instruction {
+impl Transfer {
+    pub fn instruction(&self, args: TransferInstructionArgs) -> solana_instruction::Instruction {
         self.instruction_with_remaining_accounts(args, &[])
     }
     #[allow(clippy::arithmetic_side_effects)]
     #[allow(clippy::vec_init_then_push)]
     pub fn instruction_with_remaining_accounts(
         &self,
-        args: TransferSolWithSeedInstructionArgs,
+        args: TransferInstructionArgs,
         remaining_accounts: &[solana_instruction::AccountMeta],
     ) -> solana_instruction::Instruction {
-        let mut accounts = Vec::with_capacity(3 + remaining_accounts.len());
-        accounts.push(solana_instruction::AccountMeta::new(self.source, false));
-        accounts.push(solana_instruction::AccountMeta::new_readonly(
-            self.base_account,
-            true,
-        ));
+        let mut accounts = Vec::with_capacity(2 + remaining_accounts.len());
+        accounts.push(solana_instruction::AccountMeta::new(self.source, true));
         accounts.push(solana_instruction::AccountMeta::new(
             self.destination,
             false,
         ));
         accounts.extend_from_slice(remaining_accounts);
-        let mut data = TransferSolWithSeedInstructionData::new()
-            .try_to_vec()
-            .unwrap();
+        let mut data = TransferInstructionData::new().try_to_vec().unwrap();
         let mut args = args.try_to_vec().unwrap();
         data.append(&mut args);
 
@@ -62,13 +49,13 @@ impl TransferSolWithSeed {
 }
 
 #[derive(BorshSerialize, BorshDeserialize, Clone, Debug, Eq, PartialEq)]
-pub struct TransferSolWithSeedInstructionData {
+pub struct TransferInstructionData {
     discriminator: u32,
 }
 
-impl TransferSolWithSeedInstructionData {
+impl TransferInstructionData {
     pub fn new() -> Self {
-        Self { discriminator: 11 }
+        Self { discriminator: 2 }
     }
 
     pub(crate) fn try_to_vec(&self) -> Result<Vec<u8>, std::io::Error> {
@@ -76,55 +63,44 @@ impl TransferSolWithSeedInstructionData {
     }
 }
 
-impl Default for TransferSolWithSeedInstructionData {
+impl Default for TransferInstructionData {
     fn default() -> Self {
         Self::new()
     }
 }
 
 #[derive(BorshSerialize, BorshDeserialize, Clone, Debug, Eq, PartialEq)]
-pub struct TransferSolWithSeedInstructionArgs {
+pub struct TransferInstructionArgs {
     pub amount: u64,
-    pub from_seed: U64PrefixedStr,
-    pub from_owner: Address,
 }
 
-impl TransferSolWithSeedInstructionArgs {
+impl TransferInstructionArgs {
     pub(crate) fn try_to_vec(&self) -> Result<Vec<u8>, std::io::Error> {
         borsh::to_vec(self)
     }
 }
 
-/// Instruction builder for `TransferSolWithSeed`.
+/// Instruction builder for `Transfer`.
 ///
 /// ### Accounts:
 ///
-///   0. `[writable]` source
-///   1. `[signer]` base_account
-///   2. `[writable]` destination
+///   0. `[writable, signer]` source
+///   1. `[writable]` destination
 #[derive(Clone, Debug, Default)]
-pub struct TransferSolWithSeedBuilder {
+pub struct TransferBuilder {
     source: Option<solana_address::Address>,
-    base_account: Option<solana_address::Address>,
     destination: Option<solana_address::Address>,
     amount: Option<u64>,
-    from_seed: Option<U64PrefixedStr>,
-    from_owner: Option<Address>,
     __remaining_accounts: Vec<solana_instruction::AccountMeta>,
 }
 
-impl TransferSolWithSeedBuilder {
+impl TransferBuilder {
     pub fn new() -> Self {
         Self::default()
     }
     #[inline(always)]
     pub fn source(&mut self, source: solana_address::Address) -> &mut Self {
         self.source = Some(source);
-        self
-    }
-    #[inline(always)]
-    pub fn base_account(&mut self, base_account: solana_address::Address) -> &mut Self {
-        self.base_account = Some(base_account);
         self
     }
     #[inline(always)]
@@ -135,16 +111,6 @@ impl TransferSolWithSeedBuilder {
     #[inline(always)]
     pub fn amount(&mut self, amount: u64) -> &mut Self {
         self.amount = Some(amount);
-        self
-    }
-    #[inline(always)]
-    pub fn from_seed(&mut self, from_seed: U64PrefixedStr) -> &mut Self {
-        self.from_seed = Some(from_seed);
-        self
-    }
-    #[inline(always)]
-    pub fn from_owner(&mut self, from_owner: Address) -> &mut Self {
-        self.from_owner = Some(from_owner);
         self
     }
     /// Add an additional account to the instruction.
@@ -164,54 +130,46 @@ impl TransferSolWithSeedBuilder {
     }
     #[allow(clippy::clone_on_copy)]
     pub fn instruction(&self) -> solana_instruction::Instruction {
-        let accounts = TransferSolWithSeed {
+        let accounts = Transfer {
             source: self.source.expect("source is not set"),
-            base_account: self.base_account.expect("base_account is not set"),
             destination: self.destination.expect("destination is not set"),
         };
-        let args = TransferSolWithSeedInstructionArgs {
+        let args = TransferInstructionArgs {
             amount: self.amount.clone().expect("amount is not set"),
-            from_seed: self.from_seed.clone().expect("from_seed is not set"),
-            from_owner: self.from_owner.clone().expect("from_owner is not set"),
         };
 
         accounts.instruction_with_remaining_accounts(args, &self.__remaining_accounts)
     }
 }
 
-/// `transfer_sol_with_seed` CPI accounts.
-pub struct TransferSolWithSeedCpiAccounts<'a, 'b> {
+/// `transfer` CPI accounts.
+pub struct TransferCpiAccounts<'a, 'b> {
     pub source: &'b solana_account_info::AccountInfo<'a>,
-
-    pub base_account: &'b solana_account_info::AccountInfo<'a>,
 
     pub destination: &'b solana_account_info::AccountInfo<'a>,
 }
 
-/// `transfer_sol_with_seed` CPI instruction.
-pub struct TransferSolWithSeedCpi<'a, 'b> {
+/// `transfer` CPI instruction.
+pub struct TransferCpi<'a, 'b> {
     /// The program to invoke.
     pub __program: &'b solana_account_info::AccountInfo<'a>,
 
     pub source: &'b solana_account_info::AccountInfo<'a>,
 
-    pub base_account: &'b solana_account_info::AccountInfo<'a>,
-
     pub destination: &'b solana_account_info::AccountInfo<'a>,
     /// The arguments for the instruction.
-    pub __args: TransferSolWithSeedInstructionArgs,
+    pub __args: TransferInstructionArgs,
 }
 
-impl<'a, 'b> TransferSolWithSeedCpi<'a, 'b> {
+impl<'a, 'b> TransferCpi<'a, 'b> {
     pub fn new(
         program: &'b solana_account_info::AccountInfo<'a>,
-        accounts: TransferSolWithSeedCpiAccounts<'a, 'b>,
-        args: TransferSolWithSeedInstructionArgs,
+        accounts: TransferCpiAccounts<'a, 'b>,
+        args: TransferInstructionArgs,
     ) -> Self {
         Self {
             __program: program,
             source: accounts.source,
-            base_account: accounts.base_account,
             destination: accounts.destination,
             __args: args,
         }
@@ -239,15 +197,8 @@ impl<'a, 'b> TransferSolWithSeedCpi<'a, 'b> {
         signers_seeds: &[&[&[u8]]],
         remaining_accounts: &[(&'b solana_account_info::AccountInfo<'a>, bool, bool)],
     ) -> solana_program_error::ProgramResult {
-        let mut accounts = Vec::with_capacity(3 + remaining_accounts.len());
-        accounts.push(solana_instruction::AccountMeta::new(
-            *self.source.key,
-            false,
-        ));
-        accounts.push(solana_instruction::AccountMeta::new_readonly(
-            *self.base_account.key,
-            true,
-        ));
+        let mut accounts = Vec::with_capacity(2 + remaining_accounts.len());
+        accounts.push(solana_instruction::AccountMeta::new(*self.source.key, true));
         accounts.push(solana_instruction::AccountMeta::new(
             *self.destination.key,
             false,
@@ -259,9 +210,7 @@ impl<'a, 'b> TransferSolWithSeedCpi<'a, 'b> {
                 is_writable: remaining_account.2,
             })
         });
-        let mut data = TransferSolWithSeedInstructionData::new()
-            .try_to_vec()
-            .unwrap();
+        let mut data = TransferInstructionData::new().try_to_vec().unwrap();
         let mut args = self.__args.try_to_vec().unwrap();
         data.append(&mut args);
 
@@ -270,10 +219,9 @@ impl<'a, 'b> TransferSolWithSeedCpi<'a, 'b> {
             accounts,
             data,
         };
-        let mut account_infos = Vec::with_capacity(4 + remaining_accounts.len());
+        let mut account_infos = Vec::with_capacity(3 + remaining_accounts.len());
         account_infos.push(self.__program.clone());
         account_infos.push(self.source.clone());
-        account_infos.push(self.base_account.clone());
         account_infos.push(self.destination.clone());
         remaining_accounts
             .iter()
@@ -287,28 +235,24 @@ impl<'a, 'b> TransferSolWithSeedCpi<'a, 'b> {
     }
 }
 
-/// Instruction builder for `TransferSolWithSeed` via CPI.
+/// Instruction builder for `Transfer` via CPI.
 ///
 /// ### Accounts:
 ///
-///   0. `[writable]` source
-///   1. `[signer]` base_account
-///   2. `[writable]` destination
+///   0. `[writable, signer]` source
+///   1. `[writable]` destination
 #[derive(Clone, Debug)]
-pub struct TransferSolWithSeedCpiBuilder<'a, 'b> {
-    instruction: Box<TransferSolWithSeedCpiBuilderInstruction<'a, 'b>>,
+pub struct TransferCpiBuilder<'a, 'b> {
+    instruction: Box<TransferCpiBuilderInstruction<'a, 'b>>,
 }
 
-impl<'a, 'b> TransferSolWithSeedCpiBuilder<'a, 'b> {
+impl<'a, 'b> TransferCpiBuilder<'a, 'b> {
     pub fn new(program: &'b solana_account_info::AccountInfo<'a>) -> Self {
-        let instruction = Box::new(TransferSolWithSeedCpiBuilderInstruction {
+        let instruction = Box::new(TransferCpiBuilderInstruction {
             __program: program,
             source: None,
-            base_account: None,
             destination: None,
             amount: None,
-            from_seed: None,
-            from_owner: None,
             __remaining_accounts: Vec::new(),
         });
         Self { instruction }
@@ -316,14 +260,6 @@ impl<'a, 'b> TransferSolWithSeedCpiBuilder<'a, 'b> {
     #[inline(always)]
     pub fn source(&mut self, source: &'b solana_account_info::AccountInfo<'a>) -> &mut Self {
         self.instruction.source = Some(source);
-        self
-    }
-    #[inline(always)]
-    pub fn base_account(
-        &mut self,
-        base_account: &'b solana_account_info::AccountInfo<'a>,
-    ) -> &mut Self {
-        self.instruction.base_account = Some(base_account);
         self
     }
     #[inline(always)]
@@ -337,16 +273,6 @@ impl<'a, 'b> TransferSolWithSeedCpiBuilder<'a, 'b> {
     #[inline(always)]
     pub fn amount(&mut self, amount: u64) -> &mut Self {
         self.instruction.amount = Some(amount);
-        self
-    }
-    #[inline(always)]
-    pub fn from_seed(&mut self, from_seed: U64PrefixedStr) -> &mut Self {
-        self.instruction.from_seed = Some(from_seed);
-        self
-    }
-    #[inline(always)]
-    pub fn from_owner(&mut self, from_owner: Address) -> &mut Self {
-        self.instruction.from_owner = Some(from_owner);
         self
     }
     /// Add an additional account to the instruction.
@@ -383,28 +309,13 @@ impl<'a, 'b> TransferSolWithSeedCpiBuilder<'a, 'b> {
     #[allow(clippy::clone_on_copy)]
     #[allow(clippy::vec_init_then_push)]
     pub fn invoke_signed(&self, signers_seeds: &[&[&[u8]]]) -> solana_program_error::ProgramResult {
-        let args = TransferSolWithSeedInstructionArgs {
+        let args = TransferInstructionArgs {
             amount: self.instruction.amount.clone().expect("amount is not set"),
-            from_seed: self
-                .instruction
-                .from_seed
-                .clone()
-                .expect("from_seed is not set"),
-            from_owner: self
-                .instruction
-                .from_owner
-                .clone()
-                .expect("from_owner is not set"),
         };
-        let instruction = TransferSolWithSeedCpi {
+        let instruction = TransferCpi {
             __program: self.instruction.__program,
 
             source: self.instruction.source.expect("source is not set"),
-
-            base_account: self
-                .instruction
-                .base_account
-                .expect("base_account is not set"),
 
             destination: self
                 .instruction
@@ -420,14 +331,11 @@ impl<'a, 'b> TransferSolWithSeedCpiBuilder<'a, 'b> {
 }
 
 #[derive(Clone, Debug)]
-struct TransferSolWithSeedCpiBuilderInstruction<'a, 'b> {
+struct TransferCpiBuilderInstruction<'a, 'b> {
     __program: &'b solana_account_info::AccountInfo<'a>,
     source: Option<&'b solana_account_info::AccountInfo<'a>>,
-    base_account: Option<&'b solana_account_info::AccountInfo<'a>>,
     destination: Option<&'b solana_account_info::AccountInfo<'a>>,
     amount: Option<u64>,
-    from_seed: Option<U64PrefixedStr>,
-    from_owner: Option<Address>,
     /// Additional instruction accounts `(AccountInfo, is_writable, is_signer)`.
     __remaining_accounts: Vec<(&'b solana_account_info::AccountInfo<'a>, bool, bool)>,
 }
