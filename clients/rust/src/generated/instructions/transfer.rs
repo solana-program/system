@@ -8,25 +8,25 @@
 use borsh::BorshDeserialize;
 use borsh::BorshSerialize;
 
-pub const TRANSFER_SOL_DISCRIMINATOR: u32 = 2;
+pub const TRANSFER_DISCRIMINATOR: u32 = 2;
 
 /// Accounts.
 #[derive(Debug)]
-pub struct TransferSol {
+pub struct Transfer {
     pub source: solana_address::Address,
 
     pub destination: solana_address::Address,
 }
 
-impl TransferSol {
-    pub fn instruction(&self, args: TransferSolInstructionArgs) -> solana_instruction::Instruction {
+impl Transfer {
+    pub fn instruction(&self, args: TransferInstructionArgs) -> solana_instruction::Instruction {
         self.instruction_with_remaining_accounts(args, &[])
     }
     #[allow(clippy::arithmetic_side_effects)]
     #[allow(clippy::vec_init_then_push)]
     pub fn instruction_with_remaining_accounts(
         &self,
-        args: TransferSolInstructionArgs,
+        args: TransferInstructionArgs,
         remaining_accounts: &[solana_instruction::AccountMeta],
     ) -> solana_instruction::Instruction {
         let mut accounts = Vec::with_capacity(2 + remaining_accounts.len());
@@ -36,7 +36,7 @@ impl TransferSol {
             false,
         ));
         accounts.extend_from_slice(remaining_accounts);
-        let mut data = TransferSolInstructionData::new().try_to_vec().unwrap();
+        let mut data = TransferInstructionData::new().try_to_vec().unwrap();
         let mut args = args.try_to_vec().unwrap();
         data.append(&mut args);
 
@@ -49,11 +49,11 @@ impl TransferSol {
 }
 
 #[derive(BorshSerialize, BorshDeserialize, Clone, Debug, Eq, PartialEq)]
-pub struct TransferSolInstructionData {
+pub struct TransferInstructionData {
     discriminator: u32,
 }
 
-impl TransferSolInstructionData {
+impl TransferInstructionData {
     pub fn new() -> Self {
         Self { discriminator: 2 }
     }
@@ -63,38 +63,38 @@ impl TransferSolInstructionData {
     }
 }
 
-impl Default for TransferSolInstructionData {
+impl Default for TransferInstructionData {
     fn default() -> Self {
         Self::new()
     }
 }
 
 #[derive(BorshSerialize, BorshDeserialize, Clone, Debug, Eq, PartialEq)]
-pub struct TransferSolInstructionArgs {
-    pub amount: u64,
+pub struct TransferInstructionArgs {
+    pub lamports: u64,
 }
 
-impl TransferSolInstructionArgs {
+impl TransferInstructionArgs {
     pub(crate) fn try_to_vec(&self) -> Result<Vec<u8>, std::io::Error> {
         borsh::to_vec(self)
     }
 }
 
-/// Instruction builder for `TransferSol`.
+/// Instruction builder for `Transfer`.
 ///
 /// ### Accounts:
 ///
 ///   0. `[writable, signer]` source
 ///   1. `[writable]` destination
 #[derive(Clone, Debug, Default)]
-pub struct TransferSolBuilder {
+pub struct TransferBuilder {
     source: Option<solana_address::Address>,
     destination: Option<solana_address::Address>,
-    amount: Option<u64>,
+    lamports: Option<u64>,
     __remaining_accounts: Vec<solana_instruction::AccountMeta>,
 }
 
-impl TransferSolBuilder {
+impl TransferBuilder {
     pub fn new() -> Self {
         Self::default()
     }
@@ -109,8 +109,8 @@ impl TransferSolBuilder {
         self
     }
     #[inline(always)]
-    pub fn amount(&mut self, amount: u64) -> &mut Self {
-        self.amount = Some(amount);
+    pub fn lamports(&mut self, lamports: u64) -> &mut Self {
+        self.lamports = Some(lamports);
         self
     }
     /// Add an additional account to the instruction.
@@ -130,27 +130,27 @@ impl TransferSolBuilder {
     }
     #[allow(clippy::clone_on_copy)]
     pub fn instruction(&self) -> solana_instruction::Instruction {
-        let accounts = TransferSol {
+        let accounts = Transfer {
             source: self.source.expect("source is not set"),
             destination: self.destination.expect("destination is not set"),
         };
-        let args = TransferSolInstructionArgs {
-            amount: self.amount.clone().expect("amount is not set"),
+        let args = TransferInstructionArgs {
+            lamports: self.lamports.clone().expect("lamports is not set"),
         };
 
         accounts.instruction_with_remaining_accounts(args, &self.__remaining_accounts)
     }
 }
 
-/// `transfer_sol` CPI accounts.
-pub struct TransferSolCpiAccounts<'a, 'b> {
+/// `transfer` CPI accounts.
+pub struct TransferCpiAccounts<'a, 'b> {
     pub source: &'b solana_account_info::AccountInfo<'a>,
 
     pub destination: &'b solana_account_info::AccountInfo<'a>,
 }
 
-/// `transfer_sol` CPI instruction.
-pub struct TransferSolCpi<'a, 'b> {
+/// `transfer` CPI instruction.
+pub struct TransferCpi<'a, 'b> {
     /// The program to invoke.
     pub __program: &'b solana_account_info::AccountInfo<'a>,
 
@@ -158,14 +158,14 @@ pub struct TransferSolCpi<'a, 'b> {
 
     pub destination: &'b solana_account_info::AccountInfo<'a>,
     /// The arguments for the instruction.
-    pub __args: TransferSolInstructionArgs,
+    pub __args: TransferInstructionArgs,
 }
 
-impl<'a, 'b> TransferSolCpi<'a, 'b> {
+impl<'a, 'b> TransferCpi<'a, 'b> {
     pub fn new(
         program: &'b solana_account_info::AccountInfo<'a>,
-        accounts: TransferSolCpiAccounts<'a, 'b>,
-        args: TransferSolInstructionArgs,
+        accounts: TransferCpiAccounts<'a, 'b>,
+        args: TransferInstructionArgs,
     ) -> Self {
         Self {
             __program: program,
@@ -210,7 +210,7 @@ impl<'a, 'b> TransferSolCpi<'a, 'b> {
                 is_writable: remaining_account.2,
             })
         });
-        let mut data = TransferSolInstructionData::new().try_to_vec().unwrap();
+        let mut data = TransferInstructionData::new().try_to_vec().unwrap();
         let mut args = self.__args.try_to_vec().unwrap();
         data.append(&mut args);
 
@@ -235,24 +235,24 @@ impl<'a, 'b> TransferSolCpi<'a, 'b> {
     }
 }
 
-/// Instruction builder for `TransferSol` via CPI.
+/// Instruction builder for `Transfer` via CPI.
 ///
 /// ### Accounts:
 ///
 ///   0. `[writable, signer]` source
 ///   1. `[writable]` destination
 #[derive(Clone, Debug)]
-pub struct TransferSolCpiBuilder<'a, 'b> {
-    instruction: Box<TransferSolCpiBuilderInstruction<'a, 'b>>,
+pub struct TransferCpiBuilder<'a, 'b> {
+    instruction: Box<TransferCpiBuilderInstruction<'a, 'b>>,
 }
 
-impl<'a, 'b> TransferSolCpiBuilder<'a, 'b> {
+impl<'a, 'b> TransferCpiBuilder<'a, 'b> {
     pub fn new(program: &'b solana_account_info::AccountInfo<'a>) -> Self {
-        let instruction = Box::new(TransferSolCpiBuilderInstruction {
+        let instruction = Box::new(TransferCpiBuilderInstruction {
             __program: program,
             source: None,
             destination: None,
-            amount: None,
+            lamports: None,
             __remaining_accounts: Vec::new(),
         });
         Self { instruction }
@@ -271,8 +271,8 @@ impl<'a, 'b> TransferSolCpiBuilder<'a, 'b> {
         self
     }
     #[inline(always)]
-    pub fn amount(&mut self, amount: u64) -> &mut Self {
-        self.instruction.amount = Some(amount);
+    pub fn lamports(&mut self, lamports: u64) -> &mut Self {
+        self.instruction.lamports = Some(lamports);
         self
     }
     /// Add an additional account to the instruction.
@@ -309,10 +309,14 @@ impl<'a, 'b> TransferSolCpiBuilder<'a, 'b> {
     #[allow(clippy::clone_on_copy)]
     #[allow(clippy::vec_init_then_push)]
     pub fn invoke_signed(&self, signers_seeds: &[&[&[u8]]]) -> solana_program_error::ProgramResult {
-        let args = TransferSolInstructionArgs {
-            amount: self.instruction.amount.clone().expect("amount is not set"),
+        let args = TransferInstructionArgs {
+            lamports: self
+                .instruction
+                .lamports
+                .clone()
+                .expect("lamports is not set"),
         };
-        let instruction = TransferSolCpi {
+        let instruction = TransferCpi {
             __program: self.instruction.__program,
 
             source: self.instruction.source.expect("source is not set"),
@@ -331,11 +335,11 @@ impl<'a, 'b> TransferSolCpiBuilder<'a, 'b> {
 }
 
 #[derive(Clone, Debug)]
-struct TransferSolCpiBuilderInstruction<'a, 'b> {
+struct TransferCpiBuilderInstruction<'a, 'b> {
     __program: &'b solana_account_info::AccountInfo<'a>,
     source: Option<&'b solana_account_info::AccountInfo<'a>>,
     destination: Option<&'b solana_account_info::AccountInfo<'a>>,
-    amount: Option<u64>,
+    lamports: Option<u64>,
     /// Additional instruction accounts `(AccountInfo, is_writable, is_signer)`.
     __remaining_accounts: Vec<(&'b solana_account_info::AccountInfo<'a>, bool, bool)>,
 }

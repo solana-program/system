@@ -42,8 +42,8 @@ import {
     getCreateAccountInstruction,
     getCreateAccountWithSeedInstruction,
     getInitializeNonceAccountInstruction,
-    getTransferSolInstruction,
-    getTransferSolWithSeedInstruction,
+    getTransferInstruction,
+    getTransferWithSeedInstruction,
     getUpgradeNonceAccountInstruction,
     getWithdrawNonceAccountInstruction,
     parseAdvanceNonceAccountInstruction,
@@ -55,8 +55,8 @@ import {
     parseCreateAccountInstruction,
     parseCreateAccountWithSeedInstruction,
     parseInitializeNonceAccountInstruction,
-    parseTransferSolInstruction,
-    parseTransferSolWithSeedInstruction,
+    parseTransferInstruction,
+    parseTransferWithSeedInstruction,
     parseUpgradeNonceAccountInstruction,
     parseWithdrawNonceAccountInstruction,
     type AdvanceNonceAccountInput,
@@ -77,12 +77,12 @@ import {
     type ParsedCreateAccountInstruction,
     type ParsedCreateAccountWithSeedInstruction,
     type ParsedInitializeNonceAccountInstruction,
-    type ParsedTransferSolInstruction,
-    type ParsedTransferSolWithSeedInstruction,
+    type ParsedTransferInstruction,
+    type ParsedTransferWithSeedInstruction,
     type ParsedUpgradeNonceAccountInstruction,
     type ParsedWithdrawNonceAccountInstruction,
-    type TransferSolInput,
-    type TransferSolWithSeedInput,
+    type TransferInput,
+    type TransferWithSeedInput,
     type UpgradeNonceAccountInput,
     type WithdrawNonceAccountInput,
 } from '../instructions';
@@ -96,7 +96,7 @@ export enum SystemAccount {
 export enum SystemInstruction {
     CreateAccount,
     Assign,
-    TransferSol,
+    Transfer,
     CreateAccountWithSeed,
     AdvanceNonceAccount,
     WithdrawNonceAccount,
@@ -105,7 +105,7 @@ export enum SystemInstruction {
     Allocate,
     AllocateWithSeed,
     AssignWithSeed,
-    TransferSolWithSeed,
+    TransferWithSeed,
     UpgradeNonceAccount,
 }
 
@@ -120,7 +120,7 @@ export function identifySystemInstruction(
         return SystemInstruction.Assign;
     }
     if (containsBytes(data, getU32Encoder().encode(2), 0)) {
-        return SystemInstruction.TransferSol;
+        return SystemInstruction.Transfer;
     }
     if (containsBytes(data, getU32Encoder().encode(3), 0)) {
         return SystemInstruction.CreateAccountWithSeed;
@@ -147,7 +147,7 @@ export function identifySystemInstruction(
         return SystemInstruction.AssignWithSeed;
     }
     if (containsBytes(data, getU32Encoder().encode(11), 0)) {
-        return SystemInstruction.TransferSolWithSeed;
+        return SystemInstruction.TransferWithSeed;
     }
     if (containsBytes(data, getU32Encoder().encode(12), 0)) {
         return SystemInstruction.UpgradeNonceAccount;
@@ -161,7 +161,7 @@ export function identifySystemInstruction(
 export type ParsedSystemInstruction<TProgram extends string = '11111111111111111111111111111111'> =
     | ({ instructionType: SystemInstruction.CreateAccount } & ParsedCreateAccountInstruction<TProgram>)
     | ({ instructionType: SystemInstruction.Assign } & ParsedAssignInstruction<TProgram>)
-    | ({ instructionType: SystemInstruction.TransferSol } & ParsedTransferSolInstruction<TProgram>)
+    | ({ instructionType: SystemInstruction.Transfer } & ParsedTransferInstruction<TProgram>)
     | ({ instructionType: SystemInstruction.CreateAccountWithSeed } & ParsedCreateAccountWithSeedInstruction<TProgram>)
     | ({ instructionType: SystemInstruction.AdvanceNonceAccount } & ParsedAdvanceNonceAccountInstruction<TProgram>)
     | ({ instructionType: SystemInstruction.WithdrawNonceAccount } & ParsedWithdrawNonceAccountInstruction<TProgram>)
@@ -172,7 +172,7 @@ export type ParsedSystemInstruction<TProgram extends string = '11111111111111111
     | ({ instructionType: SystemInstruction.Allocate } & ParsedAllocateInstruction<TProgram>)
     | ({ instructionType: SystemInstruction.AllocateWithSeed } & ParsedAllocateWithSeedInstruction<TProgram>)
     | ({ instructionType: SystemInstruction.AssignWithSeed } & ParsedAssignWithSeedInstruction<TProgram>)
-    | ({ instructionType: SystemInstruction.TransferSolWithSeed } & ParsedTransferSolWithSeedInstruction<TProgram>)
+    | ({ instructionType: SystemInstruction.TransferWithSeed } & ParsedTransferWithSeedInstruction<TProgram>)
     | ({ instructionType: SystemInstruction.UpgradeNonceAccount } & ParsedUpgradeNonceAccountInstruction<TProgram>);
 
 export function parseSystemInstruction<TProgram extends string>(
@@ -188,9 +188,9 @@ export function parseSystemInstruction<TProgram extends string>(
             assertIsInstructionWithAccounts(instruction);
             return { instructionType: SystemInstruction.Assign, ...parseAssignInstruction(instruction) };
         }
-        case SystemInstruction.TransferSol: {
+        case SystemInstruction.Transfer: {
             assertIsInstructionWithAccounts(instruction);
-            return { instructionType: SystemInstruction.TransferSol, ...parseTransferSolInstruction(instruction) };
+            return { instructionType: SystemInstruction.Transfer, ...parseTransferInstruction(instruction) };
         }
         case SystemInstruction.CreateAccountWithSeed: {
             assertIsInstructionWithAccounts(instruction);
@@ -245,11 +245,11 @@ export function parseSystemInstruction<TProgram extends string>(
                 ...parseAssignWithSeedInstruction(instruction),
             };
         }
-        case SystemInstruction.TransferSolWithSeed: {
+        case SystemInstruction.TransferWithSeed: {
             assertIsInstructionWithAccounts(instruction);
             return {
-                instructionType: SystemInstruction.TransferSolWithSeed,
-                ...parseTransferSolWithSeedInstruction(instruction),
+                instructionType: SystemInstruction.TransferWithSeed,
+                ...parseTransferWithSeedInstruction(instruction),
             };
         }
         case SystemInstruction.UpgradeNonceAccount: {
@@ -276,7 +276,7 @@ export type SystemPluginInstructions = {
         input: MakeOptional<CreateAccountInput, 'payer'>,
     ) => ReturnType<typeof getCreateAccountInstruction> & SelfPlanAndSendFunctions;
     assign: (input: AssignInput) => ReturnType<typeof getAssignInstruction> & SelfPlanAndSendFunctions;
-    transferSol: (input: TransferSolInput) => ReturnType<typeof getTransferSolInstruction> & SelfPlanAndSendFunctions;
+    transfer: (input: TransferInput) => ReturnType<typeof getTransferInstruction> & SelfPlanAndSendFunctions;
     createAccountWithSeed: (
         input: MakeOptional<CreateAccountWithSeedInput, 'payer'>,
     ) => ReturnType<typeof getCreateAccountWithSeedInstruction> & SelfPlanAndSendFunctions;
@@ -299,9 +299,9 @@ export type SystemPluginInstructions = {
     assignWithSeed: (
         input: AssignWithSeedInput,
     ) => ReturnType<typeof getAssignWithSeedInstruction> & SelfPlanAndSendFunctions;
-    transferSolWithSeed: (
-        input: TransferSolWithSeedInput,
-    ) => ReturnType<typeof getTransferSolWithSeedInstruction> & SelfPlanAndSendFunctions;
+    transferWithSeed: (
+        input: TransferWithSeedInput,
+    ) => ReturnType<typeof getTransferWithSeedInstruction> & SelfPlanAndSendFunctions;
     upgradeNonceAccount: (
         input: UpgradeNonceAccountInput,
     ) => ReturnType<typeof getUpgradeNonceAccountInstruction> & SelfPlanAndSendFunctions;
@@ -324,7 +324,7 @@ export function systemProgram() {
                             getCreateAccountInstruction({ ...input, payer: input.payer ?? client.payer }),
                         ),
                     assign: input => addSelfPlanAndSendFunctions(client, getAssignInstruction(input)),
-                    transferSol: input => addSelfPlanAndSendFunctions(client, getTransferSolInstruction(input)),
+                    transfer: input => addSelfPlanAndSendFunctions(client, getTransferInstruction(input)),
                     createAccountWithSeed: input =>
                         addSelfPlanAndSendFunctions(
                             client,
@@ -342,8 +342,8 @@ export function systemProgram() {
                     allocateWithSeed: input =>
                         addSelfPlanAndSendFunctions(client, getAllocateWithSeedInstruction(input)),
                     assignWithSeed: input => addSelfPlanAndSendFunctions(client, getAssignWithSeedInstruction(input)),
-                    transferSolWithSeed: input =>
-                        addSelfPlanAndSendFunctions(client, getTransferSolWithSeedInstruction(input)),
+                    transferWithSeed: input =>
+                        addSelfPlanAndSendFunctions(client, getTransferWithSeedInstruction(input)),
                     upgradeNonceAccount: input =>
                         addSelfPlanAndSendFunctions(client, getUpgradeNonceAccountInstruction(input)),
                 },

@@ -211,7 +211,7 @@
                     },
                     {
                         "kind": "instructionArgumentNode",
-                        "name": "amount",
+                        "name": "lamports",
                         "type": {
                             "kind": "numberTypeNode",
                             "format": "u64",
@@ -227,8 +227,8 @@
                         "offset": 0
                     }
                 ],
-                "name": "transferSol",
-                "idlName": "TransferSol",
+                "name": "transfer",
+                "idlName": "Transfer",
                 "docs": [],
                 "optionalAccountStrategy": "omitted"
             },
@@ -296,7 +296,7 @@
                     },
                     {
                         "kind": "instructionArgumentNode",
-                        "name": "amount",
+                        "name": "lamports",
                         "type": {
                             "kind": "numberTypeNode",
                             "format": "u64",
@@ -844,7 +844,7 @@
                     },
                     {
                         "kind": "instructionArgumentNode",
-                        "name": "amount",
+                        "name": "lamports",
                         "type": {
                             "kind": "numberTypeNode",
                             "format": "u64",
@@ -880,8 +880,8 @@
                         "offset": 0
                     }
                 ],
-                "name": "transferSolWithSeed",
-                "idlName": "TransferSolWithSeed",
+                "name": "transferWithSeed",
+                "idlName": "TransferWithSeed",
                 "docs": [],
                 "optionalAccountStrategy": "omitted"
             },

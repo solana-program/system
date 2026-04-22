@@ -34,13 +34,13 @@ import {
 import { getAccountMetaFactory, type ResolvedInstructionAccount } from '@solana/kit/program-client-core';
 import { SYSTEM_PROGRAM_ADDRESS } from '../programs';
 
-export const TRANSFER_SOL_DISCRIMINATOR = 2;
+export const TRANSFER_DISCRIMINATOR = 2;
 
-export function getTransferSolDiscriminatorBytes(): ReadonlyUint8Array {
-    return getU32Encoder().encode(TRANSFER_SOL_DISCRIMINATOR);
+export function getTransferDiscriminatorBytes(): ReadonlyUint8Array {
+    return getU32Encoder().encode(TRANSFER_DISCRIMINATOR);
 }
 
-export type TransferSolInstruction<
+export type TransferInstruction<
     TProgram extends string = typeof SYSTEM_PROGRAM_ADDRESS,
     TAccountSource extends string | AccountMeta<string> = string,
     TAccountDestination extends string | AccountMeta<string> = string,
@@ -57,48 +57,48 @@ export type TransferSolInstruction<
         ]
     >;
 
-export type TransferSolInstructionData = { discriminator: number; amount: bigint };
+export type TransferInstructionData = { discriminator: number; lamports: bigint };
 
-export type TransferSolInstructionDataArgs = { amount: number | bigint };
+export type TransferInstructionDataArgs = { lamports: number | bigint };
 
-export function getTransferSolInstructionDataEncoder(): FixedSizeEncoder<TransferSolInstructionDataArgs> {
+export function getTransferInstructionDataEncoder(): FixedSizeEncoder<TransferInstructionDataArgs> {
     return transformEncoder(
         getStructEncoder([
             ['discriminator', getU32Encoder()],
-            ['amount', getU64Encoder()],
+            ['lamports', getU64Encoder()],
         ]),
-        value => ({ ...value, discriminator: TRANSFER_SOL_DISCRIMINATOR }),
+        value => ({ ...value, discriminator: TRANSFER_DISCRIMINATOR }),
     );
 }
 
-export function getTransferSolInstructionDataDecoder(): FixedSizeDecoder<TransferSolInstructionData> {
+export function getTransferInstructionDataDecoder(): FixedSizeDecoder<TransferInstructionData> {
     return getStructDecoder([
         ['discriminator', getU32Decoder()],
-        ['amount', getU64Decoder()],
+        ['lamports', getU64Decoder()],
     ]);
 }
 
-export function getTransferSolInstructionDataCodec(): FixedSizeCodec<
-    TransferSolInstructionDataArgs,
-    TransferSolInstructionData
+export function getTransferInstructionDataCodec(): FixedSizeCodec<
+    TransferInstructionDataArgs,
+    TransferInstructionData
 > {
-    return combineCodec(getTransferSolInstructionDataEncoder(), getTransferSolInstructionDataDecoder());
+    return combineCodec(getTransferInstructionDataEncoder(), getTransferInstructionDataDecoder());
 }
 
-export type TransferSolInput<TAccountSource extends string = string, TAccountDestination extends string = string> = {
+export type TransferInput<TAccountSource extends string = string, TAccountDestination extends string = string> = {
     source: TransactionSigner<TAccountSource>;
     destination: Address<TAccountDestination>;
-    amount: TransferSolInstructionDataArgs['amount'];
+    lamports: TransferInstructionDataArgs['lamports'];
 };
 
-export function getTransferSolInstruction<
+export function getTransferInstruction<
     TAccountSource extends string,
     TAccountDestination extends string,
     TProgramAddress extends Address = typeof SYSTEM_PROGRAM_ADDRESS,
 >(
-    input: TransferSolInput<TAccountSource, TAccountDestination>,
+    input: TransferInput<TAccountSource, TAccountDestination>,
     config?: { programAddress?: TProgramAddress },
-): TransferSolInstruction<TProgramAddress, TAccountSource, TAccountDestination> {
+): TransferInstruction<TProgramAddress, TAccountSource, TAccountDestination> {
     // Program address.
     const programAddress = config?.programAddress ?? SYSTEM_PROGRAM_ADDRESS;
 
@@ -115,12 +115,12 @@ export function getTransferSolInstruction<
     const getAccountMeta = getAccountMetaFactory(programAddress, 'omitted');
     return Object.freeze({
         accounts: [getAccountMeta('source', accounts.source), getAccountMeta('destination', accounts.destination)],
-        data: getTransferSolInstructionDataEncoder().encode(args as TransferSolInstructionDataArgs),
+        data: getTransferInstructionDataEncoder().encode(args as TransferInstructionDataArgs),
         programAddress,
-    } as TransferSolInstruction<TProgramAddress, TAccountSource, TAccountDestination>);
+    } as TransferInstruction<TProgramAddress, TAccountSource, TAccountDestination>);
 }
 
-export type ParsedTransferSolInstruction<
+export type ParsedTransferInstruction<
     TProgram extends string = typeof SYSTEM_PROGRAM_ADDRESS,
     TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[],
 > = {
@@ -129,14 +129,14 @@ export type ParsedTransferSolInstruction<
         source: TAccountMetas[0];
         destination: TAccountMetas[1];
     };
-    data: TransferSolInstructionData;
+    data: TransferInstructionData;
 };
 
-export function parseTransferSolInstruction<TProgram extends string, TAccountMetas extends readonly AccountMeta[]>(
+export function parseTransferInstruction<TProgram extends string, TAccountMetas extends readonly AccountMeta[]>(
     instruction: Instruction<TProgram> &
         InstructionWithAccounts<TAccountMetas> &
         InstructionWithData<ReadonlyUint8Array>,
-): ParsedTransferSolInstruction<TProgram, TAccountMetas> {
+): ParsedTransferInstruction<TProgram, TAccountMetas> {
     if (instruction.accounts.length < 2) {
         throw new SolanaError(SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS, {
             actualAccountMetas: instruction.accounts.length,
@@ -152,6 +152,6 @@ export function parseTransferSolInstruction<TProgram extends string, TAccountMet
     return {
         programAddress: instruction.programAddress,
         accounts: { source: getNextAccount(), destination: getNextAccount() },
-        data: getTransferSolInstructionDataDecoder().decode(instruction.data),
+        data: getTransferInstructionDataDecoder().decode(instruction.data),
     };
 }

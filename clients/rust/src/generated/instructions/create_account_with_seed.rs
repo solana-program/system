@@ -88,7 +88,7 @@ impl Default for CreateAccountWithSeedInstructionData {
 pub struct CreateAccountWithSeedInstructionArgs {
     pub base: Address,
     pub seed: U64PrefixedStr,
-    pub amount: u64,
+    pub lamports: u64,
     pub space: u64,
     pub program_address: Address,
 }
@@ -113,7 +113,7 @@ pub struct CreateAccountWithSeedBuilder {
     base_account: Option<solana_address::Address>,
     base: Option<Address>,
     seed: Option<U64PrefixedStr>,
-    amount: Option<u64>,
+    lamports: Option<u64>,
     space: Option<u64>,
     program_address: Option<Address>,
     __remaining_accounts: Vec<solana_instruction::AccountMeta>,
@@ -150,8 +150,8 @@ impl CreateAccountWithSeedBuilder {
         self
     }
     #[inline(always)]
-    pub fn amount(&mut self, amount: u64) -> &mut Self {
-        self.amount = Some(amount);
+    pub fn lamports(&mut self, lamports: u64) -> &mut Self {
+        self.lamports = Some(lamports);
         self
     }
     #[inline(always)]
@@ -189,7 +189,7 @@ impl CreateAccountWithSeedBuilder {
         let args = CreateAccountWithSeedInstructionArgs {
             base: self.base.clone().expect("base is not set"),
             seed: self.seed.clone().expect("seed is not set"),
-            amount: self.amount.clone().expect("amount is not set"),
+            lamports: self.lamports.clone().expect("lamports is not set"),
             space: self.space.clone().expect("space is not set"),
             program_address: self
                 .program_address
@@ -331,7 +331,7 @@ impl<'a, 'b> CreateAccountWithSeedCpiBuilder<'a, 'b> {
             base_account: None,
             base: None,
             seed: None,
-            amount: None,
+            lamports: None,
             space: None,
             program_address: None,
             __remaining_accounts: Vec::new(),
@@ -371,8 +371,8 @@ impl<'a, 'b> CreateAccountWithSeedCpiBuilder<'a, 'b> {
         self
     }
     #[inline(always)]
-    pub fn amount(&mut self, amount: u64) -> &mut Self {
-        self.instruction.amount = Some(amount);
+    pub fn lamports(&mut self, lamports: u64) -> &mut Self {
+        self.instruction.lamports = Some(lamports);
         self
     }
     #[inline(always)]
@@ -422,7 +422,11 @@ impl<'a, 'b> CreateAccountWithSeedCpiBuilder<'a, 'b> {
         let args = CreateAccountWithSeedInstructionArgs {
             base: self.instruction.base.clone().expect("base is not set"),
             seed: self.instruction.seed.clone().expect("seed is not set"),
-            amount: self.instruction.amount.clone().expect("amount is not set"),
+            lamports: self
+                .instruction
+                .lamports
+                .clone()
+                .expect("lamports is not set"),
             space: self.instruction.space.clone().expect("space is not set"),
             program_address: self
                 .instruction
@@ -458,7 +462,7 @@ struct CreateAccountWithSeedCpiBuilderInstruction<'a, 'b> {
     base_account: Option<&'b solana_account_info::AccountInfo<'a>>,
     base: Option<Address>,
     seed: Option<U64PrefixedStr>,
-    amount: Option<u64>,
+    lamports: Option<u64>,
     space: Option<u64>,
     program_address: Option<Address>,
     /// Additional instruction accounts `(AccountInfo, is_writable, is_signer)`.

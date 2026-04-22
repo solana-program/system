@@ -40,13 +40,13 @@ import {
 import { getAccountMetaFactory, type ResolvedInstructionAccount } from '@solana/kit/program-client-core';
 import { SYSTEM_PROGRAM_ADDRESS } from '../programs';
 
-export const TRANSFER_SOL_WITH_SEED_DISCRIMINATOR = 11;
+export const TRANSFER_WITH_SEED_DISCRIMINATOR = 11;
 
-export function getTransferSolWithSeedDiscriminatorBytes(): ReadonlyUint8Array {
-    return getU32Encoder().encode(TRANSFER_SOL_WITH_SEED_DISCRIMINATOR);
+export function getTransferWithSeedDiscriminatorBytes(): ReadonlyUint8Array {
+    return getU32Encoder().encode(TRANSFER_WITH_SEED_DISCRIMINATOR);
 }
 
-export type TransferSolWithSeedInstruction<
+export type TransferWithSeedInstruction<
     TProgram extends string = typeof SYSTEM_PROGRAM_ADDRESS,
     TAccountSource extends string | AccountMeta<string> = string,
     TAccountBaseAccount extends string | AccountMeta<string> = string,
@@ -65,44 +65,44 @@ export type TransferSolWithSeedInstruction<
         ]
     >;
 
-export type TransferSolWithSeedInstructionData = {
+export type TransferWithSeedInstructionData = {
     discriminator: number;
-    amount: bigint;
+    lamports: bigint;
     fromSeed: string;
     fromOwner: Address;
 };
 
-export type TransferSolWithSeedInstructionDataArgs = { amount: number | bigint; fromSeed: string; fromOwner: Address };
+export type TransferWithSeedInstructionDataArgs = { lamports: number | bigint; fromSeed: string; fromOwner: Address };
 
-export function getTransferSolWithSeedInstructionDataEncoder(): Encoder<TransferSolWithSeedInstructionDataArgs> {
+export function getTransferWithSeedInstructionDataEncoder(): Encoder<TransferWithSeedInstructionDataArgs> {
     return transformEncoder(
         getStructEncoder([
             ['discriminator', getU32Encoder()],
-            ['amount', getU64Encoder()],
+            ['lamports', getU64Encoder()],
             ['fromSeed', addEncoderSizePrefix(getUtf8Encoder(), getU64Encoder())],
             ['fromOwner', getAddressEncoder()],
         ]),
-        value => ({ ...value, discriminator: TRANSFER_SOL_WITH_SEED_DISCRIMINATOR }),
+        value => ({ ...value, discriminator: TRANSFER_WITH_SEED_DISCRIMINATOR }),
     );
 }
 
-export function getTransferSolWithSeedInstructionDataDecoder(): Decoder<TransferSolWithSeedInstructionData> {
+export function getTransferWithSeedInstructionDataDecoder(): Decoder<TransferWithSeedInstructionData> {
     return getStructDecoder([
         ['discriminator', getU32Decoder()],
-        ['amount', getU64Decoder()],
+        ['lamports', getU64Decoder()],
         ['fromSeed', addDecoderSizePrefix(getUtf8Decoder(), getU64Decoder())],
         ['fromOwner', getAddressDecoder()],
     ]);
 }
 
-export function getTransferSolWithSeedInstructionDataCodec(): Codec<
-    TransferSolWithSeedInstructionDataArgs,
-    TransferSolWithSeedInstructionData
+export function getTransferWithSeedInstructionDataCodec(): Codec<
+    TransferWithSeedInstructionDataArgs,
+    TransferWithSeedInstructionData
 > {
-    return combineCodec(getTransferSolWithSeedInstructionDataEncoder(), getTransferSolWithSeedInstructionDataDecoder());
+    return combineCodec(getTransferWithSeedInstructionDataEncoder(), getTransferWithSeedInstructionDataDecoder());
 }
 
-export type TransferSolWithSeedInput<
+export type TransferWithSeedInput<
     TAccountSource extends string = string,
     TAccountBaseAccount extends string = string,
     TAccountDestination extends string = string,
@@ -110,20 +110,20 @@ export type TransferSolWithSeedInput<
     source: Address<TAccountSource>;
     baseAccount: TransactionSigner<TAccountBaseAccount>;
     destination: Address<TAccountDestination>;
-    amount: TransferSolWithSeedInstructionDataArgs['amount'];
-    fromSeed: TransferSolWithSeedInstructionDataArgs['fromSeed'];
-    fromOwner: TransferSolWithSeedInstructionDataArgs['fromOwner'];
+    lamports: TransferWithSeedInstructionDataArgs['lamports'];
+    fromSeed: TransferWithSeedInstructionDataArgs['fromSeed'];
+    fromOwner: TransferWithSeedInstructionDataArgs['fromOwner'];
 };
 
-export function getTransferSolWithSeedInstruction<
+export function getTransferWithSeedInstruction<
     TAccountSource extends string,
     TAccountBaseAccount extends string,
     TAccountDestination extends string,
     TProgramAddress extends Address = typeof SYSTEM_PROGRAM_ADDRESS,
 >(
-    input: TransferSolWithSeedInput<TAccountSource, TAccountBaseAccount, TAccountDestination>,
+    input: TransferWithSeedInput<TAccountSource, TAccountBaseAccount, TAccountDestination>,
     config?: { programAddress?: TProgramAddress },
-): TransferSolWithSeedInstruction<TProgramAddress, TAccountSource, TAccountBaseAccount, TAccountDestination> {
+): TransferWithSeedInstruction<TProgramAddress, TAccountSource, TAccountBaseAccount, TAccountDestination> {
     // Program address.
     const programAddress = config?.programAddress ?? SYSTEM_PROGRAM_ADDRESS;
 
@@ -145,12 +145,12 @@ export function getTransferSolWithSeedInstruction<
             getAccountMeta('baseAccount', accounts.baseAccount),
             getAccountMeta('destination', accounts.destination),
         ],
-        data: getTransferSolWithSeedInstructionDataEncoder().encode(args as TransferSolWithSeedInstructionDataArgs),
+        data: getTransferWithSeedInstructionDataEncoder().encode(args as TransferWithSeedInstructionDataArgs),
         programAddress,
-    } as TransferSolWithSeedInstruction<TProgramAddress, TAccountSource, TAccountBaseAccount, TAccountDestination>);
+    } as TransferWithSeedInstruction<TProgramAddress, TAccountSource, TAccountBaseAccount, TAccountDestination>);
 }
 
-export type ParsedTransferSolWithSeedInstruction<
+export type ParsedTransferWithSeedInstruction<
     TProgram extends string = typeof SYSTEM_PROGRAM_ADDRESS,
     TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[],
 > = {
@@ -160,17 +160,14 @@ export type ParsedTransferSolWithSeedInstruction<
         baseAccount: TAccountMetas[1];
         destination: TAccountMetas[2];
     };
-    data: TransferSolWithSeedInstructionData;
+    data: TransferWithSeedInstructionData;
 };
 
-export function parseTransferSolWithSeedInstruction<
-    TProgram extends string,
-    TAccountMetas extends readonly AccountMeta[],
->(
+export function parseTransferWithSeedInstruction<TProgram extends string, TAccountMetas extends readonly AccountMeta[]>(
     instruction: Instruction<TProgram> &
         InstructionWithAccounts<TAccountMetas> &
         InstructionWithData<ReadonlyUint8Array>,
-): ParsedTransferSolWithSeedInstruction<TProgram, TAccountMetas> {
+): ParsedTransferWithSeedInstruction<TProgram, TAccountMetas> {
     if (instruction.accounts.length < 3) {
         throw new SolanaError(SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS, {
             actualAccountMetas: instruction.accounts.length,
@@ -186,6 +183,6 @@ export function parseTransferSolWithSeedInstruction<
     return {
         programAddress: instruction.programAddress,
         accounts: { source: getNextAccount(), baseAccount: getNextAccount(), destination: getNextAccount() },
-        data: getTransferSolWithSeedInstructionDataDecoder().decode(instruction.data),
+        data: getTransferWithSeedInstructionDataDecoder().decode(instruction.data),
     };
 }
