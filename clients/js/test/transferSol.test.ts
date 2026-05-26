@@ -1,5 +1,6 @@
 import { AccountRole, generateKeyPairSigner, lamports } from '@solana/kit';
 import { expect, it } from 'vitest';
+
 import { getTransferSolInstruction, parseTransferSolInstruction } from '../src';
 import { createTestClient } from './_setup';
 

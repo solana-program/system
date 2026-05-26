@@ -1,4 +1,6 @@
 import { AccountRole, address, createNoopSigner } from '@solana/kit';
+import { it, expect } from 'vitest';
+
 import {
     getTransferSolInstruction,
     parseSystemInstruction,
@@ -6,7 +8,6 @@ import {
     SystemInstruction,
     TRANSFER_SOL_DISCRIMINATOR,
 } from '../src';
-import { it, expect } from 'vitest';
 
 it('parses a transfer SOL instruction', () => {
     const source = createNoopSigner(address('9aE3e5LQT2qKDpnoYytMVNFq7ZtbBFCpTyvKUJUx5MkX'));

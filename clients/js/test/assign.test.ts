@@ -1,5 +1,6 @@
 import { fetchEncodedAccount, generateKeyPairSigner } from '@solana/kit';
 import { expect, it } from 'vitest';
+
 import { createTestClient } from './_setup';
 
 it('assigns a new owner to an account', async () => {
