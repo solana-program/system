@@ -1,5 +1,6 @@
 import { createAddressWithSeed, fetchEncodedAccount, generateKeyPairSigner } from '@solana/kit';
 import { expect, it } from 'vitest';
+
 import { createTestClient } from './_setup';
 
 it('creates a new empty account when base is not payer', async () => {

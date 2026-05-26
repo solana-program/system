@@ -1,5 +1,6 @@
 import { assertAccountExists, fetchEncodedAccount, generateKeyPairSigner } from '@solana/kit';
 import { expect, it } from 'vitest';
+
 import { createTestClient } from './_setup';
 
 it('allocates space for an account', async () => {

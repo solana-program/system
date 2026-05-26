@@ -1,5 +1,6 @@
 import { fetchEncodedAccount, generateKeyPairSigner } from '@solana/kit';
 import { expect, it } from 'vitest';
+
 import { SYSTEM_PROGRAM_ADDRESS } from '../src';
 import { createTestClient } from './_setup';
 

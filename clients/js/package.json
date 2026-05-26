@@ -2,11 +2,25 @@
     "name": "@solana-program/system",
     "version": "0.12.0",
     "description": "JavaScript client for the System program",
-    "sideEffects": false,
-    "module": "./dist/src/index.mjs",
-    "main": "./dist/src/index.js",
-    "types": "./dist/types/index.d.ts",
+    "homepage": "https://github.com/solana-program/system#readme",
+    "bugs": {
+        "url": "https://github.com/solana-program/system/issues"
+    },
+    "license": "Apache-2.0",
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/solana-program/system.git"
+    },
+    "files": [
+        "./dist/src",
+        "./dist/types",
+        "./src/"
+    ],
     "type": "commonjs",
+    "sideEffects": false,
+    "main": "./dist/src/index.js",
+    "module": "./dist/src/index.mjs",
+    "types": "./dist/types/index.d.ts",
     "exports": {
         ".": {
             "types": "./dist/types/index.d.ts",
@@ -14,50 +28,37 @@
             "require": "./dist/src/index.js"
         }
     },
-    "files": [
-        "./dist/src",
-        "./dist/types",
-        "./src/"
-    ],
+    "publishConfig": {
+        "access": "public",
+        "registry": "https://registry.npmjs.org"
+    },
     "scripts": {
         "build": "rimraf dist && tsup && tsc -p ./tsconfig.declarations.json",
         "build:docs": "typedoc",
         "dev": "vitest",
         "test": "vitest run",
-        "lint": "eslint src",
-        "lint:fix": "eslint --fix src",
-        "format": "prettier --check src test",
-        "format:fix": "prettier --write src test",
+        "lint": "oxlint",
+        "lint:fix": "oxlint --fix",
+        "format": "oxfmt --check",
+        "format:fix": "oxfmt",
         "prepublishOnly": "pnpm build"
     },
-    "publishConfig": {
-        "access": "public",
-        "registry": "https://registry.npmjs.org"
-    },
-    "license": "Apache-2.0",
-    "repository": {
-        "type": "git",
-        "url": "git+https://github.com/solana-program/system.git"
-    },
-    "bugs": {
-        "url": "https://github.com/solana-program/system/issues"
-    },
-    "homepage": "https://github.com/solana-program/system#readme",
-    "peerDependencies": {
-        "@solana/kit": "^6.4.0"
-    },
     "devDependencies": {
-        "@solana/eslint-config-solana": "^6.0.0",
+        "@solana-config/oxc": "^0.1.1",
+        "@solana/kit": "^6.4.0",
         "@solana/kit-plugin-litesvm": "^0.10.0",
         "@solana/kit-plugin-signer": "^0.10.0",
-        "@solana/kit": "^6.4.0",
         "@types/node": "^24",
-        "eslint": "^9.39.2",
-        "prettier": "^3.7.4",
+        "oxfmt": "^0.48.0",
+        "oxlint": "^1.63.0",
+        "oxlint-tsgolint": "^0.23.0",
         "rimraf": "^6.1.2",
         "tsup": "^8.1.2",
         "typedoc": "^0.28.15",
         "typescript": "^5.9.3",
         "vitest": "^4.0.15"
+    },
+    "peerDependencies": {
+        "@solana/kit": "^6.4.0"
     }
 }

@@ -1,5 +1,6 @@
 import { generateKeyPairSigner } from '@solana/kit';
 import { expect, it } from 'vitest';
+
 import { createTestClient, getCreateNonceInstructionPlan } from './_setup';
 
 it('advances the nonce account', async () => {
