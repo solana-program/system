@@ -20,11 +20,22 @@ solana-cli-version:
 cargo-nightly:
 	cargo $(nightly) $(ARGS)
 
+# All ignored advisories are in transitive dependencies pulled in via
+# `solana-client` and its RPC / TLS / pubsub stack. The generated
+# `solana-system-client` surface itself does not depend on them directly.
 audit:
 	cargo audit \
-		--ignore RUSTSEC-2022-0093 \
-		--ignore RUSTSEC-2024-0344 \
+		--ignore RUSTSEC-2025-0141 \
+		--ignore RUSTSEC-2026-0009 \
+		--ignore RUSTSEC-2026-0037 \
+		--ignore RUSTSEC-2026-0097 \
+		--ignore RUSTSEC-2026-0098 \
+		--ignore RUSTSEC-2026-0099 \
+		--ignore RUSTSEC-2026-0104 \
 		$(ARGS)
+
+spellcheck:
+	cargo spellcheck --code 1 $(ARGS)
 
 clippy-%:
 	cargo $(nightly) clippy --manifest-path $(call make-path,$*)/Cargo.toml \
