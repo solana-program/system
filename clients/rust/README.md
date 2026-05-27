@@ -4,10 +4,10 @@ A generated Rust library for the System program.
 
 ## Getting started
 
-To build and test your Rust client from the root of the repository, you may use the following command.
+To build and test the Rust client from the root of the repository:
 
 ```sh
-pnpm clients:js:test
+make test-clients-rust
 ```
 
-This will start a new local validator, if one is not already running, and run the tests for your Rust client.
+Alternatively, you can `cd clients/rust` and use `cargo` directly.

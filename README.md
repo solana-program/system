@@ -9,7 +9,13 @@ The Solana System program and its generated clients.
 
 ## Project setup
 
-The first thing you'll want to do is install NPM dependencies which will allow you to access all the scripts and tools provided by this template.
+This repo uses a `Makefile` as its canonical command surface. Targets read the pinned nightly toolchain and Solana CLI version from `Cargo.toml`'s `[workspace.metadata]` blocks via [`toml-cli`](https://crates.io/crates/toml-cli), so you'll need it installed locally:
+
+```sh
+cargo install toml-cli
+```
+
+Then install NPM dependencies to make the Codama renderers and per-client tooling available:
 
 ```sh
 pnpm install
