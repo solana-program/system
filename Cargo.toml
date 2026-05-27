@@ -14,6 +14,9 @@ edition = "2021"
 [workspace.metadata.cli]
 solana = "3.1.8"
 
+[workspace.metadata.spellcheck]
+config = "scripts/spellcheck.toml"
+
 [workspace.metadata.toolchains]
 nightly = "nightly-2026-01-22"
 

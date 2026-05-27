@@ -40,6 +40,8 @@ permissionless
 pubkey/S
 readme/S
 realloc/S
+recent_blockhashes
+RecentBlockhashes
 redelegate
 redelegated
 redelegation
