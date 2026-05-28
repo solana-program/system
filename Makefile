@@ -25,10 +25,8 @@ cargo-nightly:
 # `solana-system-client` surface itself does not depend on them directly.
 audit:
 	cargo audit \
-		--ignore RUSTSEC-2025-0141 \
 		--ignore RUSTSEC-2026-0009 \
 		--ignore RUSTSEC-2026-0037 \
-		--ignore RUSTSEC-2026-0097 \
 		--ignore RUSTSEC-2026-0098 \
 		--ignore RUSTSEC-2026-0099 \
 		--ignore RUSTSEC-2026-0104 \
