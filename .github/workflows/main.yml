@@ -5,98 +5,41 @@ on:
     branches: [main]
   pull_request:
 
+env:
+  JS_PACKAGES: "['clients-js']"
+  RUST_PACKAGES: "['clients-rust']"
+
 jobs:
-  format_and_lint_client_js:
-    name: Format & Lint Client JS
+  set_env:
+    name: Set variables to be used in strategy definitions in reusable workflow
     runs-on: ubuntu-latest
+    outputs:
+      JS_PACKAGES: ${{ steps.compute.outputs.JS_PACKAGES }}
+      RUST_PACKAGES: ${{ steps.compute.outputs.RUST_PACKAGES }}
+      RUST_TOOLCHAIN_NIGHTLY: ${{ steps.compute.outputs.RUST_TOOLCHAIN_NIGHTLY }}
+      SOLANA_CLI_VERSION: ${{ steps.compute.outputs.SOLANA_CLI_VERSION }}
     steps:
       - name: Git Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Setup Environment
-        uses: ./.github/actions/setup
-        with:
-          pnpm: true
+        uses: solana-program/actions/setup-ubuntu@main
 
-      - name: Format Client JS
-        run: make format-js
-
-      - name: Lint Client JS
-        run: make lint-js
-
-  format_and_lint_client_rust:
-    name: Format & Lint Client Rust
-    runs-on: ubuntu-latest
-    steps:
-      - name: Git Checkout
-        uses: actions/checkout@v4
-
-      - name: Setup Environment
-        uses: ./.github/actions/setup
-        with:
-          toolchain: format, lint
-
-      - name: Format
-        run: make format-clients-rust
-
-      - name: Lint / Clippy
-        run: make clippy-clients-rust
-
-      - name: Lint / Docs
-        run: make lint-docs-clients-rust
-
-      - name: Lint / Features
-        run: make lint-features-clients-rust
-
-  generate_clients:
-    name: Check Client Generation
-    runs-on: ubuntu-latest
-    steps:
-      - name: Git Checkout
-        uses: actions/checkout@v4
-
-      - name: Setup Environment
-        uses: ./.github/actions/setup
-        with:
-          pnpm: true
-          toolchain: format
-
-      - name: Generate Clients
-        run: make generate-clients
-
-      - name: Check Working Directory
+      - name: Compute variables
+        id: compute
+        shell: bash
         run: |
-          git status --porcelain
-          test -z "$(git status --porcelain)"
+          echo "JS_PACKAGES=${{ env.JS_PACKAGES }}" >> $GITHUB_OUTPUT
+          echo "RUST_PACKAGES=${{ env.RUST_PACKAGES }}" >> $GITHUB_OUTPUT
+          echo "RUST_TOOLCHAIN_NIGHTLY=$(make rust-toolchain-nightly)" >> "$GITHUB_OUTPUT"
+          echo "SOLANA_CLI_VERSION=$(make solana-cli-version)" >> "$GITHUB_OUTPUT"
 
-  test_client_js:
-    name: Test Client JS
-    runs-on: ubuntu-latest
-    steps:
-      - name: Git Checkout
-        uses: actions/checkout@v4
-
-      - name: Setup Environment
-        uses: ./.github/actions/setup
-        with:
-          pnpm: true
-
-      - name: Test Client JS
-        run: make test-js
-
-  test_client_rust:
-    name: Test Client Rust
-    runs-on: ubuntu-latest
-    steps:
-      - name: Git Checkout
-        uses: actions/checkout@v4
-
-      - name: Setup Environment
-        uses: ./.github/actions/setup
-        with:
-          cargo-cache-key: cargo-rust-client
-          toolchain: test
-          solana: true
-
-      - name: Test Client Rust
-        run: make test-clients-rust
+  main:
+    needs: set_env
+    uses: solana-program/actions/.github/workflows/main.yml@main
+    with:
+      js-packages: ${{ needs.set_env.outputs.JS_PACKAGES }}
+      rust-packages: ${{ needs.set_env.outputs.RUST_PACKAGES }}
+      rustfmt-toolchain: ${{ needs.set_env.outputs.RUST_TOOLCHAIN_NIGHTLY }}
+      clippy-toolchain: ${{ needs.set_env.outputs.RUST_TOOLCHAIN_NIGHTLY }}
+      solana-cli-version: ${{ needs.set_env.outputs.SOLANA_CLI_VERSION }}

@@ -1,0 +1,69 @@
+name: Publish JS
+
+on:
+  workflow_dispatch:
+    inputs:
+      package-path:
+        description: Path to directory with package to release
+        required: true
+        default: 'clients/js'
+        type: choice
+        options:
+          - clients/js
+      level:
+        description: Version level
+        required: true
+        default: patch
+        type: choice
+        options:
+          - patch
+          - minor
+          - major
+          - prerelease
+          - prepatch
+          - preminor
+          - premajor
+      tag:
+        description: NPM Tag (and preid for pre-releases)
+        required: true
+        type: string
+        default: latest
+      create-release:
+        description: Create a GitHub release
+        required: true
+        type: boolean
+        default: true
+
+jobs:
+  set_env:
+    name: Set variables to be used in strategy definitions
+    runs-on: ubuntu-latest
+    outputs:
+      SOLANA_CLI_VERSION: ${{ steps.compute.outputs.SOLANA_CLI_VERSION }}
+      TARGET: ${{ steps.compute.outputs.TARGET }}
+    steps:
+      - name: Git Checkout
+        uses: actions/checkout@v6
+
+      - name: Summarise workflow inputs
+        uses: solana-program/actions/workflow-inputs@v1
+
+      - name: Compute variables
+        id: compute
+        shell: bash
+        run: |
+          echo "SOLANA_CLI_VERSION=$(make solana-cli-version)" >> "$GITHUB_OUTPUT"
+          TARGET=$(echo ${{ inputs.package-path }} | sed 's#/#-#')
+          echo "TARGET=$TARGET" >> "$GITHUB_OUTPUT"
+
+  main:
+    needs: set_env
+    uses: solana-program/actions/.github/workflows/publish-js.yml@main
+    with:
+      solana-cli-version: ${{ needs.set_env.outputs.SOLANA_CLI_VERSION }}
+      target: ${{ needs.set_env.outputs.TARGET }}
+      package-path: ${{ inputs['package-path'] }}
+      level: ${{ inputs.level }}
+      tag: ${{ inputs.tag }}
+      create-release: ${{ inputs['create-release'] }}
+    secrets: inherit

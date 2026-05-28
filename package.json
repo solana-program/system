@@ -3,7 +3,8 @@
     "devDependencies": {
         "@codama/renderers-js": "^2.2.0",
         "@codama/renderers-rust": "^3.0.0",
-        "codama": "^1.6.0"
+        "codama": "^1.6.0",
+        "typescript": "^5.9.3"
     },
     "engines": {
         "node": ">=v20.0.0"

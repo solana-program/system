@@ -11,6 +11,15 @@ homepage = "https://anza.xyz/"
 license = "Apache-2.0"
 edition = "2021"
 
+[workspace.metadata.cli]
+solana = "3.1.8"
+
+[workspace.metadata.spellcheck]
+config = "scripts/spellcheck.toml"
+
+[workspace.metadata.toolchains]
+nightly = "nightly-2026-01-22"
+
 [workspace.dependencies]
 solana-account-info = "2.2.1"
 solana-cpi = "2.2.1"
