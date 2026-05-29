@@ -922,6 +922,86 @@
                 "idlName": "UpgradeNonceAccount",
                 "docs": [],
                 "optionalAccountStrategy": "omitted"
+            },
+            {
+                "kind": "instructionNode",
+                "accounts": [
+                    {
+                        "kind": "instructionAccountNode",
+                        "name": "newAccount",
+                        "isWritable": true,
+                        "isSigner": true,
+                        "isOptional": false,
+                        "docs": []
+                    },
+                    {
+                        "kind": "instructionAccountNode",
+                        "name": "payer",
+                        "isWritable": true,
+                        "isSigner": true,
+                        "isOptional": true,
+                        "docs": [],
+                        "defaultValue": { "kind": "payerValueNode" }
+                    }
+                ],
+                "arguments": [
+                    {
+                        "kind": "instructionArgumentNode",
+                        "name": "discriminator",
+                        "type": {
+                            "kind": "numberTypeNode",
+                            "format": "u32",
+                            "endian": "le"
+                        },
+                        "docs": [],
+                        "defaultValue": { "kind": "numberValueNode", "number": 13 },
+                        "defaultValueStrategy": "omitted"
+                    },
+                    {
+                        "kind": "instructionArgumentNode",
+                        "name": "lamports",
+                        "type": {
+                            "kind": "numberTypeNode",
+                            "format": "u64",
+                            "endian": "le"
+                        },
+                        "docs": []
+                    },
+                    {
+                        "kind": "instructionArgumentNode",
+                        "name": "space",
+                        "type": {
+                            "kind": "numberTypeNode",
+                            "format": "u64",
+                            "endian": "le"
+                        },
+                        "docs": []
+                    },
+                    {
+                        "kind": "instructionArgumentNode",
+                        "name": "programAddress",
+                        "type": { "kind": "publicKeyTypeNode" },
+                        "docs": []
+                    }
+                ],
+                "byteDeltas": [
+                    {
+                        "kind": "instructionByteDeltaNode",
+                        "value": { "kind": "argumentValueNode", "name": "space" },
+                        "withHeader": true
+                    }
+                ],
+                "discriminators": [
+                    {
+                        "kind": "fieldDiscriminatorNode",
+                        "name": "discriminator",
+                        "offset": 0
+                    }
+                ],
+                "name": "createAccountAllowPrefund",
+                "idlName": "CreateAccountAllowPrefund",
+                "docs": [],
+                "optionalAccountStrategy": "omitted"
             }
         ],
         "definedTypes": [
