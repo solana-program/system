@@ -3,7 +3,7 @@ import { execSync } from 'node:child_process';
 const nightly = execSync('make --no-print-directory rust-toolchain-nightly').toString().trim();
 
 export default {
-    idl: 'program/idl.json',
+    idl: 'idl.json',
     before: [],
     scripts: {
         js: {
