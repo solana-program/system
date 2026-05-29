@@ -13,6 +13,7 @@ export * from './assign';
 export * from './assignWithSeed';
 export * from './authorizeNonceAccount';
 export * from './createAccount';
+export * from './createAccountAllowPrefund';
 export * from './createAccountWithSeed';
 export * from './initializeNonceAccount';
 export * from './transferSol';

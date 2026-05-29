@@ -39,6 +39,7 @@ import {
     getAssignInstruction,
     getAssignWithSeedInstruction,
     getAuthorizeNonceAccountInstruction,
+    getCreateAccountAllowPrefundInstruction,
     getCreateAccountInstruction,
     getCreateAccountWithSeedInstruction,
     getInitializeNonceAccountInstruction,
@@ -52,6 +53,7 @@ import {
     parseAssignInstruction,
     parseAssignWithSeedInstruction,
     parseAuthorizeNonceAccountInstruction,
+    parseCreateAccountAllowPrefundInstruction,
     parseCreateAccountInstruction,
     parseCreateAccountWithSeedInstruction,
     parseInitializeNonceAccountInstruction,
@@ -65,6 +67,7 @@ import {
     type AssignInput,
     type AssignWithSeedInput,
     type AuthorizeNonceAccountInput,
+    type CreateAccountAllowPrefundInput,
     type CreateAccountInput,
     type CreateAccountWithSeedInput,
     type InitializeNonceAccountInput,
@@ -74,6 +77,7 @@ import {
     type ParsedAssignInstruction,
     type ParsedAssignWithSeedInstruction,
     type ParsedAuthorizeNonceAccountInstruction,
+    type ParsedCreateAccountAllowPrefundInstruction,
     type ParsedCreateAccountInstruction,
     type ParsedCreateAccountWithSeedInstruction,
     type ParsedInitializeNonceAccountInstruction,
@@ -107,6 +111,7 @@ export enum SystemInstruction {
     AssignWithSeed,
     TransferSolWithSeed,
     UpgradeNonceAccount,
+    CreateAccountAllowPrefund,
 }
 
 export function identifySystemInstruction(
@@ -152,6 +157,9 @@ export function identifySystemInstruction(
     if (containsBytes(data, getU32Encoder().encode(12), 0)) {
         return SystemInstruction.UpgradeNonceAccount;
     }
+    if (containsBytes(data, getU32Encoder().encode(13), 0)) {
+        return SystemInstruction.CreateAccountAllowPrefund;
+    }
     throw new SolanaError(SOLANA_ERROR__PROGRAM_CLIENTS__FAILED_TO_IDENTIFY_INSTRUCTION, {
         instructionData: data,
         programName: 'system',
@@ -173,7 +181,10 @@ export type ParsedSystemInstruction<TProgram extends string = '11111111111111111
     | ({ instructionType: SystemInstruction.AllocateWithSeed } & ParsedAllocateWithSeedInstruction<TProgram>)
     | ({ instructionType: SystemInstruction.AssignWithSeed } & ParsedAssignWithSeedInstruction<TProgram>)
     | ({ instructionType: SystemInstruction.TransferSolWithSeed } & ParsedTransferSolWithSeedInstruction<TProgram>)
-    | ({ instructionType: SystemInstruction.UpgradeNonceAccount } & ParsedUpgradeNonceAccountInstruction<TProgram>);
+    | ({ instructionType: SystemInstruction.UpgradeNonceAccount } & ParsedUpgradeNonceAccountInstruction<TProgram>)
+    | ({
+          instructionType: SystemInstruction.CreateAccountAllowPrefund;
+      } & ParsedCreateAccountAllowPrefundInstruction<TProgram>);
 
 export function parseSystemInstruction<TProgram extends string>(
     instruction: Instruction<TProgram> & InstructionWithData<ReadonlyUint8Array>,
@@ -259,6 +270,13 @@ export function parseSystemInstruction<TProgram extends string>(
                 ...parseUpgradeNonceAccountInstruction(instruction),
             };
         }
+        case SystemInstruction.CreateAccountAllowPrefund: {
+            assertIsInstructionWithAccounts(instruction);
+            return {
+                instructionType: SystemInstruction.CreateAccountAllowPrefund,
+                ...parseCreateAccountAllowPrefundInstruction(instruction),
+            };
+        }
         default:
             throw new SolanaError(SOLANA_ERROR__PROGRAM_CLIENTS__UNRECOGNIZED_INSTRUCTION_TYPE, {
                 instructionType: instructionType as string,
@@ -305,6 +323,9 @@ export type SystemPluginInstructions = {
     upgradeNonceAccount: (
         input: UpgradeNonceAccountInput,
     ) => ReturnType<typeof getUpgradeNonceAccountInstruction> & SelfPlanAndSendFunctions;
+    createAccountAllowPrefund: (
+        input: CreateAccountAllowPrefundInput,
+    ) => ReturnType<typeof getCreateAccountAllowPrefundInstruction> & SelfPlanAndSendFunctions;
 };
 
 export type SystemPluginRequirements = ClientWithRpc<GetAccountInfoApi & GetMultipleAccountsApi> &
@@ -346,6 +367,8 @@ export function systemProgram() {
                         addSelfPlanAndSendFunctions(client, getTransferSolWithSeedInstruction(input)),
                     upgradeNonceAccount: input =>
                         addSelfPlanAndSendFunctions(client, getUpgradeNonceAccountInstruction(input)),
+                    createAccountAllowPrefund: input =>
+                        addSelfPlanAndSendFunctions(client, getCreateAccountAllowPrefundInstruction(input)),
                 },
             },
         });
