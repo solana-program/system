@@ -77,7 +77,7 @@ export type CreateAccountAllowPrefundInstructionData = {
 };
 
 export type CreateAccountAllowPrefundInstructionDataArgs = {
-    lamports: number | bigint;
+    lamports?: number | bigint;
     space: number | bigint;
     programAddress: Address;
 };
@@ -90,7 +90,11 @@ export function getCreateAccountAllowPrefundInstructionDataEncoder(): FixedSizeE
             ['space', getU64Encoder()],
             ['programAddress', getAddressEncoder()],
         ]),
-        value => ({ ...value, discriminator: CREATE_ACCOUNT_ALLOW_PREFUND_DISCRIMINATOR }),
+        value => ({
+            ...value,
+            discriminator: CREATE_ACCOUNT_ALLOW_PREFUND_DISCRIMINATOR,
+            lamports: value.lamports ?? 0,
+        }),
     );
 }
 
@@ -119,7 +123,7 @@ export type CreateAccountAllowPrefundInput<
 > = {
     newAccount: TransactionSigner<TAccountNewAccount>;
     payer?: TransactionSigner<TAccountPayer>;
-    lamports: CreateAccountAllowPrefundInstructionDataArgs['lamports'];
+    lamports?: CreateAccountAllowPrefundInstructionDataArgs['lamports'];
     space: CreateAccountAllowPrefundInstructionDataArgs['space'];
     programAddress: CreateAccountAllowPrefundInstructionDataArgs['programAddress'];
 };

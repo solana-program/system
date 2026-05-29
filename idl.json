@@ -965,7 +965,9 @@
                             "format": "u64",
                             "endian": "le"
                         },
-                        "docs": []
+                        "docs": [],
+                        "defaultValue": { "kind": "numberValueNode", "number": 0 },
+                        "defaultValueStrategy": "optional"
                     },
                     {
                         "kind": "instructionArgumentNode",

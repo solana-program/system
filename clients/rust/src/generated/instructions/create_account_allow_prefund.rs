@@ -118,6 +118,7 @@ impl CreateAccountAllowPrefundBuilder {
         self.payer = payer;
         self
     }
+    /// `[optional argument, defaults to '0']`
     #[inline(always)]
     pub fn lamports(&mut self, lamports: u64) -> &mut Self {
         self.lamports = Some(lamports);
@@ -155,7 +156,7 @@ impl CreateAccountAllowPrefundBuilder {
             payer: self.payer,
         };
         let args = CreateAccountAllowPrefundInstructionArgs {
-            lamports: self.lamports.clone().expect("lamports is not set"),
+            lamports: self.lamports.clone().unwrap_or(0),
             space: self.space.clone().expect("space is not set"),
             program_address: self
                 .program_address
@@ -304,6 +305,7 @@ impl<'a, 'b> CreateAccountAllowPrefundCpiBuilder<'a, 'b> {
         self.instruction.payer = payer;
         self
     }
+    /// `[optional argument, defaults to '0']`
     #[inline(always)]
     pub fn lamports(&mut self, lamports: u64) -> &mut Self {
         self.instruction.lamports = Some(lamports);
@@ -354,11 +356,7 @@ impl<'a, 'b> CreateAccountAllowPrefundCpiBuilder<'a, 'b> {
     #[allow(clippy::vec_init_then_push)]
     pub fn invoke_signed(&self, signers_seeds: &[&[&[u8]]]) -> solana_program_error::ProgramResult {
         let args = CreateAccountAllowPrefundInstructionArgs {
-            lamports: self
-                .instruction
-                .lamports
-                .clone()
-                .expect("lamports is not set"),
+            lamports: self.instruction.lamports.clone().unwrap_or(0),
             space: self.instruction.space.clone().expect("space is not set"),
             program_address: self
                 .instruction
