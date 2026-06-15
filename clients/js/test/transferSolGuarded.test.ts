@@ -53,6 +53,27 @@ it('rejects an existing destination owned by another program', async () => {
     expect(error.destination).toBe(destination);
 });
 
+it('accepts an existing destination owned by the program given in programOwner', async () => {
+    const client = await createTestClient();
+    const destination = await createForeignOwnedAddress(client);
+    await expect(
+        assertValidTransferSolDestination(client.rpc, destination, { programOwner: TOKEN_PROGRAM_ADDRESS }),
+    ).resolves.toBeUndefined();
+});
+
+it('rejects a System-Program-owned destination when programOwner expects another program', async () => {
+    const client = await createTestClient();
+    const destination = (await generateKeyPairSigner()).address;
+    await client.airdrop(destination, lamports(1_000_000_000n));
+
+    const error = await assertValidTransferSolDestination(client.rpc, destination, {
+        programOwner: TOKEN_PROGRAM_ADDRESS,
+    }).catch(e => e);
+    expect(error).toBeInstanceOf(InvalidTransferSolDestinationError);
+    expect(error.reason).toBe('non-system-owner');
+    expect(error.owner).toBe(SYSTEM_PROGRAM_ADDRESS);
+});
+
 it('rejects an unfunded recipient by default', async () => {
     const client = await createTestClient();
     const destination = (await generateKeyPairSigner()).address;

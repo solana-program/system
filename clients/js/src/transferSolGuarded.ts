@@ -23,6 +23,11 @@ export type TransferSolGuardConfig = FetchAccountConfig & {
      * Defaults to `false`.
      */
     allowOffCurve?: boolean;
+    /**
+     * The program expected to own an existing destination account. A destination owned by any other
+     * program is rejected. Defaults to the System Program ({@link SYSTEM_PROGRAM_ADDRESS}).
+     */
+    programOwner?: Address;
 };
 
 /** Thrown when a SOL-transfer destination is not a valid System-Program-owned recipient. */
@@ -48,9 +53,10 @@ export class InvalidTransferSolDestinationError extends Error {
  * Asserts that `destination` can safely receive a SOL transfer, throwing
  * {@link InvalidTransferSolDestinationError} otherwise.
  *
- * By default a destination is valid only when it is an account already owned by the System Program.
- * An existing account owned by any other program — most commonly an SPL token mint — is rejected,
- * since SOL sent to it is typically unrecoverable. A destination with no account on-chain is rejected
+ * By default a destination is valid only when it is an account already owned by the System Program;
+ * pass `programOwner` to expect a different owner. An existing account owned by any other program —
+ * most commonly an SPL token mint — is rejected, since SOL sent to it is typically unrecoverable. A
+ * destination with no account on-chain is rejected
  * unless `allowUnfundedRecipient` is set, and an unfunded off-curve address additionally requires
  * `allowOffCurve`.
  *
@@ -61,12 +67,13 @@ export async function assertValidTransferSolDestination(
     destination: Address,
     config?: TransferSolGuardConfig,
 ): Promise<void> {
+    const programOwner = config?.programOwner ?? SYSTEM_PROGRAM_ADDRESS;
     const account = await fetchEncodedAccount(rpc, destination, config);
 
     if (account.exists) {
-        if (account.programAddress !== SYSTEM_PROGRAM_ADDRESS) {
+        if (account.programAddress !== programOwner) {
             throw new InvalidTransferSolDestinationError(
-                `Refusing to transfer SOL to ${destination}: it is owned by program ${account.programAddress}, not the System Program (${SYSTEM_PROGRAM_ADDRESS}). It is likely an SPL token mint or another program account, and SOL sent to it would be unrecoverable. Verify the recipient is a wallet address.`,
+                `Refusing to transfer SOL to ${destination}: it is owned by program ${account.programAddress}, not the expected program (${programOwner}). It is likely an SPL token mint or another program account, and SOL sent to it would be unrecoverable. Verify the recipient is a wallet address.`,
                 { destination, owner: account.programAddress, reason: 'non-system-owner' },
             );
         }
