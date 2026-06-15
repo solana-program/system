@@ -4,7 +4,7 @@ A generated JavaScript library for the System program.
 
 ## Guarded SOL transfers
 
-SOL sent to an account that is not owned by the System Program — most commonly an SPL token mint — is typically unrecoverable. The guarded transfer helpers refuse to build a `transferSol` instruction unless the destination is a valid System-owned recipient: either an account already owned by the System Program, or a not-yet-created on-curve address.
+SOL sent to an account that is not owned by the System Program — most commonly an SPL token mint — is typically unrecoverable. The guarded transfer helpers refuse to build a `transferSol` instruction unless the destination is a valid recipient. By default that means an account already owned by the System Program; accounts owned by other programs and addresses with no account on-chain yet (often a mistyped address) are rejected.
 
 Using the `systemProgram()` client plugin:
 
@@ -24,7 +24,7 @@ const instruction = await getTransferSolGuardedInstruction(rpc, { source, destin
 await assertValidTransferSolDestination(rpc, destination);
 ```
 
-Pass `{ allowOffCurve: true }` to permit funding a not-yet-created off-curve address (a program-derived address).
+To fund an address that has no account on-chain yet, pass `{ allowUnfundedRecipient: true }`; if that address is also off-curve (a program-derived address), additionally pass `{ allowOffCurve: true }`.
 
 ## Getting started
 

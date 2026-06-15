@@ -8,13 +8,19 @@ import {
 } from './generated';
 
 /** Distinguishes why a destination was rejected by {@link assertValidTransferSolDestination}. */
-export type InvalidTransferSolDestinationReason = 'non-system-owner' | 'off-curve-nonexistent';
+export type InvalidTransferSolDestinationReason = 'non-system-owner' | 'unfunded-recipient' | 'off-curve-nonexistent';
 
 /** Options for validating a SOL-transfer destination. Extends {@link FetchAccountConfig}. */
 export type TransferSolGuardConfig = FetchAccountConfig & {
     /**
-     * Allow a destination that has no account on-chain and is off-curve (a program-derived address).
-     * Has no effect on accounts that already exist. Defaults to `false`.
+     * Allow a destination that has no account on-chain yet, funding it as part of the transfer.
+     * Defaults to `false`, since an unfunded recipient is often a mistyped address.
+     */
+    allowUnfundedRecipient?: boolean;
+    /**
+     * Allow an unfunded destination that is off-curve (a program-derived address). Only relevant
+     * together with `allowUnfundedRecipient`, and has no effect on accounts that already exist.
+     * Defaults to `false`.
      */
     allowOffCurve?: boolean;
 };
@@ -42,11 +48,11 @@ export class InvalidTransferSolDestinationError extends Error {
  * Asserts that `destination` can safely receive a SOL transfer, throwing
  * {@link InvalidTransferSolDestinationError} otherwise.
  *
- * A destination is valid when it is either an account already owned by the System Program, or an
- * address with no account on-chain that a keypair could still control (on-curve). An existing
- * account owned by any other program — most commonly an SPL token mint — is rejected, since SOL
- * sent to it is typically unrecoverable. A non-existent off-curve address is rejected unless
- * `allowOffCurve` is set.
+ * By default a destination is valid only when it is an account already owned by the System Program.
+ * An existing account owned by any other program — most commonly an SPL token mint — is rejected,
+ * since SOL sent to it is typically unrecoverable. A destination with no account on-chain is rejected
+ * unless `allowUnfundedRecipient` is set, and an unfunded off-curve address additionally requires
+ * `allowOffCurve`.
  *
  * Reads the destination's on-chain owner, so an RPC supporting `getAccountInfo` is required.
  */
@@ -65,6 +71,13 @@ export async function assertValidTransferSolDestination(
             );
         }
         return;
+    }
+
+    if (!config?.allowUnfundedRecipient) {
+        throw new InvalidTransferSolDestinationError(
+            `Refusing to transfer SOL to ${destination}: it has no account on-chain yet, which often means the address is mistyped. If you intend to fund a new account, pass { allowUnfundedRecipient: true }.`,
+            { destination, reason: 'unfunded-recipient' },
+        );
     }
 
     if (isOffCurveAddress(destination) && !config?.allowOffCurve) {

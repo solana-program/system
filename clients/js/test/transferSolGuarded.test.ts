@@ -31,12 +31,6 @@ const deriveOffCurveAddress = async (): Promise<Address> => {
     return pda;
 };
 
-it('accepts a non-existent on-curve destination', async () => {
-    const client = await createTestClient();
-    const destination = (await generateKeyPairSigner()).address;
-    await expect(assertValidTransferSolDestination(client.rpc, destination)).resolves.toBeUndefined();
-});
-
 it('accepts an existing System-Program-owned destination', async () => {
     const client = await createTestClient();
     const destination = (await generateKeyPairSigner()).address;
@@ -59,23 +53,48 @@ it('rejects an existing destination owned by another program', async () => {
     expect(error.destination).toBe(destination);
 });
 
-it('rejects a non-existent off-curve destination by default', async () => {
+it('rejects an unfunded recipient by default', async () => {
     const client = await createTestClient();
-    const destination = await deriveOffCurveAddress();
+    const destination = (await generateKeyPairSigner()).address;
 
     await expect(assertValidTransferSolDestination(client.rpc, destination)).rejects.toThrow(
         InvalidTransferSolDestinationError,
     );
 
     const error = await assertValidTransferSolDestination(client.rpc, destination).catch(e => e);
+    expect(error.reason).toBe('unfunded-recipient');
+});
+
+it('accepts an unfunded on-curve recipient when allowUnfundedRecipient is set', async () => {
+    const client = await createTestClient();
+    const destination = (await generateKeyPairSigner()).address;
+    await expect(
+        assertValidTransferSolDestination(client.rpc, destination, { allowUnfundedRecipient: true }),
+    ).resolves.toBeUndefined();
+});
+
+it('rejects an unfunded off-curve recipient even when allowUnfundedRecipient is set', async () => {
+    const client = await createTestClient();
+    const destination = await deriveOffCurveAddress();
+
+    await expect(
+        assertValidTransferSolDestination(client.rpc, destination, { allowUnfundedRecipient: true }),
+    ).rejects.toThrow(InvalidTransferSolDestinationError);
+
+    const error = await assertValidTransferSolDestination(client.rpc, destination, {
+        allowUnfundedRecipient: true,
+    }).catch(e => e);
     expect(error.reason).toBe('off-curve-nonexistent');
 });
 
-it('accepts a non-existent off-curve destination when allowOffCurve is set', async () => {
+it('accepts an unfunded off-curve recipient when both flags are set', async () => {
     const client = await createTestClient();
     const destination = await deriveOffCurveAddress();
     await expect(
-        assertValidTransferSolDestination(client.rpc, destination, { allowOffCurve: true }),
+        assertValidTransferSolDestination(client.rpc, destination, {
+            allowOffCurve: true,
+            allowUnfundedRecipient: true,
+        }),
     ).resolves.toBeUndefined();
 });
 
@@ -85,7 +104,7 @@ it('builds an instruction identical to getTransferSolInstruction for a safe dest
     const destination = (await generateKeyPairSigner()).address;
     const input = { source, destination, amount: 1_000_000_000 };
 
-    const guarded = await getTransferSolGuardedInstruction(client.rpc, input);
+    const guarded = await getTransferSolGuardedInstruction(client.rpc, input, { allowUnfundedRecipient: true });
 
     expect(guarded).toStrictEqual(getTransferSolInstruction(input));
 });
@@ -109,7 +128,7 @@ it('transfers SOL to a safe destination via the client plugin method', async () 
     await client.airdrop(source.address, lamports(3_000_000_000n));
 
     await client.system.instructions
-        .transferSolGuarded({ source, destination, amount: 1_000_000_000 })
+        .transferSolGuarded({ source, destination, amount: 1_000_000_000 }, { allowUnfundedRecipient: true })
         .sendTransaction();
 
     const { value: sourceBalance } = await client.rpc.getBalance(source.address, { commitment: 'confirmed' }).send();
