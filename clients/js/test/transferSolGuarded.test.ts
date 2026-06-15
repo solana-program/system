@@ -14,8 +14,7 @@ const TOKEN_PROGRAM_ADDRESS = address('TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5
 
 type TestClient = Awaited<ReturnType<typeof createTestClient>>;
 
-// Creates an account that exists on-chain but is owned by a program other than the System Program,
-// reproducing the footgun this helper guards against (e.g. sending SOL to a token mint).
+// Creates an on-chain account owned by a program other than the System Program, like an SPL token mint.
 const createForeignOwnedAddress = async (client: TestClient): Promise<Address> => {
     const account = await generateKeyPairSigner();
     await client.airdrop(account.address, lamports(1_000_000_000n));
@@ -48,7 +47,7 @@ it('rejects an existing destination owned by another program', async () => {
 
     const error = await assertValidTransferSolDestination(client.rpc, destination).catch(e => e);
     expect(error).toBeInstanceOf(InvalidTransferSolDestinationError);
-    expect(error.reason).toBe('non-system-owner');
+    expect(error.reason).toBe('unexpected-owner');
     expect(error.owner).toBe(TOKEN_PROGRAM_ADDRESS);
     expect(error.destination).toBe(destination);
 });
@@ -70,7 +69,7 @@ it('rejects a System-Program-owned destination when programOwner expects another
         programOwner: TOKEN_PROGRAM_ADDRESS,
     }).catch(e => e);
     expect(error).toBeInstanceOf(InvalidTransferSolDestinationError);
-    expect(error.reason).toBe('non-system-owner');
+    expect(error.reason).toBe('unexpected-owner');
     expect(error.owner).toBe(SYSTEM_PROGRAM_ADDRESS);
 });
 
@@ -105,7 +104,7 @@ it('rejects an unfunded off-curve recipient even when allowUnfundedRecipient is 
     const error = await assertValidTransferSolDestination(client.rpc, destination, {
         allowUnfundedRecipient: true,
     }).catch(e => e);
-    expect(error.reason).toBe('off-curve-nonexistent');
+    expect(error.reason).toBe('off-curve');
 });
 
 it('accepts an unfunded off-curve recipient when both flags are set', async () => {
@@ -116,6 +115,20 @@ it('accepts an unfunded off-curve recipient when both flags are set', async () =
             allowOffCurve: true,
             allowUnfundedRecipient: true,
         }),
+    ).resolves.toBeUndefined();
+});
+
+it('rejects an existing off-curve System-Program-owned account unless allowOffCurve is set', async () => {
+    const client = await createTestClient();
+    const destination = await deriveOffCurveAddress();
+    await client.airdrop(destination, lamports(1_000_000_000n));
+
+    const error = await assertValidTransferSolDestination(client.rpc, destination).catch(e => e);
+    expect(error).toBeInstanceOf(InvalidTransferSolDestinationError);
+    expect(error.reason).toBe('off-curve');
+
+    await expect(
+        assertValidTransferSolDestination(client.rpc, destination, { allowOffCurve: true }),
     ).resolves.toBeUndefined();
 });
 

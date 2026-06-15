@@ -24,7 +24,7 @@ const instruction = await getTransferSolGuardedInstruction(rpc, { source, destin
 await assertValidTransferSolDestination(rpc, destination);
 ```
 
-To fund an address that has no account on-chain yet, pass `{ allowUnfundedRecipient: true }`; if that address is also off-curve (a program-derived address), additionally pass `{ allowOffCurve: true }`.
+To fund an address that has no account on-chain yet, pass `{ allowUnfundedRecipient: true }`. Any off-curve (program-derived) destination — existing or not — requires `{ allowOffCurve: true }`. To require an existing destination be owned by a program other than the System Program, pass `{ programOwner }`.
 
 ## Getting started
 

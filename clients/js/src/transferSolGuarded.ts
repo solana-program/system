@@ -8,7 +8,7 @@ import {
 } from './generated';
 
 /** Distinguishes why a destination was rejected by {@link assertValidTransferSolDestination}. */
-export type InvalidTransferSolDestinationReason = 'non-system-owner' | 'unfunded-recipient' | 'off-curve-nonexistent';
+export type InvalidTransferSolDestinationReason = 'unexpected-owner' | 'unfunded-recipient' | 'off-curve';
 
 /** Options for validating a SOL-transfer destination. Extends {@link FetchAccountConfig}. */
 export type TransferSolGuardConfig = FetchAccountConfig & {
@@ -18,8 +18,7 @@ export type TransferSolGuardConfig = FetchAccountConfig & {
      */
     allowUnfundedRecipient?: boolean;
     /**
-     * Allow an unfunded destination that is off-curve (a program-derived address). Only relevant
-     * together with `allowUnfundedRecipient`, and has no effect on accounts that already exist.
+     * Allow an off-curve (program-derived) destination, whether or not it already exists.
      * Defaults to `false`.
      */
     allowOffCurve?: boolean;
@@ -30,10 +29,10 @@ export type TransferSolGuardConfig = FetchAccountConfig & {
     programOwner?: Address;
 };
 
-/** Thrown when a SOL-transfer destination is not a valid System-Program-owned recipient. */
+/** Thrown when a SOL-transfer destination fails validation by {@link assertValidTransferSolDestination}. */
 export class InvalidTransferSolDestinationError extends Error {
     readonly destination: Address;
-    /** The program that owns the destination account, set only when `reason` is `'non-system-owner'`. */
+    /** The program that owns the destination account, set only when `reason` is `'unexpected-owner'`. */
     readonly owner?: Address;
     readonly reason: InvalidTransferSolDestinationReason;
 
@@ -55,10 +54,10 @@ export class InvalidTransferSolDestinationError extends Error {
  *
  * By default a destination is valid only when it is an account already owned by the System Program;
  * pass `programOwner` to expect a different owner. An existing account owned by any other program —
- * most commonly an SPL token mint — is rejected, since SOL sent to it is typically unrecoverable. A
- * destination with no account on-chain is rejected
- * unless `allowUnfundedRecipient` is set, and an unfunded off-curve address additionally requires
- * `allowOffCurve`.
+ * (commonly an SPL token mint) — is rejected, since SOL sent to it is typically unrecoverable. A
+ * destination with no account on-chain is rejected unless `allowUnfundedRecipient` is set. An
+ * off-curve (program-derived) destination is rejected unless `allowOffCurve` is set, whether or not
+ * it already exists.
  *
  * Reads the destination's on-chain owner, so an RPC supporting `getAccountInfo` is required.
  */
@@ -73,14 +72,11 @@ export async function assertValidTransferSolDestination(
     if (account.exists) {
         if (account.programAddress !== programOwner) {
             throw new InvalidTransferSolDestinationError(
-                `Refusing to transfer SOL to ${destination}: it is owned by program ${account.programAddress}, not the expected program (${programOwner}). It is likely an SPL token mint or another program account, and SOL sent to it would be unrecoverable. Verify the recipient is a wallet address.`,
-                { destination, owner: account.programAddress, reason: 'non-system-owner' },
+                `Refusing to transfer SOL to ${destination}: it is owned by program ${account.programAddress}, not the expected program (${programOwner}).`,
+                { destination, owner: account.programAddress, reason: 'unexpected-owner' },
             );
         }
-        return;
-    }
-
-    if (!config?.allowUnfundedRecipient) {
+    } else if (!config?.allowUnfundedRecipient) {
         throw new InvalidTransferSolDestinationError(
             `Refusing to transfer SOL to ${destination}: it has no account on-chain yet, which often means the address is mistyped. If you intend to fund a new account, pass { allowUnfundedRecipient: true }.`,
             { destination, reason: 'unfunded-recipient' },
@@ -89,8 +85,8 @@ export async function assertValidTransferSolDestination(
 
     if (isOffCurveAddress(destination) && !config?.allowOffCurve) {
         throw new InvalidTransferSolDestinationError(
-            `Refusing to transfer SOL to ${destination}: it is an off-curve (program-derived) address with no account on-chain, so no keypair can control funds sent to it. If you intend to fund a PDA, pass { allowOffCurve: true }.`,
-            { destination, reason: 'off-curve-nonexistent' },
+            `Refusing to transfer SOL to ${destination}: it is an off-curve (program-derived) address, so no keypair can control SOL sent there. If this is intentional, pass { allowOffCurve: true }.`,
+            { destination, reason: 'off-curve' },
         );
     }
 }
