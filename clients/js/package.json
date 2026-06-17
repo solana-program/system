@@ -45,7 +45,7 @@
     },
     "devDependencies": {
         "@solana-config/oxc": "^0.1.1",
-        "@solana/kit": "^6.4.0",
+        "@solana/kit": "^6.10.0",
         "@solana/kit-plugin-litesvm": "^0.10.0",
         "@solana/kit-plugin-signer": "^0.10.0",
         "@types/node": "^24",
@@ -59,6 +59,6 @@
         "vitest": "^4.0.15"
     },
     "peerDependencies": {
-        "@solana/kit": "^6.4.0"
+        "@solana/kit": "^6.10.0"
     }
 }
