@@ -41,7 +41,7 @@ impl<'a> TryFrom<&solana_account_info::AccountInfo<'a>> for Nonce {
 
 #[cfg(feature = "fetch")]
 pub fn fetch_nonce(
-    rpc: &solana_client::rpc_client::RpcClient,
+    rpc: &solana_rpc_client::rpc_client::RpcClient,
     address: &solana_address::Address,
 ) -> Result<crate::shared::DecodedAccount<Nonce>, std::io::Error> {
     let accounts = fetch_all_nonce(rpc, &[*address])?;
@@ -50,7 +50,7 @@ pub fn fetch_nonce(
 
 #[cfg(feature = "fetch")]
 pub fn fetch_all_nonce(
-    rpc: &solana_client::rpc_client::RpcClient,
+    rpc: &solana_rpc_client::rpc_client::RpcClient,
     addresses: &[solana_address::Address],
 ) -> Result<Vec<crate::shared::DecodedAccount<Nonce>>, std::io::Error> {
     let accounts = rpc
@@ -74,7 +74,7 @@ pub fn fetch_all_nonce(
 
 #[cfg(feature = "fetch")]
 pub fn fetch_maybe_nonce(
-    rpc: &solana_client::rpc_client::RpcClient,
+    rpc: &solana_rpc_client::rpc_client::RpcClient,
     address: &solana_address::Address,
 ) -> Result<crate::shared::MaybeAccount<Nonce>, std::io::Error> {
     let accounts = fetch_all_maybe_nonce(rpc, &[*address])?;
@@ -83,7 +83,7 @@ pub fn fetch_maybe_nonce(
 
 #[cfg(feature = "fetch")]
 pub fn fetch_all_maybe_nonce(
-    rpc: &solana_client::rpc_client::RpcClient,
+    rpc: &solana_rpc_client::rpc_client::RpcClient,
     addresses: &[solana_address::Address],
 ) -> Result<Vec<crate::shared::MaybeAccount<Nonce>>, std::io::Error> {
     let accounts = rpc

@@ -19,6 +19,7 @@ import {
     type ClientWithRpc,
     type ClientWithTransactionPlanning,
     type ClientWithTransactionSending,
+    type ExtendedClient,
     type GetAccountInfoApi,
     type GetMultipleAccountsApi,
     type Instruction,
@@ -285,7 +286,12 @@ export function parseSystemInstruction<TProgram extends string>(
     }
 }
 
-export type SystemPlugin = { accounts: SystemPluginAccounts; instructions: SystemPluginInstructions };
+export type SystemPlugin = {
+    accounts: SystemPluginAccounts;
+    instructions: SystemPluginInstructions;
+    identifyInstruction: typeof identifySystemInstruction;
+    parseInstruction: typeof parseSystemInstruction;
+};
 
 export type SystemPluginAccounts = { nonce: ReturnType<typeof getNonceCodec> & SelfFetchFunctions<NonceArgs, Nonce> };
 
@@ -334,7 +340,7 @@ export type SystemPluginRequirements = ClientWithRpc<GetAccountInfoApi & GetMult
     ClientWithTransactionSending;
 
 export function systemProgram() {
-    return <T extends SystemPluginRequirements>(client: T): Omit<T, 'system'> & { system: SystemPlugin } => {
+    return <T extends SystemPluginRequirements>(client: T): ExtendedClient<T, { system: SystemPlugin }> => {
         return extendClient(client, {
             system: <SystemPlugin>{
                 accounts: { nonce: addSelfFetchFunctions(client, getNonceCodec()) },
@@ -370,6 +376,8 @@ export function systemProgram() {
                     createAccountAllowPrefund: input =>
                         addSelfPlanAndSendFunctions(client, getCreateAccountAllowPrefundInstruction(input)),
                 },
+                identifyInstruction: identifySystemInstruction,
+                parseInstruction: parseSystemInstruction,
             },
         });
     };
