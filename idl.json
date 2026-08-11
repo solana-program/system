@@ -46,8 +46,7 @@
                                     "unit": { "kind": "stringValueNode", "string": "SOL" }
                                 }
                             },
-                            "docs": [],
-                            "display": { "kind": "structFieldDisplayNode", "label": "Lamports per signature" }
+                            "docs": []
                         }
                     ]
                 },
@@ -68,8 +67,7 @@
                         "isSigner": true,
                         "isOptional": false,
                         "docs": [],
-                        "defaultValue": { "kind": "payerValueNode" },
-                        "display": { "kind": "instructionAccountDisplayNode", "label": "Payer" }
+                        "defaultValue": { "kind": "payerValueNode" }
                     },
                     {
                         "kind": "instructionAccountNode",
@@ -77,8 +75,7 @@
                         "isWritable": true,
                         "isSigner": true,
                         "isOptional": false,
-                        "docs": [],
-                        "display": { "kind": "instructionAccountDisplayNode", "label": "New account" }
+                        "docs": []
                     }
                 ],
                 "arguments": [
@@ -108,7 +105,7 @@
                                 "unit": { "kind": "stringValueNode", "string": "SOL" }
                             }
                         },
-                        "display": { "kind": "structFieldDisplayNode", "label": "Funding amount" },
+                        "display": { "kind": "structFieldDisplayNode", "label": "Funding Amount" },
                         "docs": []
                     },
                     {
@@ -123,7 +120,6 @@
                                 "unit": { "kind": "stringValueNode", "string": "bytes" }
                             }
                         },
-                        "display": { "kind": "structFieldDisplayNode", "label": "Space" },
                         "docs": []
                     },
                     {
@@ -131,7 +127,7 @@
                         "name": "programAddress",
                         "type": { "kind": "publicKeyTypeNode" },
                         "docs": [],
-                        "display": { "kind": "structFieldDisplayNode", "label": "Owner program" }
+                        "display": { "kind": "structFieldDisplayNode", "label": "Owner Program" }
                     }
                 ],
                 "byteDeltas": [
@@ -167,8 +163,7 @@
                         "isWritable": true,
                         "isSigner": true,
                         "isOptional": false,
-                        "docs": [],
-                        "display": { "kind": "instructionAccountDisplayNode", "label": "Account" }
+                        "docs": []
                     }
                 ],
                 "arguments": [
@@ -190,7 +185,7 @@
                         "name": "programAddress",
                         "type": { "kind": "publicKeyTypeNode" },
                         "docs": [],
-                        "display": { "kind": "structFieldDisplayNode", "label": "Owner program" }
+                        "display": { "kind": "structFieldDisplayNode", "label": "Owner Program" }
                     }
                 ],
                 "discriminators": [
@@ -259,8 +254,7 @@
                                 "unit": { "kind": "stringValueNode", "string": "SOL" }
                             }
                         },
-                        "docs": [],
-                        "display": { "kind": "structFieldDisplayNode", "label": "Amount" }
+                        "docs": []
                     }
                 ],
                 "discriminators": [
@@ -290,8 +284,7 @@
                         "isSigner": true,
                         "isOptional": false,
                         "docs": [],
-                        "defaultValue": { "kind": "payerValueNode" },
-                        "display": { "kind": "instructionAccountDisplayNode", "label": "Payer" }
+                        "defaultValue": { "kind": "payerValueNode" }
                     },
                     {
                         "kind": "instructionAccountNode",
@@ -299,8 +292,7 @@
                         "isWritable": true,
                         "isSigner": false,
                         "isOptional": false,
-                        "docs": [],
-                        "display": { "kind": "instructionAccountDisplayNode", "label": "New account" }
+                        "docs": []
                     },
                     {
                         "kind": "instructionAccountNode",
@@ -308,8 +300,7 @@
                         "isWritable": false,
                         "isSigner": true,
                         "isOptional": true,
-                        "docs": [],
-                        "display": { "kind": "instructionAccountDisplayNode", "label": "Base account" }
+                        "docs": []
                     }
                 ],
                 "arguments": [
@@ -331,7 +322,7 @@
                         "name": "base",
                         "type": { "kind": "publicKeyTypeNode" },
                         "docs": [],
-                        "display": { "kind": "structFieldDisplayNode", "label": "Base address" }
+                        "display": { "kind": "structFieldDisplayNode", "label": "Base Address" }
                     },
                     {
                         "kind": "instructionArgumentNode",
@@ -345,8 +336,7 @@
                                 "endian": "le"
                             }
                         },
-                        "docs": [],
-                        "display": { "kind": "structFieldDisplayNode", "label": "Seed" }
+                        "docs": []
                     },
                     {
                         "kind": "instructionArgumentNode",
@@ -362,7 +352,7 @@
                             }
                         },
                         "docs": [],
-                        "display": { "kind": "structFieldDisplayNode", "label": "Funding amount" }
+                        "display": { "kind": "structFieldDisplayNode", "label": "Funding Amount" }
                     },
                     {
                         "kind": "instructionArgumentNode",
@@ -376,7 +366,6 @@
                                 "unit": { "kind": "stringValueNode", "string": "bytes" }
                             }
                         },
-                        "display": { "kind": "structFieldDisplayNode", "label": "Space" },
                         "docs": []
                     },
                     {
@@ -384,7 +373,7 @@
                         "name": "programAddress",
                         "type": { "kind": "publicKeyTypeNode" },
                         "docs": [],
-                        "display": { "kind": "structFieldDisplayNode", "label": "Owner program" }
+                        "display": { "kind": "structFieldDisplayNode", "label": "Owner Program" }
                     }
                 ],
                 "discriminators": [
@@ -413,8 +402,7 @@
                         "isWritable": true,
                         "isSigner": false,
                         "isOptional": false,
-                        "docs": [],
-                        "display": { "kind": "instructionAccountDisplayNode", "label": "Nonce account" }
+                        "docs": []
                     },
                     {
                         "kind": "instructionAccountNode",
@@ -435,8 +423,7 @@
                         "isWritable": false,
                         "isSigner": true,
                         "isOptional": false,
-                        "docs": [],
-                        "display": { "kind": "instructionAccountDisplayNode", "label": "Nonce authority" }
+                        "docs": []
                     }
                 ],
                 "arguments": [
@@ -480,8 +467,7 @@
                         "isWritable": true,
                         "isSigner": false,
                         "isOptional": false,
-                        "docs": [],
-                        "display": { "kind": "instructionAccountDisplayNode", "label": "Nonce account" }
+                        "docs": []
                     },
                     {
                         "kind": "instructionAccountNode",
@@ -524,8 +510,7 @@
                         "isWritable": false,
                         "isSigner": true,
                         "isOptional": false,
-                        "docs": [],
-                        "display": { "kind": "instructionAccountDisplayNode", "label": "Nonce authority" }
+                        "docs": []
                     }
                 ],
                 "arguments": [
@@ -585,8 +570,7 @@
                         "isWritable": true,
                         "isSigner": false,
                         "isOptional": false,
-                        "docs": [],
-                        "display": { "kind": "instructionAccountDisplayNode", "label": "Nonce account" }
+                        "docs": []
                     },
                     {
                         "kind": "instructionAccountNode",
@@ -633,8 +617,7 @@
                         "kind": "instructionArgumentNode",
                         "name": "nonceAuthority",
                         "type": { "kind": "publicKeyTypeNode" },
-                        "docs": [],
-                        "display": { "kind": "structFieldDisplayNode", "label": "Nonce authority" }
+                        "docs": []
                     }
                 ],
                 "discriminators": [
@@ -663,8 +646,7 @@
                         "isWritable": true,
                         "isSigner": false,
                         "isOptional": false,
-                        "docs": [],
-                        "display": { "kind": "instructionAccountDisplayNode", "label": "Nonce account" }
+                        "docs": []
                     },
                     {
                         "kind": "instructionAccountNode",
@@ -672,8 +654,7 @@
                         "isWritable": false,
                         "isSigner": true,
                         "isOptional": false,
-                        "docs": [],
-                        "display": { "kind": "instructionAccountDisplayNode", "label": "Nonce authority" }
+                        "docs": []
                     }
                 ],
                 "arguments": [
@@ -694,8 +675,7 @@
                         "kind": "instructionArgumentNode",
                         "name": "newNonceAuthority",
                         "type": { "kind": "publicKeyTypeNode" },
-                        "docs": [],
-                        "display": { "kind": "structFieldDisplayNode", "label": "New nonce authority" }
+                        "docs": []
                     }
                 ],
                 "discriminators": [
@@ -754,7 +734,6 @@
                                 "unit": { "kind": "stringValueNode", "string": "bytes" }
                             }
                         },
-                        "display": { "kind": "structFieldDisplayNode", "label": "Space" },
                         "docs": []
                     }
                 ],
@@ -793,8 +772,7 @@
                         "isWritable": false,
                         "isSigner": true,
                         "isOptional": false,
-                        "docs": [],
-                        "display": { "kind": "instructionAccountDisplayNode", "label": "Base account" }
+                        "docs": []
                     }
                 ],
                 "arguments": [
@@ -816,7 +794,7 @@
                         "name": "base",
                         "type": { "kind": "publicKeyTypeNode" },
                         "docs": [],
-                        "display": { "kind": "structFieldDisplayNode", "label": "Base address" }
+                        "display": { "kind": "structFieldDisplayNode", "label": "Base Address" }
                     },
                     {
                         "kind": "instructionArgumentNode",
@@ -830,8 +808,7 @@
                                 "endian": "le"
                             }
                         },
-                        "docs": [],
-                        "display": { "kind": "structFieldDisplayNode", "label": "Seed" }
+                        "docs": []
                     },
                     {
                         "kind": "instructionArgumentNode",
@@ -845,7 +822,6 @@
                                 "unit": { "kind": "stringValueNode", "string": "bytes" }
                             }
                         },
-                        "display": { "kind": "structFieldDisplayNode", "label": "Space" },
                         "docs": []
                     },
                     {
@@ -853,7 +829,7 @@
                         "name": "programAddress",
                         "type": { "kind": "publicKeyTypeNode" },
                         "docs": [],
-                        "display": { "kind": "structFieldDisplayNode", "label": "Owner program" }
+                        "display": { "kind": "structFieldDisplayNode", "label": "Owner Program" }
                     }
                 ],
                 "discriminators": [
@@ -882,8 +858,7 @@
                         "isWritable": true,
                         "isSigner": false,
                         "isOptional": false,
-                        "docs": [],
-                        "display": { "kind": "instructionAccountDisplayNode", "label": "Account" }
+                        "docs": []
                     },
                     {
                         "kind": "instructionAccountNode",
@@ -891,8 +866,7 @@
                         "isWritable": false,
                         "isSigner": true,
                         "isOptional": false,
-                        "docs": [],
-                        "display": { "kind": "instructionAccountDisplayNode", "label": "Base account" }
+                        "docs": []
                     }
                 ],
                 "arguments": [
@@ -914,7 +888,7 @@
                         "name": "base",
                         "type": { "kind": "publicKeyTypeNode" },
                         "docs": [],
-                        "display": { "kind": "structFieldDisplayNode", "label": "Base address" }
+                        "display": { "kind": "structFieldDisplayNode", "label": "Base Address" }
                     },
                     {
                         "kind": "instructionArgumentNode",
@@ -928,15 +902,14 @@
                                 "endian": "le"
                             }
                         },
-                        "docs": [],
-                        "display": { "kind": "structFieldDisplayNode", "label": "Seed" }
+                        "docs": []
                     },
                     {
                         "kind": "instructionArgumentNode",
                         "name": "programAddress",
                         "type": { "kind": "publicKeyTypeNode" },
                         "docs": [],
-                        "display": { "kind": "structFieldDisplayNode", "label": "Owner program" }
+                        "display": { "kind": "structFieldDisplayNode", "label": "Owner Program" }
                     }
                 ],
                 "discriminators": [
@@ -974,8 +947,7 @@
                         "isWritable": false,
                         "isSigner": true,
                         "isOptional": false,
-                        "docs": [],
-                        "display": { "kind": "instructionAccountDisplayNode", "label": "Base account" }
+                        "docs": []
                     },
                     {
                         "kind": "instructionAccountNode",
@@ -1014,8 +986,7 @@
                                 "unit": { "kind": "stringValueNode", "string": "SOL" }
                             }
                         },
-                        "docs": [],
-                        "display": { "kind": "structFieldDisplayNode", "label": "Amount" }
+                        "docs": []
                     },
                     {
                         "kind": "instructionArgumentNode",
@@ -1029,15 +1000,13 @@
                                 "endian": "le"
                             }
                         },
-                        "docs": [],
-                        "display": { "kind": "structFieldDisplayNode", "label": "From seed" }
+                        "docs": []
                     },
                     {
                         "kind": "instructionArgumentNode",
                         "name": "fromOwner",
                         "type": { "kind": "publicKeyTypeNode" },
-                        "docs": [],
-                        "display": { "kind": "structFieldDisplayNode", "label": "From owner" }
+                        "docs": []
                     }
                 ],
                 "discriminators": [
@@ -1066,8 +1035,7 @@
                         "isWritable": true,
                         "isSigner": false,
                         "isOptional": false,
-                        "docs": [],
-                        "display": { "kind": "instructionAccountDisplayNode", "label": "Nonce account" }
+                        "docs": []
                     }
                 ],
                 "arguments": [
@@ -1111,8 +1079,7 @@
                         "isWritable": true,
                         "isSigner": true,
                         "isOptional": false,
-                        "docs": [],
-                        "display": { "kind": "instructionAccountDisplayNode", "label": "New account" }
+                        "docs": []
                     },
                     {
                         "kind": "instructionAccountNode",
@@ -1121,8 +1088,7 @@
                         "isSigner": true,
                         "isOptional": true,
                         "docs": [],
-                        "defaultValue": { "kind": "payerValueNode" },
-                        "display": { "kind": "instructionAccountDisplayNode", "label": "Payer" }
+                        "defaultValue": { "kind": "payerValueNode" }
                     }
                 ],
                 "arguments": [
@@ -1152,7 +1118,7 @@
                                 "unit": { "kind": "stringValueNode", "string": "SOL" }
                             }
                         },
-                        "display": { "kind": "structFieldDisplayNode", "label": "Funding amount" },
+                        "display": { "kind": "structFieldDisplayNode", "label": "Funding Amount" },
                         "docs": [],
                         "defaultValue": { "kind": "numberValueNode", "number": 0 },
                         "defaultValueStrategy": "optional"
@@ -1169,7 +1135,6 @@
                                 "unit": { "kind": "stringValueNode", "string": "bytes" }
                             }
                         },
-                        "display": { "kind": "structFieldDisplayNode", "label": "Space" },
                         "docs": []
                     },
                     {
@@ -1177,7 +1142,7 @@
                         "name": "programAddress",
                         "type": { "kind": "publicKeyTypeNode" },
                         "docs": [],
-                        "display": { "kind": "structFieldDisplayNode", "label": "Owner program" }
+                        "display": { "kind": "structFieldDisplayNode", "label": "Owner Program" }
                     }
                 ],
                 "byteDeltas": [
