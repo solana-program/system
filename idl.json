@@ -39,7 +39,12 @@
                             "type": {
                                 "kind": "numberTypeNode",
                                 "format": "u64",
-                                "endian": "le"
+                                "endian": "le",
+                                "display": {
+                                    "kind": "amountNumberDisplayNode",
+                                    "decimals": { "kind": "numberValueNode", "number": 9 },
+                                    "unit": { "kind": "stringValueNode", "string": "SOL" }
+                                }
                             },
                             "docs": []
                         }
@@ -84,7 +89,8 @@
                         },
                         "docs": [],
                         "defaultValue": { "kind": "numberValueNode", "number": 0 },
-                        "defaultValueStrategy": "omitted"
+                        "defaultValueStrategy": "omitted",
+                        "display": { "kind": "structFieldDisplayNode", "skip": "always" }
                     },
                     {
                         "kind": "instructionArgumentNode",
@@ -92,8 +98,14 @@
                         "type": {
                             "kind": "numberTypeNode",
                             "format": "u64",
-                            "endian": "le"
+                            "endian": "le",
+                            "display": {
+                                "kind": "amountNumberDisplayNode",
+                                "decimals": { "kind": "numberValueNode", "number": 9 },
+                                "unit": { "kind": "stringValueNode", "string": "SOL" }
+                            }
                         },
+                        "display": { "kind": "structFieldDisplayNode", "label": "Funding Amount" },
                         "docs": []
                     },
                     {
@@ -102,7 +114,11 @@
                         "type": {
                             "kind": "numberTypeNode",
                             "format": "u64",
-                            "endian": "le"
+                            "endian": "le",
+                            "display": {
+                                "kind": "amountNumberDisplayNode",
+                                "unit": { "kind": "stringValueNode", "string": "bytes" }
+                            }
                         },
                         "docs": []
                     },
@@ -110,7 +126,8 @@
                         "kind": "instructionArgumentNode",
                         "name": "programAddress",
                         "type": { "kind": "publicKeyTypeNode" },
-                        "docs": []
+                        "docs": [],
+                        "display": { "kind": "structFieldDisplayNode", "label": "Owner Program" }
                     }
                 ],
                 "byteDeltas": [
@@ -130,7 +147,12 @@
                 "name": "createAccount",
                 "idlName": "CreateAccount",
                 "docs": [],
-                "optionalAccountStrategy": "omitted"
+                "optionalAccountStrategy": "omitted",
+                "display": {
+                    "kind": "instructionDisplayNode",
+                    "intent": "Create account",
+                    "interpolatedIntent": "Create account ${accounts.newAccount} with ${data.lamports}"
+                }
             },
             {
                 "kind": "instructionNode",
@@ -155,13 +177,15 @@
                         },
                         "docs": [],
                         "defaultValue": { "kind": "numberValueNode", "number": 1 },
-                        "defaultValueStrategy": "omitted"
+                        "defaultValueStrategy": "omitted",
+                        "display": { "kind": "structFieldDisplayNode", "skip": "always" }
                     },
                     {
                         "kind": "instructionArgumentNode",
                         "name": "programAddress",
                         "type": { "kind": "publicKeyTypeNode" },
-                        "docs": []
+                        "docs": [],
+                        "display": { "kind": "structFieldDisplayNode", "label": "Owner Program" }
                     }
                 ],
                 "discriminators": [
@@ -174,7 +198,12 @@
                 "name": "assign",
                 "idlName": "Assign",
                 "docs": [],
-                "optionalAccountStrategy": "omitted"
+                "optionalAccountStrategy": "omitted",
+                "display": {
+                    "kind": "instructionDisplayNode",
+                    "intent": "Assign account",
+                    "interpolatedIntent": "Assign ${accounts.account} to program ${data.programAddress}"
+                }
             },
             {
                 "kind": "instructionNode",
@@ -185,7 +214,8 @@
                         "isWritable": true,
                         "isSigner": true,
                         "isOptional": false,
-                        "docs": []
+                        "docs": [],
+                        "display": { "kind": "instructionAccountDisplayNode", "label": "From" }
                     },
                     {
                         "kind": "instructionAccountNode",
@@ -193,7 +223,8 @@
                         "isWritable": true,
                         "isSigner": false,
                         "isOptional": false,
-                        "docs": []
+                        "docs": [],
+                        "display": { "kind": "instructionAccountDisplayNode", "label": "To" }
                     }
                 ],
                 "arguments": [
@@ -207,7 +238,8 @@
                         },
                         "docs": [],
                         "defaultValue": { "kind": "numberValueNode", "number": 2 },
-                        "defaultValueStrategy": "omitted"
+                        "defaultValueStrategy": "omitted",
+                        "display": { "kind": "structFieldDisplayNode", "skip": "always" }
                     },
                     {
                         "kind": "instructionArgumentNode",
@@ -215,7 +247,12 @@
                         "type": {
                             "kind": "numberTypeNode",
                             "format": "u64",
-                            "endian": "le"
+                            "endian": "le",
+                            "display": {
+                                "kind": "amountNumberDisplayNode",
+                                "decimals": { "kind": "numberValueNode", "number": 9 },
+                                "unit": { "kind": "stringValueNode", "string": "SOL" }
+                            }
                         },
                         "docs": []
                     }
@@ -230,7 +267,12 @@
                 "name": "transferSol",
                 "idlName": "TransferSol",
                 "docs": [],
-                "optionalAccountStrategy": "omitted"
+                "optionalAccountStrategy": "omitted",
+                "display": {
+                    "kind": "instructionDisplayNode",
+                    "intent": "Transfer SOL",
+                    "interpolatedIntent": "Transfer ${data.amount} from ${accounts.source} to ${accounts.destination}"
+                }
             },
             {
                 "kind": "instructionNode",
@@ -272,13 +314,15 @@
                         },
                         "docs": [],
                         "defaultValue": { "kind": "numberValueNode", "number": 3 },
-                        "defaultValueStrategy": "omitted"
+                        "defaultValueStrategy": "omitted",
+                        "display": { "kind": "structFieldDisplayNode", "skip": "always" }
                     },
                     {
                         "kind": "instructionArgumentNode",
                         "name": "base",
                         "type": { "kind": "publicKeyTypeNode" },
-                        "docs": []
+                        "docs": [],
+                        "display": { "kind": "structFieldDisplayNode", "label": "Base Address" }
                     },
                     {
                         "kind": "instructionArgumentNode",
@@ -300,9 +344,15 @@
                         "type": {
                             "kind": "numberTypeNode",
                             "format": "u64",
-                            "endian": "le"
+                            "endian": "le",
+                            "display": {
+                                "kind": "amountNumberDisplayNode",
+                                "decimals": { "kind": "numberValueNode", "number": 9 },
+                                "unit": { "kind": "stringValueNode", "string": "SOL" }
+                            }
                         },
-                        "docs": []
+                        "docs": [],
+                        "display": { "kind": "structFieldDisplayNode", "label": "Funding Amount" }
                     },
                     {
                         "kind": "instructionArgumentNode",
@@ -310,7 +360,11 @@
                         "type": {
                             "kind": "numberTypeNode",
                             "format": "u64",
-                            "endian": "le"
+                            "endian": "le",
+                            "display": {
+                                "kind": "amountNumberDisplayNode",
+                                "unit": { "kind": "stringValueNode", "string": "bytes" }
+                            }
                         },
                         "docs": []
                     },
@@ -318,7 +372,8 @@
                         "kind": "instructionArgumentNode",
                         "name": "programAddress",
                         "type": { "kind": "publicKeyTypeNode" },
-                        "docs": []
+                        "docs": [],
+                        "display": { "kind": "structFieldDisplayNode", "label": "Owner Program" }
                     }
                 ],
                 "discriminators": [
@@ -331,7 +386,12 @@
                 "name": "createAccountWithSeed",
                 "idlName": "CreateAccountWithSeed",
                 "docs": [],
-                "optionalAccountStrategy": "omitted"
+                "optionalAccountStrategy": "omitted",
+                "display": {
+                    "kind": "instructionDisplayNode",
+                    "intent": "Create account with seed",
+                    "interpolatedIntent": "Create account ${accounts.newAccount} with ${data.amount}"
+                }
             },
             {
                 "kind": "instructionNode",
@@ -354,7 +414,8 @@
                         "defaultValue": {
                             "kind": "publicKeyValueNode",
                             "publicKey": "SysvarRecentB1ockHashes11111111111111111111"
-                        }
+                        },
+                        "display": { "kind": "instructionAccountDisplayNode", "skip": "always" }
                     },
                     {
                         "kind": "instructionAccountNode",
@@ -376,7 +437,8 @@
                         },
                         "docs": [],
                         "defaultValue": { "kind": "numberValueNode", "number": 4 },
-                        "defaultValueStrategy": "omitted"
+                        "defaultValueStrategy": "omitted",
+                        "display": { "kind": "structFieldDisplayNode", "skip": "always" }
                     }
                 ],
                 "discriminators": [
@@ -389,7 +451,12 @@
                 "name": "advanceNonceAccount",
                 "idlName": "AdvanceNonceAccount",
                 "docs": [],
-                "optionalAccountStrategy": "omitted"
+                "optionalAccountStrategy": "omitted",
+                "display": {
+                    "kind": "instructionDisplayNode",
+                    "intent": "Advance nonce account",
+                    "interpolatedIntent": "Advance nonce account ${accounts.nonceAccount}"
+                }
             },
             {
                 "kind": "instructionNode",
@@ -408,7 +475,8 @@
                         "isWritable": true,
                         "isSigner": false,
                         "isOptional": false,
-                        "docs": []
+                        "docs": [],
+                        "display": { "kind": "instructionAccountDisplayNode", "label": "Recipient" }
                     },
                     {
                         "kind": "instructionAccountNode",
@@ -420,7 +488,8 @@
                         "defaultValue": {
                             "kind": "publicKeyValueNode",
                             "publicKey": "SysvarRecentB1ockHashes11111111111111111111"
-                        }
+                        },
+                        "display": { "kind": "instructionAccountDisplayNode", "skip": "always" }
                     },
                     {
                         "kind": "instructionAccountNode",
@@ -432,7 +501,8 @@
                         "defaultValue": {
                             "kind": "publicKeyValueNode",
                             "publicKey": "SysvarRent111111111111111111111111111111111"
-                        }
+                        },
+                        "display": { "kind": "instructionAccountDisplayNode", "skip": "always" }
                     },
                     {
                         "kind": "instructionAccountNode",
@@ -454,7 +524,8 @@
                         },
                         "docs": [],
                         "defaultValue": { "kind": "numberValueNode", "number": 5 },
-                        "defaultValueStrategy": "omitted"
+                        "defaultValueStrategy": "omitted",
+                        "display": { "kind": "structFieldDisplayNode", "skip": "always" }
                     },
                     {
                         "kind": "instructionArgumentNode",
@@ -462,9 +533,15 @@
                         "type": {
                             "kind": "numberTypeNode",
                             "format": "u64",
-                            "endian": "le"
+                            "endian": "le",
+                            "display": {
+                                "kind": "amountNumberDisplayNode",
+                                "decimals": { "kind": "numberValueNode", "number": 9 },
+                                "unit": { "kind": "stringValueNode", "string": "SOL" }
+                            }
                         },
-                        "docs": []
+                        "docs": [],
+                        "display": { "kind": "structFieldDisplayNode", "label": "Amount" }
                     }
                 ],
                 "discriminators": [
@@ -477,7 +554,12 @@
                 "name": "withdrawNonceAccount",
                 "idlName": "WithdrawNonceAccount",
                 "docs": [],
-                "optionalAccountStrategy": "omitted"
+                "optionalAccountStrategy": "omitted",
+                "display": {
+                    "kind": "instructionDisplayNode",
+                    "intent": "Withdraw from nonce account",
+                    "interpolatedIntent": "Withdraw ${data.withdrawAmount} from ${accounts.nonceAccount} to ${accounts.recipientAccount}"
+                }
             },
             {
                 "kind": "instructionNode",
@@ -500,7 +582,8 @@
                         "defaultValue": {
                             "kind": "publicKeyValueNode",
                             "publicKey": "SysvarRecentB1ockHashes11111111111111111111"
-                        }
+                        },
+                        "display": { "kind": "instructionAccountDisplayNode", "skip": "always" }
                     },
                     {
                         "kind": "instructionAccountNode",
@@ -512,7 +595,8 @@
                         "defaultValue": {
                             "kind": "publicKeyValueNode",
                             "publicKey": "SysvarRent111111111111111111111111111111111"
-                        }
+                        },
+                        "display": { "kind": "instructionAccountDisplayNode", "skip": "always" }
                     }
                 ],
                 "arguments": [
@@ -526,7 +610,8 @@
                         },
                         "docs": [],
                         "defaultValue": { "kind": "numberValueNode", "number": 6 },
-                        "defaultValueStrategy": "omitted"
+                        "defaultValueStrategy": "omitted",
+                        "display": { "kind": "structFieldDisplayNode", "skip": "always" }
                     },
                     {
                         "kind": "instructionArgumentNode",
@@ -545,7 +630,12 @@
                 "name": "initializeNonceAccount",
                 "idlName": "InitializeNonceAccount",
                 "docs": [],
-                "optionalAccountStrategy": "omitted"
+                "optionalAccountStrategy": "omitted",
+                "display": {
+                    "kind": "instructionDisplayNode",
+                    "intent": "Initialize nonce account",
+                    "interpolatedIntent": "Initialize nonce account ${accounts.nonceAccount} with authority ${data.nonceAuthority}"
+                }
             },
             {
                 "kind": "instructionNode",
@@ -578,7 +668,8 @@
                         },
                         "docs": [],
                         "defaultValue": { "kind": "numberValueNode", "number": 7 },
-                        "defaultValueStrategy": "omitted"
+                        "defaultValueStrategy": "omitted",
+                        "display": { "kind": "structFieldDisplayNode", "skip": "always" }
                     },
                     {
                         "kind": "instructionArgumentNode",
@@ -597,7 +688,12 @@
                 "name": "authorizeNonceAccount",
                 "idlName": "AuthorizeNonceAccount",
                 "docs": [],
-                "optionalAccountStrategy": "omitted"
+                "optionalAccountStrategy": "omitted",
+                "display": {
+                    "kind": "instructionDisplayNode",
+                    "intent": "Authorize nonce account",
+                    "interpolatedIntent": "Set the authority of nonce account ${accounts.nonceAccount} to ${data.newNonceAuthority}"
+                }
             },
             {
                 "kind": "instructionNode",
@@ -608,7 +704,8 @@
                         "isWritable": true,
                         "isSigner": true,
                         "isOptional": false,
-                        "docs": []
+                        "docs": [],
+                        "display": { "kind": "instructionAccountDisplayNode", "label": "Account" }
                     }
                 ],
                 "arguments": [
@@ -622,7 +719,8 @@
                         },
                         "docs": [],
                         "defaultValue": { "kind": "numberValueNode", "number": 8 },
-                        "defaultValueStrategy": "omitted"
+                        "defaultValueStrategy": "omitted",
+                        "display": { "kind": "structFieldDisplayNode", "skip": "always" }
                     },
                     {
                         "kind": "instructionArgumentNode",
@@ -630,7 +728,11 @@
                         "type": {
                             "kind": "numberTypeNode",
                             "format": "u64",
-                            "endian": "le"
+                            "endian": "le",
+                            "display": {
+                                "kind": "amountNumberDisplayNode",
+                                "unit": { "kind": "stringValueNode", "string": "bytes" }
+                            }
                         },
                         "docs": []
                     }
@@ -645,7 +747,12 @@
                 "name": "allocate",
                 "idlName": "Allocate",
                 "docs": [],
-                "optionalAccountStrategy": "omitted"
+                "optionalAccountStrategy": "omitted",
+                "display": {
+                    "kind": "instructionDisplayNode",
+                    "intent": "Allocate space",
+                    "interpolatedIntent": "Allocate ${data.space} for ${accounts.newAccount}"
+                }
             },
             {
                 "kind": "instructionNode",
@@ -656,7 +763,8 @@
                         "isWritable": true,
                         "isSigner": false,
                         "isOptional": false,
-                        "docs": []
+                        "docs": [],
+                        "display": { "kind": "instructionAccountDisplayNode", "label": "Account" }
                     },
                     {
                         "kind": "instructionAccountNode",
@@ -678,13 +786,15 @@
                         },
                         "docs": [],
                         "defaultValue": { "kind": "numberValueNode", "number": 9 },
-                        "defaultValueStrategy": "omitted"
+                        "defaultValueStrategy": "omitted",
+                        "display": { "kind": "structFieldDisplayNode", "skip": "always" }
                     },
                     {
                         "kind": "instructionArgumentNode",
                         "name": "base",
                         "type": { "kind": "publicKeyTypeNode" },
-                        "docs": []
+                        "docs": [],
+                        "display": { "kind": "structFieldDisplayNode", "label": "Base Address" }
                     },
                     {
                         "kind": "instructionArgumentNode",
@@ -706,7 +816,11 @@
                         "type": {
                             "kind": "numberTypeNode",
                             "format": "u64",
-                            "endian": "le"
+                            "endian": "le",
+                            "display": {
+                                "kind": "amountNumberDisplayNode",
+                                "unit": { "kind": "stringValueNode", "string": "bytes" }
+                            }
                         },
                         "docs": []
                     },
@@ -714,7 +828,8 @@
                         "kind": "instructionArgumentNode",
                         "name": "programAddress",
                         "type": { "kind": "publicKeyTypeNode" },
-                        "docs": []
+                        "docs": [],
+                        "display": { "kind": "structFieldDisplayNode", "label": "Owner Program" }
                     }
                 ],
                 "discriminators": [
@@ -727,7 +842,12 @@
                 "name": "allocateWithSeed",
                 "idlName": "AllocateWithSeed",
                 "docs": [],
-                "optionalAccountStrategy": "omitted"
+                "optionalAccountStrategy": "omitted",
+                "display": {
+                    "kind": "instructionDisplayNode",
+                    "intent": "Allocate space with seed",
+                    "interpolatedIntent": "Allocate ${data.space} for ${accounts.newAccount}"
+                }
             },
             {
                 "kind": "instructionNode",
@@ -760,13 +880,15 @@
                         },
                         "docs": [],
                         "defaultValue": { "kind": "numberValueNode", "number": 10 },
-                        "defaultValueStrategy": "omitted"
+                        "defaultValueStrategy": "omitted",
+                        "display": { "kind": "structFieldDisplayNode", "skip": "always" }
                     },
                     {
                         "kind": "instructionArgumentNode",
                         "name": "base",
                         "type": { "kind": "publicKeyTypeNode" },
-                        "docs": []
+                        "docs": [],
+                        "display": { "kind": "structFieldDisplayNode", "label": "Base Address" }
                     },
                     {
                         "kind": "instructionArgumentNode",
@@ -786,7 +908,8 @@
                         "kind": "instructionArgumentNode",
                         "name": "programAddress",
                         "type": { "kind": "publicKeyTypeNode" },
-                        "docs": []
+                        "docs": [],
+                        "display": { "kind": "structFieldDisplayNode", "label": "Owner Program" }
                     }
                 ],
                 "discriminators": [
@@ -799,7 +922,12 @@
                 "name": "assignWithSeed",
                 "idlName": "AssignWithSeed",
                 "docs": [],
-                "optionalAccountStrategy": "omitted"
+                "optionalAccountStrategy": "omitted",
+                "display": {
+                    "kind": "instructionDisplayNode",
+                    "intent": "Assign account with seed",
+                    "interpolatedIntent": "Assign ${accounts.account} to program ${data.programAddress}"
+                }
             },
             {
                 "kind": "instructionNode",
@@ -810,7 +938,8 @@
                         "isWritable": true,
                         "isSigner": false,
                         "isOptional": false,
-                        "docs": []
+                        "docs": [],
+                        "display": { "kind": "instructionAccountDisplayNode", "label": "From" }
                     },
                     {
                         "kind": "instructionAccountNode",
@@ -826,7 +955,8 @@
                         "isWritable": true,
                         "isSigner": false,
                         "isOptional": false,
-                        "docs": []
+                        "docs": [],
+                        "display": { "kind": "instructionAccountDisplayNode", "label": "To" }
                     }
                 ],
                 "arguments": [
@@ -840,7 +970,8 @@
                         },
                         "docs": [],
                         "defaultValue": { "kind": "numberValueNode", "number": 11 },
-                        "defaultValueStrategy": "omitted"
+                        "defaultValueStrategy": "omitted",
+                        "display": { "kind": "structFieldDisplayNode", "skip": "always" }
                     },
                     {
                         "kind": "instructionArgumentNode",
@@ -848,7 +979,12 @@
                         "type": {
                             "kind": "numberTypeNode",
                             "format": "u64",
-                            "endian": "le"
+                            "endian": "le",
+                            "display": {
+                                "kind": "amountNumberDisplayNode",
+                                "decimals": { "kind": "numberValueNode", "number": 9 },
+                                "unit": { "kind": "stringValueNode", "string": "SOL" }
+                            }
                         },
                         "docs": []
                     },
@@ -883,7 +1019,12 @@
                 "name": "transferSolWithSeed",
                 "idlName": "TransferSolWithSeed",
                 "docs": [],
-                "optionalAccountStrategy": "omitted"
+                "optionalAccountStrategy": "omitted",
+                "display": {
+                    "kind": "instructionDisplayNode",
+                    "intent": "Transfer SOL with seed",
+                    "interpolatedIntent": "Transfer ${data.amount} from ${accounts.source} to ${accounts.destination}"
+                }
             },
             {
                 "kind": "instructionNode",
@@ -908,7 +1049,8 @@
                         },
                         "docs": [],
                         "defaultValue": { "kind": "numberValueNode", "number": 12 },
-                        "defaultValueStrategy": "omitted"
+                        "defaultValueStrategy": "omitted",
+                        "display": { "kind": "structFieldDisplayNode", "skip": "always" }
                     }
                 ],
                 "discriminators": [
@@ -921,7 +1063,12 @@
                 "name": "upgradeNonceAccount",
                 "idlName": "UpgradeNonceAccount",
                 "docs": [],
-                "optionalAccountStrategy": "omitted"
+                "optionalAccountStrategy": "omitted",
+                "display": {
+                    "kind": "instructionDisplayNode",
+                    "intent": "Upgrade nonce account",
+                    "interpolatedIntent": "Upgrade nonce account ${accounts.nonceAccount}"
+                }
             },
             {
                 "kind": "instructionNode",
@@ -955,7 +1102,8 @@
                         },
                         "docs": [],
                         "defaultValue": { "kind": "numberValueNode", "number": 13 },
-                        "defaultValueStrategy": "omitted"
+                        "defaultValueStrategy": "omitted",
+                        "display": { "kind": "structFieldDisplayNode", "skip": "always" }
                     },
                     {
                         "kind": "instructionArgumentNode",
@@ -963,8 +1111,14 @@
                         "type": {
                             "kind": "numberTypeNode",
                             "format": "u64",
-                            "endian": "le"
+                            "endian": "le",
+                            "display": {
+                                "kind": "amountNumberDisplayNode",
+                                "decimals": { "kind": "numberValueNode", "number": 9 },
+                                "unit": { "kind": "stringValueNode", "string": "SOL" }
+                            }
                         },
+                        "display": { "kind": "structFieldDisplayNode", "label": "Funding Amount" },
                         "docs": [],
                         "defaultValue": { "kind": "numberValueNode", "number": 0 },
                         "defaultValueStrategy": "optional"
@@ -975,7 +1129,11 @@
                         "type": {
                             "kind": "numberTypeNode",
                             "format": "u64",
-                            "endian": "le"
+                            "endian": "le",
+                            "display": {
+                                "kind": "amountNumberDisplayNode",
+                                "unit": { "kind": "stringValueNode", "string": "bytes" }
+                            }
                         },
                         "docs": []
                     },
@@ -983,7 +1141,8 @@
                         "kind": "instructionArgumentNode",
                         "name": "programAddress",
                         "type": { "kind": "publicKeyTypeNode" },
-                        "docs": []
+                        "docs": [],
+                        "display": { "kind": "structFieldDisplayNode", "label": "Owner Program" }
                     }
                 ],
                 "byteDeltas": [
@@ -1003,7 +1162,12 @@
                 "name": "createAccountAllowPrefund",
                 "idlName": "CreateAccountAllowPrefund",
                 "docs": [],
-                "optionalAccountStrategy": "omitted"
+                "optionalAccountStrategy": "omitted",
+                "display": {
+                    "kind": "instructionDisplayNode",
+                    "intent": "Create account",
+                    "interpolatedIntent": "Create account ${accounts.newAccount} with ${data.lamports}"
+                }
             }
         ],
         "definedTypes": [
