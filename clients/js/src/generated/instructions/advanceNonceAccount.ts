@@ -27,10 +27,16 @@ import {
     type ReadonlyAccount,
     type ReadonlySignerAccount,
     type ReadonlyUint8Array,
-    type TransactionSigner,
     type WritableAccount,
 } from '@solana/kit';
-import { getAccountMetaFactory, type ResolvedInstructionAccount } from '@solana/kit/program-client-core';
+import {
+    getAccountMetaFactory,
+    type InstructionAccountInput,
+    type InstructionAccountInputAddress,
+    type InstructionSignerInput,
+    type ResolvedInstructionAccount,
+    type ResolvedInstructionAccountMeta,
+} from '@solana/kit/program-client-core';
 import { SYSTEM_PROGRAM_ADDRESS } from '../programs';
 
 export const ADVANCE_NONCE_ACCOUNT_DISCRIMINATOR = 4;
@@ -84,37 +90,43 @@ export function getAdvanceNonceAccountInstructionDataCodec(): FixedSizeCodec<
 }
 
 export type AdvanceNonceAccountInput<
-    TAccountNonceAccount extends string = string,
-    TAccountRecentBlockhashesSysvar extends string = string,
-    TAccountNonceAuthority extends string = string,
+    TAccountNonceAccount extends InstructionAccountInput = InstructionAccountInput,
+    TAccountRecentBlockhashesSysvar extends InstructionAccountInput = InstructionAccountInput,
+    TAccountNonceAuthority extends InstructionSignerInput = InstructionSignerInput,
 > = {
-    nonceAccount: Address<TAccountNonceAccount>;
-    recentBlockhashesSysvar?: Address<TAccountRecentBlockhashesSysvar>;
-    nonceAuthority: TransactionSigner<TAccountNonceAuthority>;
+    nonceAccount: TAccountNonceAccount;
+    recentBlockhashesSysvar?: TAccountRecentBlockhashesSysvar;
+    nonceAuthority: TAccountNonceAuthority;
 };
 
 export function getAdvanceNonceAccountInstruction<
-    TAccountNonceAccount extends string,
-    TAccountRecentBlockhashesSysvar extends string,
-    TAccountNonceAuthority extends string,
+    TAccountNonceAccount extends InstructionAccountInput,
+    TAccountRecentBlockhashesSysvar extends InstructionAccountInput,
+    TAccountNonceAuthority extends InstructionSignerInput,
     TProgramAddress extends Address = typeof SYSTEM_PROGRAM_ADDRESS,
 >(
     input: AdvanceNonceAccountInput<TAccountNonceAccount, TAccountRecentBlockhashesSysvar, TAccountNonceAuthority>,
     config?: { programAddress?: TProgramAddress },
 ): AdvanceNonceAccountInstruction<
     TProgramAddress,
-    TAccountNonceAccount,
-    TAccountRecentBlockhashesSysvar,
-    TAccountNonceAuthority
+    ResolvedInstructionAccountMeta<TAccountNonceAccount, InstructionAccountInputAddress<TAccountNonceAccount>>,
+    ResolvedInstructionAccountMeta<
+        TAccountRecentBlockhashesSysvar,
+        InstructionAccountInputAddress<TAccountRecentBlockhashesSysvar>
+    >,
+    ResolvedInstructionAccountMeta<TAccountNonceAuthority, InstructionAccountInputAddress<TAccountNonceAuthority>>
 > {
     // Program address.
     const programAddress = config?.programAddress ?? SYSTEM_PROGRAM_ADDRESS;
 
+    // Account meta helper.
+    const getAccountMeta = getAccountMetaFactory(programAddress, 'omitted');
+
     // Original accounts.
     const originalAccounts = {
-        nonceAccount: { value: input.nonceAccount ?? null, isWritable: true },
-        recentBlockhashesSysvar: { value: input.recentBlockhashesSysvar ?? null, isWritable: false },
-        nonceAuthority: { value: input.nonceAuthority ?? null, isWritable: false },
+        nonceAccount: { value: input.nonceAccount ?? null, isSigner: false, isWritable: true },
+        recentBlockhashesSysvar: { value: input.recentBlockhashesSysvar ?? null, isSigner: false, isWritable: false },
+        nonceAuthority: { value: input.nonceAuthority ?? null, isSigner: true, isWritable: false },
     };
     const accounts = originalAccounts as Record<keyof typeof originalAccounts, ResolvedInstructionAccount>;
 
@@ -124,7 +136,6 @@ export function getAdvanceNonceAccountInstruction<
             'SysvarRecentB1ockHashes11111111111111111111' as Address<'SysvarRecentB1ockHashes11111111111111111111'>;
     }
 
-    const getAccountMeta = getAccountMetaFactory(programAddress, 'omitted');
     return Object.freeze({
         accounts: [
             getAccountMeta('nonceAccount', accounts.nonceAccount),
@@ -135,9 +146,12 @@ export function getAdvanceNonceAccountInstruction<
         programAddress,
     } as AdvanceNonceAccountInstruction<
         TProgramAddress,
-        TAccountNonceAccount,
-        TAccountRecentBlockhashesSysvar,
-        TAccountNonceAuthority
+        ResolvedInstructionAccountMeta<TAccountNonceAccount, InstructionAccountInputAddress<TAccountNonceAccount>>,
+        ResolvedInstructionAccountMeta<
+            TAccountRecentBlockhashesSysvar,
+            InstructionAccountInputAddress<TAccountRecentBlockhashesSysvar>
+        >,
+        ResolvedInstructionAccountMeta<TAccountNonceAuthority, InstructionAccountInputAddress<TAccountNonceAuthority>>
     >);
 }
 

@@ -27,11 +27,17 @@ import {
     type InstructionWithAccounts,
     type InstructionWithData,
     type ReadonlyUint8Array,
-    type TransactionSigner,
     type WritableAccount,
     type WritableSignerAccount,
 } from '@solana/kit';
-import { getAccountMetaFactory, type ResolvedInstructionAccount } from '@solana/kit/program-client-core';
+import {
+    getAccountMetaFactory,
+    type InstructionAccountInput,
+    type InstructionAccountInputAddress,
+    type InstructionSignerInput,
+    type ResolvedInstructionAccount,
+    type ResolvedInstructionAccountMeta,
+} from '@solana/kit/program-client-core';
 import { SYSTEM_PROGRAM_ADDRESS } from '../programs';
 
 export const TRANSFER_SOL_DISCRIMINATOR = 2;
@@ -85,39 +91,52 @@ export function getTransferSolInstructionDataCodec(): FixedSizeCodec<
     return combineCodec(getTransferSolInstructionDataEncoder(), getTransferSolInstructionDataDecoder());
 }
 
-export type TransferSolInput<TAccountSource extends string = string, TAccountDestination extends string = string> = {
-    source: TransactionSigner<TAccountSource>;
-    destination: Address<TAccountDestination>;
+export type TransferSolInput<
+    TAccountSource extends InstructionSignerInput = InstructionSignerInput,
+    TAccountDestination extends InstructionAccountInput = InstructionAccountInput,
+> = {
+    source: TAccountSource;
+    destination: TAccountDestination;
     amount: TransferSolInstructionDataArgs['amount'];
 };
 
 export function getTransferSolInstruction<
-    TAccountSource extends string,
-    TAccountDestination extends string,
+    TAccountSource extends InstructionSignerInput,
+    TAccountDestination extends InstructionAccountInput,
     TProgramAddress extends Address = typeof SYSTEM_PROGRAM_ADDRESS,
 >(
     input: TransferSolInput<TAccountSource, TAccountDestination>,
     config?: { programAddress?: TProgramAddress },
-): TransferSolInstruction<TProgramAddress, TAccountSource, TAccountDestination> {
+): TransferSolInstruction<
+    TProgramAddress,
+    ResolvedInstructionAccountMeta<TAccountSource, InstructionAccountInputAddress<TAccountSource>>,
+    ResolvedInstructionAccountMeta<TAccountDestination, InstructionAccountInputAddress<TAccountDestination>>
+> {
     // Program address.
     const programAddress = config?.programAddress ?? SYSTEM_PROGRAM_ADDRESS;
 
+    // Account meta helper.
+    const getAccountMeta = getAccountMetaFactory(programAddress, 'omitted');
+
     // Original accounts.
     const originalAccounts = {
-        source: { value: input.source ?? null, isWritable: true },
-        destination: { value: input.destination ?? null, isWritable: true },
+        source: { value: input.source ?? null, isSigner: true, isWritable: true },
+        destination: { value: input.destination ?? null, isSigner: false, isWritable: true },
     };
     const accounts = originalAccounts as Record<keyof typeof originalAccounts, ResolvedInstructionAccount>;
 
     // Original args.
     const args = { ...input };
 
-    const getAccountMeta = getAccountMetaFactory(programAddress, 'omitted');
     return Object.freeze({
         accounts: [getAccountMeta('source', accounts.source), getAccountMeta('destination', accounts.destination)],
         data: getTransferSolInstructionDataEncoder().encode(args as TransferSolInstructionDataArgs),
         programAddress,
-    } as TransferSolInstruction<TProgramAddress, TAccountSource, TAccountDestination>);
+    } as TransferSolInstruction<
+        TProgramAddress,
+        ResolvedInstructionAccountMeta<TAccountSource, InstructionAccountInputAddress<TAccountSource>>,
+        ResolvedInstructionAccountMeta<TAccountDestination, InstructionAccountInputAddress<TAccountDestination>>
+    >);
 }
 
 export type ParsedTransferSolInstruction<

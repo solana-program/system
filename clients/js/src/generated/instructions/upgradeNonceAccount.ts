@@ -26,7 +26,13 @@ import {
     type ReadonlyUint8Array,
     type WritableAccount,
 } from '@solana/kit';
-import { getAccountMetaFactory, type ResolvedInstructionAccount } from '@solana/kit/program-client-core';
+import {
+    getAccountMetaFactory,
+    type InstructionAccountInput,
+    type InstructionAccountInputAddress,
+    type ResolvedInstructionAccount,
+    type ResolvedInstructionAccountMeta,
+} from '@solana/kit/program-client-core';
 import { SYSTEM_PROGRAM_ADDRESS } from '../programs';
 
 export const UPGRADE_NONCE_ACCOUNT_DISCRIMINATOR = 12;
@@ -70,30 +76,38 @@ export function getUpgradeNonceAccountInstructionDataCodec(): FixedSizeCodec<
     return combineCodec(getUpgradeNonceAccountInstructionDataEncoder(), getUpgradeNonceAccountInstructionDataDecoder());
 }
 
-export type UpgradeNonceAccountInput<TAccountNonceAccount extends string = string> = {
-    nonceAccount: Address<TAccountNonceAccount>;
+export type UpgradeNonceAccountInput<TAccountNonceAccount extends InstructionAccountInput = InstructionAccountInput> = {
+    nonceAccount: TAccountNonceAccount;
 };
 
 export function getUpgradeNonceAccountInstruction<
-    TAccountNonceAccount extends string,
+    TAccountNonceAccount extends InstructionAccountInput,
     TProgramAddress extends Address = typeof SYSTEM_PROGRAM_ADDRESS,
 >(
     input: UpgradeNonceAccountInput<TAccountNonceAccount>,
     config?: { programAddress?: TProgramAddress },
-): UpgradeNonceAccountInstruction<TProgramAddress, TAccountNonceAccount> {
+): UpgradeNonceAccountInstruction<
+    TProgramAddress,
+    ResolvedInstructionAccountMeta<TAccountNonceAccount, InstructionAccountInputAddress<TAccountNonceAccount>>
+> {
     // Program address.
     const programAddress = config?.programAddress ?? SYSTEM_PROGRAM_ADDRESS;
 
+    // Account meta helper.
+    const getAccountMeta = getAccountMetaFactory(programAddress, 'omitted');
+
     // Original accounts.
-    const originalAccounts = { nonceAccount: { value: input.nonceAccount ?? null, isWritable: true } };
+    const originalAccounts = { nonceAccount: { value: input.nonceAccount ?? null, isSigner: false, isWritable: true } };
     const accounts = originalAccounts as Record<keyof typeof originalAccounts, ResolvedInstructionAccount>;
 
-    const getAccountMeta = getAccountMetaFactory(programAddress, 'omitted');
     return Object.freeze({
         accounts: [getAccountMeta('nonceAccount', accounts.nonceAccount)],
         data: getUpgradeNonceAccountInstructionDataEncoder().encode({}),
         programAddress,
-    } as UpgradeNonceAccountInstruction<TProgramAddress, TAccountNonceAccount>);
+    } as UpgradeNonceAccountInstruction<
+        TProgramAddress,
+        ResolvedInstructionAccountMeta<TAccountNonceAccount, InstructionAccountInputAddress<TAccountNonceAccount>>
+    >);
 }
 
 export type ParsedUpgradeNonceAccountInstruction<

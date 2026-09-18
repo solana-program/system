@@ -29,7 +29,13 @@ import {
     type ReadonlyUint8Array,
     type WritableAccount,
 } from '@solana/kit';
-import { getAccountMetaFactory, type ResolvedInstructionAccount } from '@solana/kit/program-client-core';
+import {
+    getAccountMetaFactory,
+    type InstructionAccountInput,
+    type InstructionAccountInputAddress,
+    type ResolvedInstructionAccount,
+    type ResolvedInstructionAccountMeta,
+} from '@solana/kit/program-client-core';
 import { SYSTEM_PROGRAM_ADDRESS } from '../programs';
 
 export const INITIALIZE_NONCE_ACCOUNT_DISCRIMINATOR = 6;
@@ -90,38 +96,44 @@ export function getInitializeNonceAccountInstructionDataCodec(): FixedSizeCodec<
 }
 
 export type InitializeNonceAccountInput<
-    TAccountNonceAccount extends string = string,
-    TAccountRecentBlockhashesSysvar extends string = string,
-    TAccountRentSysvar extends string = string,
+    TAccountNonceAccount extends InstructionAccountInput = InstructionAccountInput,
+    TAccountRecentBlockhashesSysvar extends InstructionAccountInput = InstructionAccountInput,
+    TAccountRentSysvar extends InstructionAccountInput = InstructionAccountInput,
 > = {
-    nonceAccount: Address<TAccountNonceAccount>;
-    recentBlockhashesSysvar?: Address<TAccountRecentBlockhashesSysvar>;
-    rentSysvar?: Address<TAccountRentSysvar>;
+    nonceAccount: TAccountNonceAccount;
+    recentBlockhashesSysvar?: TAccountRecentBlockhashesSysvar;
+    rentSysvar?: TAccountRentSysvar;
     nonceAuthority: InitializeNonceAccountInstructionDataArgs['nonceAuthority'];
 };
 
 export function getInitializeNonceAccountInstruction<
-    TAccountNonceAccount extends string,
-    TAccountRecentBlockhashesSysvar extends string,
-    TAccountRentSysvar extends string,
+    TAccountNonceAccount extends InstructionAccountInput,
+    TAccountRecentBlockhashesSysvar extends InstructionAccountInput,
+    TAccountRentSysvar extends InstructionAccountInput,
     TProgramAddress extends Address = typeof SYSTEM_PROGRAM_ADDRESS,
 >(
     input: InitializeNonceAccountInput<TAccountNonceAccount, TAccountRecentBlockhashesSysvar, TAccountRentSysvar>,
     config?: { programAddress?: TProgramAddress },
 ): InitializeNonceAccountInstruction<
     TProgramAddress,
-    TAccountNonceAccount,
-    TAccountRecentBlockhashesSysvar,
-    TAccountRentSysvar
+    ResolvedInstructionAccountMeta<TAccountNonceAccount, InstructionAccountInputAddress<TAccountNonceAccount>>,
+    ResolvedInstructionAccountMeta<
+        TAccountRecentBlockhashesSysvar,
+        InstructionAccountInputAddress<TAccountRecentBlockhashesSysvar>
+    >,
+    ResolvedInstructionAccountMeta<TAccountRentSysvar, InstructionAccountInputAddress<TAccountRentSysvar>>
 > {
     // Program address.
     const programAddress = config?.programAddress ?? SYSTEM_PROGRAM_ADDRESS;
 
+    // Account meta helper.
+    const getAccountMeta = getAccountMetaFactory(programAddress, 'omitted');
+
     // Original accounts.
     const originalAccounts = {
-        nonceAccount: { value: input.nonceAccount ?? null, isWritable: true },
-        recentBlockhashesSysvar: { value: input.recentBlockhashesSysvar ?? null, isWritable: false },
-        rentSysvar: { value: input.rentSysvar ?? null, isWritable: false },
+        nonceAccount: { value: input.nonceAccount ?? null, isSigner: false, isWritable: true },
+        recentBlockhashesSysvar: { value: input.recentBlockhashesSysvar ?? null, isSigner: false, isWritable: false },
+        rentSysvar: { value: input.rentSysvar ?? null, isSigner: false, isWritable: false },
     };
     const accounts = originalAccounts as Record<keyof typeof originalAccounts, ResolvedInstructionAccount>;
 
@@ -138,7 +150,6 @@ export function getInitializeNonceAccountInstruction<
             'SysvarRent111111111111111111111111111111111' as Address<'SysvarRent111111111111111111111111111111111'>;
     }
 
-    const getAccountMeta = getAccountMetaFactory(programAddress, 'omitted');
     return Object.freeze({
         accounts: [
             getAccountMeta('nonceAccount', accounts.nonceAccount),
@@ -151,9 +162,12 @@ export function getInitializeNonceAccountInstruction<
         programAddress,
     } as InitializeNonceAccountInstruction<
         TProgramAddress,
-        TAccountNonceAccount,
-        TAccountRecentBlockhashesSysvar,
-        TAccountRentSysvar
+        ResolvedInstructionAccountMeta<TAccountNonceAccount, InstructionAccountInputAddress<TAccountNonceAccount>>,
+        ResolvedInstructionAccountMeta<
+            TAccountRecentBlockhashesSysvar,
+            InstructionAccountInputAddress<TAccountRecentBlockhashesSysvar>
+        >,
+        ResolvedInstructionAccountMeta<TAccountRentSysvar, InstructionAccountInputAddress<TAccountRentSysvar>>
     >);
 }
 
