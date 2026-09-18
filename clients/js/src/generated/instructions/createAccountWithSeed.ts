@@ -34,11 +34,17 @@ import {
     type InstructionWithData,
     type ReadonlySignerAccount,
     type ReadonlyUint8Array,
-    type TransactionSigner,
     type WritableAccount,
     type WritableSignerAccount,
 } from '@solana/kit';
-import { getAccountMetaFactory, type ResolvedInstructionAccount } from '@solana/kit/program-client-core';
+import {
+    getAccountMetaFactory,
+    type InstructionAccountInput,
+    type InstructionAccountInputAddress,
+    type InstructionSignerInput,
+    type ResolvedInstructionAccount,
+    type ResolvedInstructionAccountMeta,
+} from '@solana/kit/program-client-core';
 import { SYSTEM_PROGRAM_ADDRESS } from '../programs';
 
 export const CREATE_ACCOUNT_WITH_SEED_DISCRIMINATOR = 3;
@@ -125,13 +131,13 @@ export function getCreateAccountWithSeedInstructionDataCodec(): Codec<
 }
 
 export type CreateAccountWithSeedInput<
-    TAccountPayer extends string = string,
-    TAccountNewAccount extends string = string,
-    TAccountBaseAccount extends string = string,
+    TAccountPayer extends InstructionSignerInput = InstructionSignerInput,
+    TAccountNewAccount extends InstructionAccountInput = InstructionAccountInput,
+    TAccountBaseAccount extends InstructionSignerInput = InstructionSignerInput,
 > = {
-    payer: TransactionSigner<TAccountPayer>;
-    newAccount: Address<TAccountNewAccount>;
-    baseAccount?: TransactionSigner<TAccountBaseAccount>;
+    payer: TAccountPayer;
+    newAccount: TAccountNewAccount;
+    baseAccount?: TAccountBaseAccount;
     base: CreateAccountWithSeedInstructionDataArgs['base'];
     seed: CreateAccountWithSeedInstructionDataArgs['seed'];
     amount: CreateAccountWithSeedInstructionDataArgs['amount'];
@@ -140,29 +146,36 @@ export type CreateAccountWithSeedInput<
 };
 
 export function getCreateAccountWithSeedInstruction<
-    TAccountPayer extends string,
-    TAccountNewAccount extends string,
-    TAccountBaseAccount extends string,
+    TAccountPayer extends InstructionSignerInput,
+    TAccountNewAccount extends InstructionAccountInput,
+    TAccountBaseAccount extends InstructionSignerInput,
     TProgramAddress extends Address = typeof SYSTEM_PROGRAM_ADDRESS,
 >(
     input: CreateAccountWithSeedInput<TAccountPayer, TAccountNewAccount, TAccountBaseAccount>,
     config?: { programAddress?: TProgramAddress },
-): CreateAccountWithSeedInstruction<TProgramAddress, TAccountPayer, TAccountNewAccount, TAccountBaseAccount> {
+): CreateAccountWithSeedInstruction<
+    TProgramAddress,
+    ResolvedInstructionAccountMeta<TAccountPayer, InstructionAccountInputAddress<TAccountPayer>>,
+    ResolvedInstructionAccountMeta<TAccountNewAccount, InstructionAccountInputAddress<TAccountNewAccount>>,
+    ResolvedInstructionAccountMeta<TAccountBaseAccount, InstructionAccountInputAddress<TAccountBaseAccount>>
+> {
     // Program address.
     const programAddress = config?.programAddress ?? SYSTEM_PROGRAM_ADDRESS;
 
+    // Account meta helper.
+    const getAccountMeta = getAccountMetaFactory(programAddress, 'omitted');
+
     // Original accounts.
     const originalAccounts = {
-        payer: { value: input.payer ?? null, isWritable: true },
-        newAccount: { value: input.newAccount ?? null, isWritable: true },
-        baseAccount: { value: input.baseAccount ?? null, isWritable: false },
+        payer: { value: input.payer ?? null, isSigner: true, isWritable: true },
+        newAccount: { value: input.newAccount ?? null, isSigner: false, isWritable: true },
+        baseAccount: { value: input.baseAccount ?? null, isSigner: true, isWritable: false },
     };
     const accounts = originalAccounts as Record<keyof typeof originalAccounts, ResolvedInstructionAccount>;
 
     // Original args.
     const args = { ...input };
 
-    const getAccountMeta = getAccountMetaFactory(programAddress, 'omitted');
     return Object.freeze({
         accounts: [
             getAccountMeta('payer', accounts.payer),
@@ -171,7 +184,12 @@ export function getCreateAccountWithSeedInstruction<
         ].filter(<T>(x: T | undefined): x is T => x !== undefined),
         data: getCreateAccountWithSeedInstructionDataEncoder().encode(args as CreateAccountWithSeedInstructionDataArgs),
         programAddress,
-    } as CreateAccountWithSeedInstruction<TProgramAddress, TAccountPayer, TAccountNewAccount, TAccountBaseAccount>);
+    } as CreateAccountWithSeedInstruction<
+        TProgramAddress,
+        ResolvedInstructionAccountMeta<TAccountPayer, InstructionAccountInputAddress<TAccountPayer>>,
+        ResolvedInstructionAccountMeta<TAccountNewAccount, InstructionAccountInputAddress<TAccountNewAccount>>,
+        ResolvedInstructionAccountMeta<TAccountBaseAccount, InstructionAccountInputAddress<TAccountBaseAccount>>
+    >);
 }
 
 export type ParsedCreateAccountWithSeedInstruction<
