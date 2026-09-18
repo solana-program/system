@@ -30,13 +30,15 @@ import {
     type InstructionWithAccounts,
     type InstructionWithData,
     type ReadonlyUint8Array,
-    type TransactionSigner,
     type WritableSignerAccount,
 } from '@solana/kit';
 import {
     getAccountMetaFactory,
+    type InstructionAccountInputAddress,
+    type InstructionSignerInput,
     type InstructionWithByteDelta,
     type ResolvedInstructionAccount,
+    type ResolvedInstructionAccountMeta,
 } from '@solana/kit/program-client-core';
 import { SYSTEM_PROGRAM_ADDRESS } from '../programs';
 
@@ -118,31 +120,39 @@ export function getCreateAccountAllowPrefundInstructionDataCodec(): FixedSizeCod
 }
 
 export type CreateAccountAllowPrefundInput<
-    TAccountNewAccount extends string = string,
-    TAccountPayer extends string = string,
+    TAccountNewAccount extends InstructionSignerInput = InstructionSignerInput,
+    TAccountPayer extends InstructionSignerInput = InstructionSignerInput,
 > = {
-    newAccount: TransactionSigner<TAccountNewAccount>;
-    payer?: TransactionSigner<TAccountPayer>;
+    newAccount: TAccountNewAccount;
+    payer?: TAccountPayer;
     lamports?: CreateAccountAllowPrefundInstructionDataArgs['lamports'];
     space: CreateAccountAllowPrefundInstructionDataArgs['space'];
     programAddress: CreateAccountAllowPrefundInstructionDataArgs['programAddress'];
 };
 
 export function getCreateAccountAllowPrefundInstruction<
-    TAccountNewAccount extends string,
-    TAccountPayer extends string,
+    TAccountNewAccount extends InstructionSignerInput,
+    TAccountPayer extends InstructionSignerInput,
     TProgramAddress extends Address = typeof SYSTEM_PROGRAM_ADDRESS,
 >(
     input: CreateAccountAllowPrefundInput<TAccountNewAccount, TAccountPayer>,
     config?: { programAddress?: TProgramAddress },
-): CreateAccountAllowPrefundInstruction<TProgramAddress, TAccountNewAccount, TAccountPayer> & InstructionWithByteDelta {
+): CreateAccountAllowPrefundInstruction<
+    TProgramAddress,
+    ResolvedInstructionAccountMeta<TAccountNewAccount, InstructionAccountInputAddress<TAccountNewAccount>>,
+    ResolvedInstructionAccountMeta<TAccountPayer, InstructionAccountInputAddress<TAccountPayer>>
+> &
+    InstructionWithByteDelta {
     // Program address.
     const programAddress = config?.programAddress ?? SYSTEM_PROGRAM_ADDRESS;
 
+    // Account meta helper.
+    const getAccountMeta = getAccountMetaFactory(programAddress, 'omitted');
+
     // Original accounts.
     const originalAccounts = {
-        newAccount: { value: input.newAccount ?? null, isWritable: true },
-        payer: { value: input.payer ?? null, isWritable: true },
+        newAccount: { value: input.newAccount ?? null, isSigner: true, isWritable: true },
+        payer: { value: input.payer ?? null, isSigner: true, isWritable: true },
     };
     const accounts = originalAccounts as Record<keyof typeof originalAccounts, ResolvedInstructionAccount>;
 
@@ -152,7 +162,6 @@ export function getCreateAccountAllowPrefundInstruction<
     // Bytes created or reallocated by the instruction.
     const byteDelta: number = [Number(args.space) + BASE_ACCOUNT_SIZE].reduce((a, b) => a + b, 0);
 
-    const getAccountMeta = getAccountMetaFactory(programAddress, 'omitted');
     return Object.freeze({
         accounts: [getAccountMeta('newAccount', accounts.newAccount), getAccountMeta('payer', accounts.payer)].filter(
             <T>(x: T | undefined): x is T => x !== undefined,
@@ -162,7 +171,11 @@ export function getCreateAccountAllowPrefundInstruction<
             args as CreateAccountAllowPrefundInstructionDataArgs,
         ),
         programAddress,
-    } as CreateAccountAllowPrefundInstruction<TProgramAddress, TAccountNewAccount, TAccountPayer> &
+    } as CreateAccountAllowPrefundInstruction<
+        TProgramAddress,
+        ResolvedInstructionAccountMeta<TAccountNewAccount, InstructionAccountInputAddress<TAccountNewAccount>>,
+        ResolvedInstructionAccountMeta<TAccountPayer, InstructionAccountInputAddress<TAccountPayer>>
+    > &
         InstructionWithByteDelta);
 }
 

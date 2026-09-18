@@ -34,10 +34,16 @@ import {
     type InstructionWithData,
     type ReadonlySignerAccount,
     type ReadonlyUint8Array,
-    type TransactionSigner,
     type WritableAccount,
 } from '@solana/kit';
-import { getAccountMetaFactory, type ResolvedInstructionAccount } from '@solana/kit/program-client-core';
+import {
+    getAccountMetaFactory,
+    type InstructionAccountInput,
+    type InstructionAccountInputAddress,
+    type InstructionSignerInput,
+    type ResolvedInstructionAccount,
+    type ResolvedInstructionAccountMeta,
+} from '@solana/kit/program-client-core';
 import { SYSTEM_PROGRAM_ADDRESS } from '../programs';
 
 export const TRANSFER_SOL_WITH_SEED_DISCRIMINATOR = 11;
@@ -103,42 +109,49 @@ export function getTransferSolWithSeedInstructionDataCodec(): Codec<
 }
 
 export type TransferSolWithSeedInput<
-    TAccountSource extends string = string,
-    TAccountBaseAccount extends string = string,
-    TAccountDestination extends string = string,
+    TAccountSource extends InstructionAccountInput = InstructionAccountInput,
+    TAccountBaseAccount extends InstructionSignerInput = InstructionSignerInput,
+    TAccountDestination extends InstructionAccountInput = InstructionAccountInput,
 > = {
-    source: Address<TAccountSource>;
-    baseAccount: TransactionSigner<TAccountBaseAccount>;
-    destination: Address<TAccountDestination>;
+    source: TAccountSource;
+    baseAccount: TAccountBaseAccount;
+    destination: TAccountDestination;
     amount: TransferSolWithSeedInstructionDataArgs['amount'];
     fromSeed: TransferSolWithSeedInstructionDataArgs['fromSeed'];
     fromOwner: TransferSolWithSeedInstructionDataArgs['fromOwner'];
 };
 
 export function getTransferSolWithSeedInstruction<
-    TAccountSource extends string,
-    TAccountBaseAccount extends string,
-    TAccountDestination extends string,
+    TAccountSource extends InstructionAccountInput,
+    TAccountBaseAccount extends InstructionSignerInput,
+    TAccountDestination extends InstructionAccountInput,
     TProgramAddress extends Address = typeof SYSTEM_PROGRAM_ADDRESS,
 >(
     input: TransferSolWithSeedInput<TAccountSource, TAccountBaseAccount, TAccountDestination>,
     config?: { programAddress?: TProgramAddress },
-): TransferSolWithSeedInstruction<TProgramAddress, TAccountSource, TAccountBaseAccount, TAccountDestination> {
+): TransferSolWithSeedInstruction<
+    TProgramAddress,
+    ResolvedInstructionAccountMeta<TAccountSource, InstructionAccountInputAddress<TAccountSource>>,
+    ResolvedInstructionAccountMeta<TAccountBaseAccount, InstructionAccountInputAddress<TAccountBaseAccount>>,
+    ResolvedInstructionAccountMeta<TAccountDestination, InstructionAccountInputAddress<TAccountDestination>>
+> {
     // Program address.
     const programAddress = config?.programAddress ?? SYSTEM_PROGRAM_ADDRESS;
 
+    // Account meta helper.
+    const getAccountMeta = getAccountMetaFactory(programAddress, 'omitted');
+
     // Original accounts.
     const originalAccounts = {
-        source: { value: input.source ?? null, isWritable: true },
-        baseAccount: { value: input.baseAccount ?? null, isWritable: false },
-        destination: { value: input.destination ?? null, isWritable: true },
+        source: { value: input.source ?? null, isSigner: false, isWritable: true },
+        baseAccount: { value: input.baseAccount ?? null, isSigner: true, isWritable: false },
+        destination: { value: input.destination ?? null, isSigner: false, isWritable: true },
     };
     const accounts = originalAccounts as Record<keyof typeof originalAccounts, ResolvedInstructionAccount>;
 
     // Original args.
     const args = { ...input };
 
-    const getAccountMeta = getAccountMetaFactory(programAddress, 'omitted');
     return Object.freeze({
         accounts: [
             getAccountMeta('source', accounts.source),
@@ -147,7 +160,12 @@ export function getTransferSolWithSeedInstruction<
         ],
         data: getTransferSolWithSeedInstructionDataEncoder().encode(args as TransferSolWithSeedInstructionDataArgs),
         programAddress,
-    } as TransferSolWithSeedInstruction<TProgramAddress, TAccountSource, TAccountBaseAccount, TAccountDestination>);
+    } as TransferSolWithSeedInstruction<
+        TProgramAddress,
+        ResolvedInstructionAccountMeta<TAccountSource, InstructionAccountInputAddress<TAccountSource>>,
+        ResolvedInstructionAccountMeta<TAccountBaseAccount, InstructionAccountInputAddress<TAccountBaseAccount>>,
+        ResolvedInstructionAccountMeta<TAccountDestination, InstructionAccountInputAddress<TAccountDestination>>
+    >);
 }
 
 export type ParsedTransferSolWithSeedInstruction<

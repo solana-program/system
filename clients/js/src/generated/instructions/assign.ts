@@ -27,10 +27,15 @@ import {
     type InstructionWithAccounts,
     type InstructionWithData,
     type ReadonlyUint8Array,
-    type TransactionSigner,
     type WritableSignerAccount,
 } from '@solana/kit';
-import { getAccountMetaFactory, type ResolvedInstructionAccount } from '@solana/kit/program-client-core';
+import {
+    getAccountMetaFactory,
+    type InstructionAccountInputAddress,
+    type InstructionSignerInput,
+    type ResolvedInstructionAccount,
+    type ResolvedInstructionAccountMeta,
+} from '@solana/kit/program-client-core';
 import { SYSTEM_PROGRAM_ADDRESS } from '../programs';
 
 export const ASSIGN_DISCRIMINATOR = 1;
@@ -79,34 +84,42 @@ export function getAssignInstructionDataCodec(): FixedSizeCodec<AssignInstructio
     return combineCodec(getAssignInstructionDataEncoder(), getAssignInstructionDataDecoder());
 }
 
-export type AssignInput<TAccountAccount extends string = string> = {
-    account: TransactionSigner<TAccountAccount>;
+export type AssignInput<TAccountAccount extends InstructionSignerInput = InstructionSignerInput> = {
+    account: TAccountAccount;
     programAddress: AssignInstructionDataArgs['programAddress'];
 };
 
 export function getAssignInstruction<
-    TAccountAccount extends string,
+    TAccountAccount extends InstructionSignerInput,
     TProgramAddress extends Address = typeof SYSTEM_PROGRAM_ADDRESS,
 >(
     input: AssignInput<TAccountAccount>,
     config?: { programAddress?: TProgramAddress },
-): AssignInstruction<TProgramAddress, TAccountAccount> {
+): AssignInstruction<
+    TProgramAddress,
+    ResolvedInstructionAccountMeta<TAccountAccount, InstructionAccountInputAddress<TAccountAccount>>
+> {
     // Program address.
     const programAddress = config?.programAddress ?? SYSTEM_PROGRAM_ADDRESS;
 
+    // Account meta helper.
+    const getAccountMeta = getAccountMetaFactory(programAddress, 'omitted');
+
     // Original accounts.
-    const originalAccounts = { account: { value: input.account ?? null, isWritable: true } };
+    const originalAccounts = { account: { value: input.account ?? null, isSigner: true, isWritable: true } };
     const accounts = originalAccounts as Record<keyof typeof originalAccounts, ResolvedInstructionAccount>;
 
     // Original args.
     const args = { ...input };
 
-    const getAccountMeta = getAccountMetaFactory(programAddress, 'omitted');
     return Object.freeze({
         accounts: [getAccountMeta('account', accounts.account)],
         data: getAssignInstructionDataEncoder().encode(args as AssignInstructionDataArgs),
         programAddress,
-    } as AssignInstruction<TProgramAddress, TAccountAccount>);
+    } as AssignInstruction<
+        TProgramAddress,
+        ResolvedInstructionAccountMeta<TAccountAccount, InstructionAccountInputAddress<TAccountAccount>>
+    >);
 }
 
 export type ParsedAssignInstruction<
