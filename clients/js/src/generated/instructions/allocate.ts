@@ -27,10 +27,15 @@ import {
     type InstructionWithAccounts,
     type InstructionWithData,
     type ReadonlyUint8Array,
-    type TransactionSigner,
     type WritableSignerAccount,
 } from '@solana/kit';
-import { getAccountMetaFactory, type ResolvedInstructionAccount } from '@solana/kit/program-client-core';
+import {
+    getAccountMetaFactory,
+    type InstructionAccountInputAddress,
+    type InstructionSignerInput,
+    type ResolvedInstructionAccount,
+    type ResolvedInstructionAccountMeta,
+} from '@solana/kit/program-client-core';
 import { SYSTEM_PROGRAM_ADDRESS } from '../programs';
 
 export const ALLOCATE_DISCRIMINATOR = 8;
@@ -82,34 +87,42 @@ export function getAllocateInstructionDataCodec(): FixedSizeCodec<
     return combineCodec(getAllocateInstructionDataEncoder(), getAllocateInstructionDataDecoder());
 }
 
-export type AllocateInput<TAccountNewAccount extends string = string> = {
-    newAccount: TransactionSigner<TAccountNewAccount>;
+export type AllocateInput<TAccountNewAccount extends InstructionSignerInput = InstructionSignerInput> = {
+    newAccount: TAccountNewAccount;
     space: AllocateInstructionDataArgs['space'];
 };
 
 export function getAllocateInstruction<
-    TAccountNewAccount extends string,
+    TAccountNewAccount extends InstructionSignerInput,
     TProgramAddress extends Address = typeof SYSTEM_PROGRAM_ADDRESS,
 >(
     input: AllocateInput<TAccountNewAccount>,
     config?: { programAddress?: TProgramAddress },
-): AllocateInstruction<TProgramAddress, TAccountNewAccount> {
+): AllocateInstruction<
+    TProgramAddress,
+    ResolvedInstructionAccountMeta<TAccountNewAccount, InstructionAccountInputAddress<TAccountNewAccount>>
+> {
     // Program address.
     const programAddress = config?.programAddress ?? SYSTEM_PROGRAM_ADDRESS;
 
+    // Account meta helper.
+    const getAccountMeta = getAccountMetaFactory(programAddress, 'omitted');
+
     // Original accounts.
-    const originalAccounts = { newAccount: { value: input.newAccount ?? null, isWritable: true } };
+    const originalAccounts = { newAccount: { value: input.newAccount ?? null, isSigner: true, isWritable: true } };
     const accounts = originalAccounts as Record<keyof typeof originalAccounts, ResolvedInstructionAccount>;
 
     // Original args.
     const args = { ...input };
 
-    const getAccountMeta = getAccountMetaFactory(programAddress, 'omitted');
     return Object.freeze({
         accounts: [getAccountMeta('newAccount', accounts.newAccount)],
         data: getAllocateInstructionDataEncoder().encode(args as AllocateInstructionDataArgs),
         programAddress,
-    } as AllocateInstruction<TProgramAddress, TAccountNewAccount>);
+    } as AllocateInstruction<
+        TProgramAddress,
+        ResolvedInstructionAccountMeta<TAccountNewAccount, InstructionAccountInputAddress<TAccountNewAccount>>
+    >);
 }
 
 export type ParsedAllocateInstruction<
