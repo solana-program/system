@@ -23,6 +23,7 @@ import {
     type FixedSizeCodec,
     type FixedSizeDecoder,
     type FixedSizeEncoder,
+    type HasAddress,
     type Instruction,
     type InstructionWithAccounts,
     type InstructionWithData,
@@ -61,7 +62,7 @@ export type AssignInstruction<
 
 export type AssignInstructionData = { discriminator: number; programAddress: Address };
 
-export type AssignInstructionDataArgs = { programAddress: Address };
+export type AssignInstructionDataArgs = { programAddress: Address | HasAddress };
 
 export function getAssignInstructionDataEncoder(): FixedSizeEncoder<AssignInstructionDataArgs> {
     return transformEncoder(
@@ -94,13 +95,14 @@ export function getAssignInstruction<
     TProgramAddress extends Address = typeof SYSTEM_PROGRAM_ADDRESS,
 >(
     input: AssignInput<TAccountAccount>,
-    config?: { programAddress?: TProgramAddress },
+    config?: { programAddress?: TProgramAddress | { readonly address: TProgramAddress } },
 ): AssignInstruction<
     TProgramAddress,
     ResolvedInstructionAccountMeta<TAccountAccount, InstructionAccountInputAddress<TAccountAccount>>
 > {
     // Program address.
-    const programAddress = config?.programAddress ?? SYSTEM_PROGRAM_ADDRESS;
+    const programAddressInput = config?.programAddress ?? SYSTEM_PROGRAM_ADDRESS;
+    const programAddress = typeof programAddressInput === 'string' ? programAddressInput : programAddressInput.address;
 
     // Account meta helper.
     const getAccountMeta = getAccountMetaFactory(programAddress, 'omitted');
