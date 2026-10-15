@@ -8,12 +8,7 @@ import {
 } from '@solana/kit';
 import { expect, it, vi } from 'vitest';
 
-import {
-    assertValidTransferSolDestination,
-    getTransferSolGuardedInstruction,
-    getTransferSolInstruction,
-    SYSTEM_PROGRAM_ADDRESS,
-} from '../src';
+import { assertValidTransferSolDestination, SYSTEM_PROGRAM_ADDRESS } from '../src';
 import { createTestClient } from './_setup';
 
 const TOKEN_PROGRAM_ADDRESS = address('TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA');
@@ -171,112 +166,6 @@ it('accepts an existing off-curve System-Program-owned account unless allowOffCu
     await expect(
         assertValidTransferSolDestination(client.rpc, destination, { allowOffCurve: false }),
     ).rejects.toMatchObject({ cause: { reason: 'off-curve' } });
-});
-
-it('builds an instruction identical to getTransferSolInstruction for a safe destination', async () => {
-    // Given an unfunded on-curve destination.
-    const client = await createTestClient();
-    const source = await generateKeyPairSigner();
-    const destination = (await generateKeyPairSigner()).address;
-    const input = { source, destination, amount: 1_000_000_000 };
-
-    // When we build a guarded transfer allowing unfunded recipients.
-    const guarded = await getTransferSolGuardedInstruction(client.rpc, input, { allowUnfundedRecipient: true });
-
-    // Then it matches the unguarded instruction.
-    expect(guarded).toStrictEqual(getTransferSolInstruction(input));
-});
-
-it('builds an instruction for a HasAddress destination', async () => {
-    // Given an unfunded on-curve destination held in an `AddressWrapper`.
-    const client = await createTestClient();
-    const source = await generateKeyPairSigner();
-    const destination = new AddressWrapper((await generateKeyPairSigner()).address);
-    const input = { source, destination, amount: 1_000_000_000 };
-
-    // When we build a guarded transfer allowing unfunded recipients.
-    const guarded = await getTransferSolGuardedInstruction(client.rpc, input, { allowUnfundedRecipient: true });
-
-    // Then it matches the unguarded instruction.
-    expect(guarded).toStrictEqual(getTransferSolInstruction(input));
-});
-
-it('refuses to build an instruction for an unsafe destination', async () => {
-    // Given a destination owned by the Token program.
-    const client = await createTestClient();
-    const source = await generateKeyPairSigner();
-    const destination = await createForeignOwnedAddress(client);
-
-    // Then building a guarded transfer throws.
-    await expect(getTransferSolGuardedInstruction(client.rpc, { source, destination, amount: 1n })).rejects.toThrow(
-        `owned by program ${TOKEN_PROGRAM_ADDRESS}`,
-    );
-});
-
-it('refuses to build an instruction for an unsafe HasAddress destination', async () => {
-    // Given a Token-program-owned destination held in an `AddressWrapper`.
-    const client = await createTestClient();
-    const source = await generateKeyPairSigner();
-    const destination = new AddressWrapper(await createForeignOwnedAddress(client));
-
-    // Then building a guarded transfer throws for the wrapped address.
-    await expect(getTransferSolGuardedInstruction(client.rpc, { source, destination, amount: 1n })).rejects.toThrow(
-        `Refusing to transfer SOL to ${destination.address}`,
-    );
-});
-
-it('refuses to build an instruction for an off-curve program-derived address destination', async () => {
-    // Given an unfunded off-curve destination as a program-derived address tuple.
-    const client = await createTestClient();
-    const source = await generateKeyPairSigner();
-    const destination = await getProgramDerivedAddress({
-        programAddress: SYSTEM_PROGRAM_ADDRESS,
-        seeds: ['guarded-transfer'],
-    });
-
-    // Then building a guarded transfer that disallows off-curve recipients throws for the derived address.
-    await expect(
-        getTransferSolGuardedInstruction(
-            client.rpc,
-            { source, destination, amount: 1n },
-            { allowOffCurve: false, allowUnfundedRecipient: true },
-        ),
-    ).rejects.toThrow(`Refusing to transfer SOL to ${destination[0]}: it is an off-curve`);
-});
-
-it('transfers SOL to a safe destination via the client plugin method', async () => {
-    // Given a source account with 3 SOL and an unfunded on-curve destination.
-    const client = await createTestClient();
-    const [source, destination] = await Promise.all([
-        generateKeyPairSigner(),
-        generateKeyPairSigner().then(signer => signer.address),
-    ]);
-    await client.airdrop(source.address, lamports(3_000_000_000n));
-
-    // When the source transfers 1 SOL through the guarded plugin method.
-    await client.system.instructions
-        .transferSolGuarded({ source, destination, amount: 1_000_000_000 }, { allowUnfundedRecipient: true })
-        .sendTransaction();
-
-    // Then the source has exactly 2 SOL.
-    const { value: sourceBalance } = await client.rpc.getBalance(source.address, { commitment: 'confirmed' }).send();
-    expect(sourceBalance).toBe(lamports(2_000_000_000n));
-    // And the destination has exactly 1 SOL.
-    const { value: destinationBalance } = await client.rpc.getBalance(destination, { commitment: 'confirmed' }).send();
-    expect(destinationBalance).toBe(lamports(1_000_000_000n));
-});
-
-it('rejects an unsafe destination via the client plugin method', async () => {
-    // Given a funded source and a destination owned by the Token program.
-    const client = await createTestClient();
-    const source = await generateKeyPairSigner();
-    await client.airdrop(source.address, lamports(1_000_000_000n));
-    const destination = await createForeignOwnedAddress(client);
-
-    // Then transferring SOL through the guarded plugin method throws.
-    await expect(
-        client.system.instructions.transferSolGuarded({ source, destination, amount: 1n }).sendTransaction(),
-    ).rejects.toThrow(`owned by program ${TOKEN_PROGRAM_ADDRESS}`);
 });
 
 it('does not forward guard options to getAccountInfo', async () => {

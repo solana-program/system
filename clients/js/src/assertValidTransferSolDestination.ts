@@ -5,13 +5,8 @@ import {
     type FetchAccountConfig,
     type HasAddress,
 } from '@solana/kit';
-import {
-    getAddressFromResolvedInstructionAccount,
-    type InstructionAccountInput,
-    type InstructionSignerInput,
-} from '@solana/kit/program-client-core';
 
-import { getTransferSolInstruction, SYSTEM_PROGRAM_ADDRESS, type TransferSolInput } from './generated';
+import { SYSTEM_PROGRAM_ADDRESS } from './generated';
 
 /** Distinguishes why a destination was rejected by {@link assertValidTransferSolDestination}. */
 export type InvalidTransferSolDestinationReason = 'unexpected-owner' | 'unfunded-recipient' | 'off-curve';
@@ -96,21 +91,4 @@ export async function assertValidTransferSolDestination(
             { cause: { destination, reason: 'off-curve' } },
         );
     }
-}
-
-/**
- * Builds a `transferSol` instruction after checking the destination with
- * {@link assertValidTransferSolDestination}. Accepts the same input as `getTransferSolInstruction`.
- */
-export async function getTransferSolGuardedInstruction<
-    TAccountSource extends InstructionSignerInput,
-    TAccountDestination extends InstructionAccountInput,
->(
-    rpc: Parameters<typeof fetchEncodedAccount>[0],
-    input: TransferSolInput<TAccountSource, TAccountDestination>,
-    config?: TransferSolGuardConfig,
-): Promise<ReturnType<typeof getTransferSolInstruction<TAccountSource, TAccountDestination>>> {
-    const destination = getAddressFromResolvedInstructionAccount('destination', input.destination);
-    await assertValidTransferSolDestination(rpc, destination, config);
-    return getTransferSolInstruction<TAccountSource, TAccountDestination, typeof SYSTEM_PROGRAM_ADDRESS>(input);
 }
