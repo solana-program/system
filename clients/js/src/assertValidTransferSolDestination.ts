@@ -3,8 +3,13 @@ import {
     isOffCurveAddress,
     type Address,
     type FetchAccountConfig,
-    type HasAddress,
+    type GetAccountInfoApi,
+    type Rpc,
 } from '@solana/kit';
+import {
+    getAddressFromResolvedInstructionAccount,
+    type InstructionAccountInput,
+} from '@solana/kit/program-client-core';
 
 import { SYSTEM_PROGRAM_ADDRESS } from './generated';
 
@@ -12,28 +17,36 @@ import { SYSTEM_PROGRAM_ADDRESS } from './generated';
 export type InvalidTransferSolDestinationReason = 'unexpected-owner' | 'unfunded-recipient' | 'off-curve';
 
 /**
- * The `cause` of the `Error` thrown by {@link assertValidTransferSolDestination}. `owner` is set only
+ * Thrown by {@link assertValidTransferSolDestination} when a destination is rejected. `owner` is set only
  * when `reason` is `'unexpected-owner'`.
  */
-export type InvalidTransferSolDestinationCause = {
-    destination: Address;
-    reason: InvalidTransferSolDestinationReason;
-    owner?: Address;
-};
+export class InvalidTransferSolDestinationError extends Error {
+    override readonly name = 'InvalidTransferSolDestinationError';
+
+    constructor(
+        message: string,
+        readonly destination: Address,
+        readonly reason: InvalidTransferSolDestinationReason,
+        readonly owner?: Address,
+    ) {
+        super(message);
+    }
+}
 
 /**
  * Options for {@link assertValidTransferSolDestination}. Any {@link FetchAccountConfig} fields are passed
  * through to the account fetch.
  */
-export type TransferSolGuardConfig = FetchAccountConfig & {
+export type AssertValidTransferSolDestinationConfig = FetchAccountConfig & {
     /**
      * Allow a destination that has no account on-chain yet, funding it as part of the transfer.
      * Defaults to `false`, since an unfunded recipient is often a mistyped address.
      */
     allowUnfundedRecipient?: boolean;
     /**
-     * Allow an off-curve (program-derived) destination, existing or not. Defaults to `true`; set to
-     * `false` to reject off-curve destinations until the recipient confirms they control them.
+     * Allow an off-curve (program-derived) destination, existing or not. Defaults to `true`, since
+     * program-controlled wallets such as multisigs are common, legitimate recipients; set to `false` to
+     * reject off-curve destinations until the recipient confirms they control them.
      */
     allowOffCurve?: boolean;
     /**
@@ -45,7 +58,7 @@ export type TransferSolGuardConfig = FetchAccountConfig & {
 
 /**
  * Asserts that `destination` can safely receive a SOL transfer by fetching its account. Otherwise throws
- * an `Error` whose `cause` is an {@link InvalidTransferSolDestinationCause} with one of these reasons:
+ * an {@link InvalidTransferSolDestinationError} with one of these reasons:
  *
  * - `'unexpected-owner'`: the account exists but is not owned by `programOwner` (the System Program by
  *   default), e.g. an SPL token mint. SOL sent to such an account is typically unrecoverable.
@@ -58,11 +71,11 @@ export type TransferSolGuardConfig = FetchAccountConfig & {
  * token account, reports `'unexpected-owner'`.
  */
 export async function assertValidTransferSolDestination(
-    rpc: Parameters<typeof fetchEncodedAccount>[0],
-    destinationInput: Address | HasAddress,
-    config?: TransferSolGuardConfig,
+    rpc: Rpc<GetAccountInfoApi>,
+    destinationInput: InstructionAccountInput,
+    config?: AssertValidTransferSolDestinationConfig,
 ): Promise<void> {
-    const destination = typeof destinationInput === 'string' ? destinationInput : destinationInput.address;
+    const destination = getAddressFromResolvedInstructionAccount('destination', destinationInput);
     const {
         allowOffCurve = true,
         allowUnfundedRecipient = false,
@@ -73,22 +86,26 @@ export async function assertValidTransferSolDestination(
 
     if (account.exists) {
         if (account.programAddress !== programOwner) {
-            throw new Error(
+            throw new InvalidTransferSolDestinationError(
                 `Refusing to transfer SOL to ${destination}: it is owned by program ${account.programAddress}, not the expected program (${programOwner}).`,
-                { cause: { destination, reason: 'unexpected-owner', owner: account.programAddress } },
+                destination,
+                'unexpected-owner',
+                account.programAddress,
             );
         }
     } else if (!allowUnfundedRecipient) {
-        throw new Error(
+        throw new InvalidTransferSolDestinationError(
             `Refusing to transfer SOL to ${destination}: it has no account on-chain yet, which often means the address is mistyped. If you intend to fund a new account, pass { allowUnfundedRecipient: true }.`,
-            { cause: { destination, reason: 'unfunded-recipient' } },
+            destination,
+            'unfunded-recipient',
         );
     }
 
     if (isOffCurveAddress(destination) && !allowOffCurve) {
-        throw new Error(
-            `Refusing to transfer SOL to ${destination}: it is an off-curve (program-derived) address, which no keypair controls. It may be a smart wallet (e.g. Squads or Swig); once the recipient confirms they control it, pass { allowOffCurve: true }.`,
-            { cause: { destination, reason: 'off-curve' } },
+        throw new InvalidTransferSolDestinationError(
+            `Refusing to transfer SOL to ${destination}: it is an off-curve (program-derived) address, which no keypair controls. It may be a program-controlled account such as a multisig or smart wallet; once the recipient confirms they control it, pass { allowOffCurve: true }.`,
+            destination,
+            'off-curve',
         );
     }
 }
