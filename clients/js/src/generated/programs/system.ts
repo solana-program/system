@@ -22,6 +22,7 @@ import {
     type ExtendedClient,
     type GetAccountInfoApi,
     type GetMultipleAccountsApi,
+    type HasAddress,
     type Instruction,
     type InstructionWithData,
     type ReadonlyUint8Array,
@@ -298,39 +299,59 @@ export type SystemPluginAccounts = { nonce: ReturnType<typeof getNonceCodec> & S
 export type SystemPluginInstructions = {
     createAccount: (
         input: MakeOptional<CreateAccountInput, 'payer'>,
+        config?: { programAddress?: Address | HasAddress },
     ) => ReturnType<typeof getCreateAccountInstruction> & SelfPlanAndSendFunctions;
-    assign: (input: AssignInput) => ReturnType<typeof getAssignInstruction> & SelfPlanAndSendFunctions;
-    transferSol: (input: TransferSolInput) => ReturnType<typeof getTransferSolInstruction> & SelfPlanAndSendFunctions;
+    assign: (
+        input: AssignInput,
+        config?: { programAddress?: Address | HasAddress },
+    ) => ReturnType<typeof getAssignInstruction> & SelfPlanAndSendFunctions;
+    transferSol: (
+        input: TransferSolInput,
+        config?: { programAddress?: Address | HasAddress },
+    ) => ReturnType<typeof getTransferSolInstruction> & SelfPlanAndSendFunctions;
     createAccountWithSeed: (
         input: MakeOptional<CreateAccountWithSeedInput, 'payer'>,
+        config?: { programAddress?: Address | HasAddress },
     ) => ReturnType<typeof getCreateAccountWithSeedInstruction> & SelfPlanAndSendFunctions;
     advanceNonceAccount: (
         input: AdvanceNonceAccountInput,
+        config?: { programAddress?: Address | HasAddress },
     ) => ReturnType<typeof getAdvanceNonceAccountInstruction> & SelfPlanAndSendFunctions;
     withdrawNonceAccount: (
         input: WithdrawNonceAccountInput,
+        config?: { programAddress?: Address | HasAddress },
     ) => ReturnType<typeof getWithdrawNonceAccountInstruction> & SelfPlanAndSendFunctions;
     initializeNonceAccount: (
         input: InitializeNonceAccountInput,
+        config?: { programAddress?: Address | HasAddress },
     ) => ReturnType<typeof getInitializeNonceAccountInstruction> & SelfPlanAndSendFunctions;
     authorizeNonceAccount: (
         input: AuthorizeNonceAccountInput,
+        config?: { programAddress?: Address | HasAddress },
     ) => ReturnType<typeof getAuthorizeNonceAccountInstruction> & SelfPlanAndSendFunctions;
-    allocate: (input: AllocateInput) => ReturnType<typeof getAllocateInstruction> & SelfPlanAndSendFunctions;
+    allocate: (
+        input: AllocateInput,
+        config?: { programAddress?: Address | HasAddress },
+    ) => ReturnType<typeof getAllocateInstruction> & SelfPlanAndSendFunctions;
     allocateWithSeed: (
         input: AllocateWithSeedInput,
+        config?: { programAddress?: Address | HasAddress },
     ) => ReturnType<typeof getAllocateWithSeedInstruction> & SelfPlanAndSendFunctions;
     assignWithSeed: (
         input: AssignWithSeedInput,
+        config?: { programAddress?: Address | HasAddress },
     ) => ReturnType<typeof getAssignWithSeedInstruction> & SelfPlanAndSendFunctions;
     transferSolWithSeed: (
         input: TransferSolWithSeedInput,
+        config?: { programAddress?: Address | HasAddress },
     ) => ReturnType<typeof getTransferSolWithSeedInstruction> & SelfPlanAndSendFunctions;
     upgradeNonceAccount: (
         input: UpgradeNonceAccountInput,
+        config?: { programAddress?: Address | HasAddress },
     ) => ReturnType<typeof getUpgradeNonceAccountInstruction> & SelfPlanAndSendFunctions;
     createAccountAllowPrefund: (
         input: CreateAccountAllowPrefundInput,
+        config?: { programAddress?: Address | HasAddress },
     ) => ReturnType<typeof getCreateAccountAllowPrefundInstruction> & SelfPlanAndSendFunctions;
 };
 
@@ -339,42 +360,112 @@ export type SystemPluginRequirements = ClientWithRpc<GetAccountInfoApi & GetMult
     ClientWithTransactionPlanning &
     ClientWithTransactionSending;
 
-export function systemProgram() {
+export function systemProgram(config: { programAddress?: Address | HasAddress } = {}) {
     return <T extends SystemPluginRequirements>(client: T): ExtendedClient<T, { system: SystemPlugin }> => {
         return extendClient(client, {
             system: <SystemPlugin>{
                 accounts: { nonce: addSelfFetchFunctions(client, getNonceCodec()) },
                 instructions: {
-                    createAccount: input =>
+                    createAccount: (input, instructionConfig) =>
                         addSelfPlanAndSendFunctions(
                             client,
-                            getCreateAccountInstruction({ ...input, payer: input.payer ?? client.payer }),
+                            getCreateAccountInstruction(
+                                { ...input, payer: input.payer ?? client.payer },
+                                { programAddress: instructionConfig?.programAddress ?? config.programAddress },
+                            ),
                         ),
-                    assign: input => addSelfPlanAndSendFunctions(client, getAssignInstruction(input)),
-                    transferSol: input => addSelfPlanAndSendFunctions(client, getTransferSolInstruction(input)),
-                    createAccountWithSeed: input =>
+                    assign: (input, instructionConfig) =>
                         addSelfPlanAndSendFunctions(
                             client,
-                            getCreateAccountWithSeedInstruction({ ...input, payer: input.payer ?? client.payer }),
+                            getAssignInstruction(input, {
+                                programAddress: instructionConfig?.programAddress ?? config.programAddress,
+                            }),
                         ),
-                    advanceNonceAccount: input =>
-                        addSelfPlanAndSendFunctions(client, getAdvanceNonceAccountInstruction(input)),
-                    withdrawNonceAccount: input =>
-                        addSelfPlanAndSendFunctions(client, getWithdrawNonceAccountInstruction(input)),
-                    initializeNonceAccount: input =>
-                        addSelfPlanAndSendFunctions(client, getInitializeNonceAccountInstruction(input)),
-                    authorizeNonceAccount: input =>
-                        addSelfPlanAndSendFunctions(client, getAuthorizeNonceAccountInstruction(input)),
-                    allocate: input => addSelfPlanAndSendFunctions(client, getAllocateInstruction(input)),
-                    allocateWithSeed: input =>
-                        addSelfPlanAndSendFunctions(client, getAllocateWithSeedInstruction(input)),
-                    assignWithSeed: input => addSelfPlanAndSendFunctions(client, getAssignWithSeedInstruction(input)),
-                    transferSolWithSeed: input =>
-                        addSelfPlanAndSendFunctions(client, getTransferSolWithSeedInstruction(input)),
-                    upgradeNonceAccount: input =>
-                        addSelfPlanAndSendFunctions(client, getUpgradeNonceAccountInstruction(input)),
-                    createAccountAllowPrefund: input =>
-                        addSelfPlanAndSendFunctions(client, getCreateAccountAllowPrefundInstruction(input)),
+                    transferSol: (input, instructionConfig) =>
+                        addSelfPlanAndSendFunctions(
+                            client,
+                            getTransferSolInstruction(input, {
+                                programAddress: instructionConfig?.programAddress ?? config.programAddress,
+                            }),
+                        ),
+                    createAccountWithSeed: (input, instructionConfig) =>
+                        addSelfPlanAndSendFunctions(
+                            client,
+                            getCreateAccountWithSeedInstruction(
+                                { ...input, payer: input.payer ?? client.payer },
+                                { programAddress: instructionConfig?.programAddress ?? config.programAddress },
+                            ),
+                        ),
+                    advanceNonceAccount: (input, instructionConfig) =>
+                        addSelfPlanAndSendFunctions(
+                            client,
+                            getAdvanceNonceAccountInstruction(input, {
+                                programAddress: instructionConfig?.programAddress ?? config.programAddress,
+                            }),
+                        ),
+                    withdrawNonceAccount: (input, instructionConfig) =>
+                        addSelfPlanAndSendFunctions(
+                            client,
+                            getWithdrawNonceAccountInstruction(input, {
+                                programAddress: instructionConfig?.programAddress ?? config.programAddress,
+                            }),
+                        ),
+                    initializeNonceAccount: (input, instructionConfig) =>
+                        addSelfPlanAndSendFunctions(
+                            client,
+                            getInitializeNonceAccountInstruction(input, {
+                                programAddress: instructionConfig?.programAddress ?? config.programAddress,
+                            }),
+                        ),
+                    authorizeNonceAccount: (input, instructionConfig) =>
+                        addSelfPlanAndSendFunctions(
+                            client,
+                            getAuthorizeNonceAccountInstruction(input, {
+                                programAddress: instructionConfig?.programAddress ?? config.programAddress,
+                            }),
+                        ),
+                    allocate: (input, instructionConfig) =>
+                        addSelfPlanAndSendFunctions(
+                            client,
+                            getAllocateInstruction(input, {
+                                programAddress: instructionConfig?.programAddress ?? config.programAddress,
+                            }),
+                        ),
+                    allocateWithSeed: (input, instructionConfig) =>
+                        addSelfPlanAndSendFunctions(
+                            client,
+                            getAllocateWithSeedInstruction(input, {
+                                programAddress: instructionConfig?.programAddress ?? config.programAddress,
+                            }),
+                        ),
+                    assignWithSeed: (input, instructionConfig) =>
+                        addSelfPlanAndSendFunctions(
+                            client,
+                            getAssignWithSeedInstruction(input, {
+                                programAddress: instructionConfig?.programAddress ?? config.programAddress,
+                            }),
+                        ),
+                    transferSolWithSeed: (input, instructionConfig) =>
+                        addSelfPlanAndSendFunctions(
+                            client,
+                            getTransferSolWithSeedInstruction(input, {
+                                programAddress: instructionConfig?.programAddress ?? config.programAddress,
+                            }),
+                        ),
+                    upgradeNonceAccount: (input, instructionConfig) =>
+                        addSelfPlanAndSendFunctions(
+                            client,
+                            getUpgradeNonceAccountInstruction(input, {
+                                programAddress: instructionConfig?.programAddress ?? config.programAddress,
+                            }),
+                        ),
+                    createAccountAllowPrefund: (input, instructionConfig) =>
+                        addSelfPlanAndSendFunctions(
+                            client,
+                            getCreateAccountAllowPrefundInstruction(input, {
+                                programAddress: instructionConfig?.programAddress ?? config.programAddress,
+                            }),
+                        ),
                 },
                 identifyInstruction: identifySystemInstruction,
                 parseInstruction: parseSystemInstruction,

@@ -29,6 +29,7 @@ import {
     type Codec,
     type Decoder,
     type Encoder,
+    type HasAddress,
     type Instruction,
     type InstructionWithAccounts,
     type InstructionWithData,
@@ -76,7 +77,11 @@ export type AssignWithSeedInstructionData = {
     programAddress: Address;
 };
 
-export type AssignWithSeedInstructionDataArgs = { base: Address; seed: string; programAddress: Address };
+export type AssignWithSeedInstructionDataArgs = {
+    base: Address | HasAddress;
+    seed: string;
+    programAddress: Address | HasAddress;
+};
 
 export function getAssignWithSeedInstructionDataEncoder(): Encoder<AssignWithSeedInstructionDataArgs> {
     return transformEncoder(
@@ -123,14 +128,15 @@ export function getAssignWithSeedInstruction<
     TProgramAddress extends Address = typeof SYSTEM_PROGRAM_ADDRESS,
 >(
     input: AssignWithSeedInput<TAccountAccount, TAccountBaseAccount>,
-    config?: { programAddress?: TProgramAddress },
+    config?: { programAddress?: TProgramAddress | { readonly address: TProgramAddress } },
 ): AssignWithSeedInstruction<
     TProgramAddress,
     ResolvedInstructionAccountMeta<TAccountAccount, InstructionAccountInputAddress<TAccountAccount>>,
     ResolvedInstructionAccountMeta<TAccountBaseAccount, InstructionAccountInputAddress<TAccountBaseAccount>>
 > {
     // Program address.
-    const programAddress = config?.programAddress ?? SYSTEM_PROGRAM_ADDRESS;
+    const programAddressInput = config?.programAddress ?? SYSTEM_PROGRAM_ADDRESS;
+    const programAddress = typeof programAddressInput === 'string' ? programAddressInput : programAddressInput.address;
 
     // Account meta helper.
     const getAccountMeta = getAccountMetaFactory(programAddress, 'omitted');
