@@ -61,8 +61,7 @@ it('rejects an existing destination owned by another program', async () => {
     await expect(promise).rejects.toMatchObject({
         message: expect.stringContaining(`owned by program ${TOKEN_PROGRAM_ADDRESS}`),
         destination,
-        reason: 'unexpected-owner',
-        owner: TOKEN_PROGRAM_ADDRESS,
+        details: { reason: 'unexpected-owner', owner: TOKEN_PROGRAM_ADDRESS },
     });
 });
 
@@ -85,7 +84,7 @@ it('rejects a System-Program-owned destination when programOwner expects another
     // Then it is rejected when the Token program is the expected owner.
     await expect(
         assertValidTransferSolDestination(client.rpc, destination, { programOwner: TOKEN_PROGRAM_ADDRESS }),
-    ).rejects.toMatchObject({ reason: 'unexpected-owner', owner: SYSTEM_PROGRAM_ADDRESS });
+    ).rejects.toMatchObject({ details: { reason: 'unexpected-owner', owner: SYSTEM_PROGRAM_ADDRESS } });
 });
 
 it('accepts a HasAddress destination', async () => {
@@ -109,7 +108,7 @@ it('rejects a HasAddress destination owned by another program', async () => {
     // Then it is rejected, reporting the wrapped address.
     await expect(assertValidTransferSolDestination(client.rpc, destination)).rejects.toMatchObject({
         destination: destination.address,
-        reason: 'unexpected-owner',
+        details: { reason: 'unexpected-owner' },
     });
 });
 
@@ -126,7 +125,7 @@ it('accepts a ProgramDerivedAddress destination', async () => {
     await expect(assertValidTransferSolDestination(client.rpc, destination)).resolves.toBeUndefined();
     await expect(
         assertValidTransferSolDestination(client.rpc, destination, { allowOffCurve: false }),
-    ).rejects.toMatchObject({ destination: destination[0], reason: 'off-curve' });
+    ).rejects.toMatchObject({ destination: destination[0], details: { reason: 'off-curve' } });
 });
 
 it('rejects an unfunded recipient by default', async () => {
@@ -136,7 +135,7 @@ it('rejects an unfunded recipient by default', async () => {
 
     // Then it is rejected as unfunded.
     await expect(assertValidTransferSolDestination(client.rpc, destination)).rejects.toMatchObject({
-        reason: 'unfunded-recipient',
+        details: { reason: 'unfunded-recipient' },
     });
 });
 
@@ -173,7 +172,7 @@ it('rejects an unfunded off-curve recipient as off-curve when allowOffCurve is f
             allowOffCurve: false,
             allowUnfundedRecipient: true,
         }),
-    ).rejects.toMatchObject({ reason: 'off-curve' });
+    ).rejects.toMatchObject({ details: { reason: 'off-curve' } });
 });
 
 it('accepts an existing off-curve System-Program-owned account unless allowOffCurve is false', async () => {
@@ -186,7 +185,7 @@ it('accepts an existing off-curve System-Program-owned account unless allowOffCu
     await expect(assertValidTransferSolDestination(client.rpc, destination)).resolves.toBeUndefined();
     await expect(
         assertValidTransferSolDestination(client.rpc, destination, { allowOffCurve: false }),
-    ).rejects.toMatchObject({ reason: 'off-curve' });
+    ).rejects.toMatchObject({ details: { reason: 'off-curve' } });
 });
 
 it('does not forward guard options to getAccountInfo', async () => {
