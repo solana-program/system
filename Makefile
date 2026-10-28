@@ -20,8 +20,13 @@ solana-cli-version:
 cargo-nightly:
 	cargo $(nightly) $(ARGS)
 
+# zstd 0.13 is pinned by solana-account-decoder-client-types (via solana-rpc-client)
+# Fixing requires zstd 0.14 / zstd-safe 8.x, which no Solana release depends on yet.
 audit:
-	cargo audit $(ARGS)
+	cargo audit \
+			--ignore RUSTSEC-2026-0391 \
+			--ignore RUSTSEC-2026-0403 \
+			$(ARGS)
 
 spellcheck:
 	cargo spellcheck --code 1 $(ARGS)
